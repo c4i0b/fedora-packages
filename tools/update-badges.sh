@@ -76,6 +76,14 @@ for chroot, cell_list in sorted(chroots.items(), key=lambda kv: sort_key(kv[0]))
 packages = sorted({c["name"] for c in mon})
 badge("packages", "packages", str(len(packages)), "blue")
 
+# prune badge files of packages/chroots that are gone from COPR
+expected = {c.replace("-x86_64", "") for c in chroots} | set(packages) | {"packages"}
+d = f"{root}/badges"
+for f in os.listdir(d):
+    if f.endswith(".json") and f[:-len(".json")] not in expected:
+        os.remove(os.path.join(d, f))
+        print(f"pruned stale badge: {f}")
+
 # ---- per-package version badges (any succeeded chroot wins) ----------------
 # pkg_version is None for fresh/queued builds: fall back to "?"
 latest, attempted = {}, {}
