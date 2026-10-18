@@ -194,9 +194,9 @@ npm:
   (e.g. Electron apps) or root/hardware build steps (disk images, loop
   devices). State which in a one-line spec comment. If every other distro
   ships it as -bin, that is the signal.
-- Prefer plain package names, no `-bin` suffix. Reserve the suffix for a
-  package that exists (or will exist) in Fedora official under the same name,
-  paired with Provides/Conflicts.
+- `-bin` marks a package we do not build from source (upstream binaries
+  shipped as-is); never add it just because a same-named package exists in
+  Fedora official.
 - BuildRequire every package providing the macros you use (pyproject macros,
   rust-packaging, go-vendor-tools...): an undefined macro reaches the shell
   literally and dies as "fg: no job control". Include build backends too
