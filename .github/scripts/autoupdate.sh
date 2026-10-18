@@ -32,7 +32,7 @@ get() {
     t1="$(date +%s%N)"
     elapsed=$(( (t1 - t0) / 1000000 ))
     rlrem="$(tr -d '\r' < "$headers" | awk 'tolower($1)=="x-ratelimit-remaining:"{print $2}' | head -1)"
-    printf 'REQ\t%s\t%s\t%s\n' "$pkg" "$code" "$attempt" >> "$stats"
+    printf 'REQ\t%s\t%s\t%s\t%s\n' "$pkg" "$code" "$attempt" "${rlrem:--}" >> "$stats"
     if [ "$code" = 200 ]; then
       echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=200 wait=$SUCCESS_DELAY wait_src=success-delay elapsed=${elapsed}ms rlrem=${rlrem:--}"
       sleep "$SUCCESS_DELAY"
@@ -149,10 +149,10 @@ fi
 
 packages_total="$(find "$root/packages" -name upstream -maxdepth 2 | wc -l)"
 total_req="$(grep -c '^REQ' "$stats" || true)"
-read -r c200 c403 c429 <<< "$(awk -F'\t' '$1=="REQ"{c[$3]++} END{print c[200]+0, c[403]+0, c[429]+0}' "$stats")"
+read -r c200 c403 c429 minrl <<< "$(awk -F'\t' '$1=="REQ"{c[$3]++; if($5+0>0 && (m==0||$5+0<m)) m=$5+0} END{print c[200]+0, c[403]+0, c[429]+0, m+0}' "$stats")"
 cother=$(( total_req - c200 - c403 - c429 ))
 retries="$(grep -c '^RETRY' "$stats" || true)"
 # a failed request is not a failed package: the tags fallback 404s first
 final_fail=$(( packages_total - $(find "$resolved" -type f | wc -l) ))
 wall=$(( $(date +%s) - job_start ))
-echo "::notice::[rate-summary] packages=$packages_total requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 other=$cother retries=$retries final_failures=$final_fail wall=${wall}s"
+echo "::notice::[rate-summary] packages=$packages_total requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
