@@ -71,6 +71,10 @@ add-package name:
         --webhook-rebuild on
 
 # Refresh COPR badges and the README build-status block (same as the badges workflow)
+# Aggregate key=value fields from GitHub Actions logs of recent runs
+analyze-logs workflow="autoupdate" days="7" pattern="rate-summary":
+    tools/analyze-logs.sh {{workflow}} {{days}} {{pattern}}
+
 badges:
     {{runner}} tools/update-badges.sh {{project}}
 
