@@ -1,6 +1,6 @@
 # Same-named CLI exists in Fedora rawhide; -bin reserves the plain name
 Name:           openclaw-bin
-Version:        2026.10.4
+Version:        2026.10.5
 Release:        1%{?dist}
 Summary:        OpenClaw CLI, a personal AI assistant (npm bundle)
 
@@ -73,5 +73,8 @@ HOME=%{_builddir} OPENCLAW_FS_SAFE_NATIVE_MODE=off \
 %{_prefix}/lib/node_modules/openclaw/
 
 %changelog
+* Sun Oct 18 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2026.10.5-1
+- Update to 2026.10.5
+
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 2026.10.4-1
 - Initial package
