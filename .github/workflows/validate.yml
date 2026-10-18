@@ -8,9 +8,10 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    container: registry.fedoraproject.org/fedora:rawhide
+    # bump the tag at each Fedora release
+    container: registry.fedoraproject.org/fedora:43
     steps:
-      - run: dnf -y install git make nodejs rpmdevtools rpmlint just
+      - run: dnf -y install git make rpmdevtools rpmlint just
       - uses: actions/checkout@v4
       - run: just test
         env:

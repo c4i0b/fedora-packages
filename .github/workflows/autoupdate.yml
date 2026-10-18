@@ -8,12 +8,11 @@ on:
 permissions:
   contents: write
 
+# no container: bump falls back to python when rpmdev-bumpspec is missing
 jobs:
   autoupdate:
     runs-on: ubuntu-latest
-    container: registry.fedoraproject.org/fedora:rawhide
     steps:
-      - run: dnf -y install git rpmdevtools
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0

@@ -16,9 +16,7 @@ permissions:
 jobs:
   badges:
     runs-on: ubuntu-latest
-    container: registry.fedoraproject.org/fedora:rawhide
     steps:
-      - run: dnf -y install git python3
       - uses: actions/checkout@v4
       - run: tools/update-badges.sh caiobruno/fedora-packages c4i0b/fedora-packages
       # [skip ci] keeps the push from re-triggering validate; badge commits
