@@ -6,8 +6,10 @@
 # provides them, making the rpm uninstallable
 %global __requires_exclude ^lib.+-[0-9a-f]{8}\\.so
 
-# Default python3 is 3.15 from F45 on, exceeding upstream's <3.15 pin
-%if 0%{?fedora} >= 45
+# Default python3 is 3.15 from F45 on, exceeding upstream's <3.15 pin;
+# EL10's 3.12 falls under upstream's python_version >= '3.14' dep markers,
+# which would silently install zero runtime deps into the venv
+%if 0%{?fedora} >= 45 || 0%{?rhel} >= 10
 %global py python3.14
 %else
 %global py python3
@@ -61,6 +63,10 @@ cp -a skills locales optional-mcps optional-skills plugin-catalog \
 %check
 # Run under a scratch HOME: hermes writes ~/.hermes on first run
 mkdir -p "%{_builddir}/home"
+# --version short-circuits before the full import chain: exercise it too,
+# or missing venv deps (e.g. python_version markers skipping installs) pass
+HOME="%{_builddir}/home" %{buildroot}%{_libdir}/%{name}/bin/python \
+    -c "import hermes_cli.main"
 HOME="%{_builddir}/home" %{buildroot}%{_libdir}/%{name}/bin/python \
     %{buildroot}%{_libdir}/%{name}/bin/hermes --version
 
@@ -78,3 +84,5 @@ HOME="%{_builddir}/home" %{buildroot}%{_libdir}/%{name}/bin/python \
 - Initial package
 - Filter hashed-soname requires from bundled manylinux wheels; the rpm
   was uninstallable (nothing provides libjpeg-31e2ca52.so.62.4.0(LIBJPEG_6.2) etc)
+- Build the venv with python3.14 on EL10: upstream deps carry
+  python_version >= '3.14' markers and 3.12 silently installed none
