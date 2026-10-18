@@ -43,11 +43,6 @@ def iter_cells():
         for chroot, c in pkg["chroots"].items():
             yield {"name": pkg["name"], "chroot": chroot, **c}
 
-def label(chroot):
-    chroot = chroot.replace("-x86_64", "")
-    return chroot.replace("fedora-", "fedora ").replace("epel-", "epel ") \
-                 .replace("fedora-rawhide", "rawhide")
-
 # ---- per-chroot semaphores -------------------------------------------------
 chroots = {}
 for cell in iter_cells():
@@ -56,6 +51,30 @@ for cell in iter_cells():
 def sort_key(c):
     m = re.match(r"fedora-(\d+)", c)
     return (0, int(m.group(1))) if m else ((1, 0) if "rawhide" in c else (2, 0))
+
+# chroot naming is arch-aware: with a single arch per base, names/labels stay
+# as today ("fedora 43"); once another arch joins, files and labels
+# disambiguate ("fedora-43-aarch64" / "fedora 43 x86_64")
+ARCH_RE = re.compile(r"-(x86_64|aarch64|ppc64le|s390x|riscv64)$")
+
+def split_chroot(c):
+    m = ARCH_RE.search(c)
+    return (c[:m.start()], m.group(1)) if m else (c, "")
+
+arches_by_base = {}
+for c in chroots:
+    base, arch = split_chroot(c)
+    arches_by_base.setdefault(base, set()).add(arch)
+
+def bname(c):
+    base, arch = split_chroot(c)
+    return f"{base}-{arch}" if len(arches_by_base[base]) > 1 else base
+
+def label(c):
+    base, arch = split_chroot(c)
+    txt = (base.replace("fedora-", "fedora ").replace("epel-", "epel ")
+               .replace("fedora-rawhide", "rawhide"))
+    return f"{txt} {arch}" if len(arches_by_base[base]) > 1 else txt
 
 os.makedirs(f"{root}/badges", exist_ok=True)
 
@@ -71,13 +90,13 @@ for chroot, cell_list in sorted(chroots.items(), key=lambda kv: sort_key(kv[0]))
     inflight = len(cell_list) - ok - bad
     msg = f"{ok} \u2713" if not bad else f"{ok} \u2713 \u00b7 {bad} \u2717"
     color = "red" if bad else ("yellow" if inflight else "brightgreen")
-    badge(chroot.replace("-x86_64", ""), label(chroot), msg, color)
+    badge(bname(chroot), label(chroot), msg, color)
 
 packages = sorted({c["name"] for c in mon})
 badge("packages", "packages", str(len(packages)), "blue")
 
 # prune badge files of packages/chroots that are gone from COPR
-expected = {c.replace("-x86_64", "") for c in chroots} | set(packages) | {"packages"}
+expected = {bname(c) for c in chroots} | set(packages) | {"packages"}
 d = f"{root}/badges"
 for f in os.listdir(d):
     if f.endswith(".json") and f[:-len(".json")] not in expected:
@@ -169,7 +188,7 @@ def bust(path):
 
 chroot_lines = []
 for chroot in sorted(chroots, key=sort_key):
-    b = chroot.replace("-x86_64", "")
+    b = bname(chroot)
     chroot_lines.append(
         f"[![{label(chroot)}]({url}"
         f"%2F{b}.json%3Fv%3D{bust(f'{root}/badges/{b}.json')}%2Er{BADGE_REV})"

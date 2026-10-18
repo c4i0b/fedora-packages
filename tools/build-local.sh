@@ -8,14 +8,15 @@ project="${COPR_OWNER:-caiobruno}/fedora-packages"
 
 command -v mock >/dev/null 2>&1 || sudo dnf -y install mock
 
+arch="${MOCK_ARCH:-x86_64}"
 project_chroots="$(copr-cli get "$project" 2>/dev/null \
-  | grep -oE 'fedora-(rawhide|[0-9]+)-x86_64' | sort -u)"
+  | grep -oE "fedora-(rawhide|[0-9]+)-$arch" | sort -u)"
 
 case "$selection" in
   default)
     # Both ends of the project chroots: rawhide + oldest stable
     oldest="$(echo "$project_chroots" | grep -E 'fedora-[0-9]+' | sort -V | head -1)"
-    chroots=(fedora-rawhide-x86_64)
+    chroots=(fedora-rawhide-"$arch")
     [ -n "$oldest" ] && chroots+=("$oldest")
     ;;
   all)
