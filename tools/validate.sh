@@ -4,11 +4,21 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 
-tools/lint.sh
+# one dnf pass up front: parallel vendor phases must not race the dnf lock
+# (vendor-sources.sh reinstalls only when the tool is absent)
+dnf -y install --nodocs --setopt=install_weak_deps=0 \
+  git make rpmdevtools go-vendor-tools python3-specfile golang git-core \
+  cargo rust-packaging >/dev/null 2>&1 \
+  || sudo dnf -y install --nodocs --setopt=install_weak_deps=0 \
+    git make rpmdevtools go-vendor-tools python3-specfile golang git-core \
+    cargo rust-packaging
 
-for dir in packages/*/; do
-    make -f .copr/Makefile srpm "pkg=$dir" outdir=/tmp/srpm
-done
+tools/lint.sh & lintpid=$!
+
+jobs=$(nproc); [ "$jobs" -gt 8 ] && jobs=8
+printf '%s\n' packages/*/ \
+  | xargs -P "$jobs" -I{} make -f .copr/Makefile srpm "pkg={}" outdir=/tmp/srpm
+wait "$lintpid"
 
 # Remove downloaded/generated build artifacts (legit files are tracked)
 find packages -maxdepth 2 -type f \( \

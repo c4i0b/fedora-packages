@@ -14,14 +14,16 @@ dnfinstall() { dnf -y install --nodocs --setopt=install_weak_deps=0 "$@" >/dev/n
 
 vendor_archive=""
 if grep -qE '^%goprep|go-vendor-tools' "$spec"; then
-  dnfinstall go-vendor-tools python3-specfile golang git-core rpmdevtools
+  command -v go_vendor_archive >/dev/null 2>&1 \
+    || dnfinstall go-vendor-tools python3-specfile golang git-core rpmdevtools
   spectool -g "$(basename "$spec")"
   config=()
   [ -f go-vendor-tools.toml ] && config=(--config go-vendor-tools.toml)
   GOTOOLCHAIN=local+auto go_vendor_archive create "${config[@]}" "$(basename "$spec")"
   vendor_archive="$(ls ./*-vendor.tar.* 2>/dev/null | head -1 || true)"
 elif grep -q '^%cargo_prep' "$spec"; then
-  dnfinstall cargo rust-packaging rpmdevtools
+  command -v cargo >/dev/null 2>&1 \
+    || dnfinstall cargo rust-packaging rpmdevtools
   spectool -g "$(basename "$spec")"
   url="$(spectool --lf "$(basename "$spec")" | awk 'NR==1{print $2}')"
   src_file="$(basename "${url%%#*}")"
