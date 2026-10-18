@@ -1,6 +1,10 @@
 # Bundled upstream-managed venv is the product: upstream ships no wheels
 # (setup.py blocks non-Nix builds) and manages deps via its own uv/PM runtime
 %global debug_package %{nil}
+# manylinux wheels bundle auditwheel-hashed libs (libjpeg-<8hex>.so); RPM
+# requires their versioned symbols but nothing (not even this package)
+# provides them, making the rpm uninstallable
+%global __requires_exclude ^lib.+-[0-9a-f]{8}\\.so
 
 # Default python3 is 3.15 from F45 on, exceeding upstream's <3.15 pin
 %if 0%{?fedora} >= 45
@@ -11,7 +15,7 @@
 
 Name:           hermes-agent
 Version:        0.22.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The self-improving AI agent by Nous Research
 
 License:        MIT
@@ -70,5 +74,9 @@ HOME="%{_builddir}/home" %{buildroot}%{_libdir}/%{name}/bin/python \
 %{_datadir}/%{name}/
 
 %changelog
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 0.22.2-2
+- Filter hashed-soname requires from bundled manylinux wheels; the rpm
+  was uninstallable (nothing provides libjpeg-31e2ca52.so.62.4.0(LIBJPEG_6.2) etc)
+
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 0.22.2-1
 - Initial package
