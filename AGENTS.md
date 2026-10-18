@@ -103,7 +103,9 @@ General:
   %{buildroot} (test.sh rejects it); local mock runs as root and hides this.
 - Upstream makefiles that build static archives with a plain `ar` lose
   symbols under partial LTO (undefined refs to symbols that ARE in the
-  archive) — strip `-f*lto*` from CFLAGS in those specs.
+  archive) — strip `-f*lto*` from CFLAGS in those specs. The same manual
+  `ar` is often parallel-unsafe too: two sub-makes rebuild the same objects
+  and the final archive lands truncated (mdk4 osdep) — build with `-j1`.
 - The Fedora meson macro forces `--auto-features=enabled` and cannot be
   overridden (argument concatenation): for minimal builds, call
   `meson setup %{_vpath_builddir} --auto-features=disabled ...` directly

@@ -21,12 +21,10 @@ weaknesses in the protocol itself.
 %autosetup -n mdk4-%{version}
 
 %build
-# env CFLAGS keeps the Makefile/common.mak appends (libnl detection,
-# -fcommon); legacy-C hard errors downgraded; DLT/MAGIC macros gone from
-# libpcap headers. -flto* stripped: osdep's manual `ar cru` archive loses
-# symbols (wi_open_osdep, getChannelFromFrequency) in gcc's partial-LTO link
+# env CFLAGS keeps common.mak appends (libnl, -fcommon) working; -flto* and
+# -j1 guard osdep's parallel-unsafe `ar cru` archive
 export CFLAGS="$(echo "%{optflags} -Wno-error=int-conversion -Wno-error=implicit-function-declaration -Wno-error=return-mismatch -DTCPDUMP_MAGIC=0xa1b2c3d4 -DLINKTYPE_ETHERNET=1 -DLINKTYPE_IEEE802_11=105 -DLINKTYPE_PRISM_HEADER=119 -DLINKTYPE_RADIOTAP_HDR=127 -DLINKTYPE_PPI_HDR=192" | sed 's/ *-f[^ ]*lto[^ ]*//g')"
-%make_build -C src
+make -C src -j1
 
 %install
 install -Dpm755 src/mdk4 %{buildroot}%{_sbindir}/mdk4
