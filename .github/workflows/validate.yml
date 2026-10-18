@@ -13,6 +13,14 @@ jobs:
     steps:
       - run: dnf -y install git make rpmdevtools rpmlint just
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            /root/go/pkg/mod
+            /root/.cargo/registry
+            /root/.cargo/git
+          key: vendor-caches-${{ hashFiles('packages/*/go.*', 'packages/*/Cargo.*', 'tools/vendor-sources.sh') }}
+          restore-keys: vendor-caches-
       - run: just test
         env:
           FEDORA_PACKAGES_DIRECT: "1"
