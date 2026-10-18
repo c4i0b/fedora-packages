@@ -105,7 +105,7 @@ for f in os.listdir(d):
 
 # ---- per-package version badges (any succeeded chroot wins) ----------------
 # pkg_version is None for fresh/queued builds: fall back to "?"
-latest, attempted, known, has_fail = {}, {}, {}, set()
+latest, attempted, known, has_fail, inflight = {}, {}, {}, set(), set()
 for c in iter_cells():
     pkg, ver = c["name"], (c["pkg_version"] or "").rsplit("-", 1)[0]
     if c["state"] == "succeeded" and pkg not in latest:
@@ -113,18 +113,22 @@ for c in iter_cells():
     if c["state"] == "failed":
         has_fail.add(pkg)
         attempted.setdefault(pkg, ver)
+    if c["state"] in ("waiting", "pending", "starting", "importing", "running"):
+        inflight.add(pkg)
     if ver and pkg not in known:
         known[pkg] = ver
 badge_lines = []
 url = (f"https://img.shields.io/endpoint?url="
        + raw.replace(":", "%3A").replace("/", "%2F"))
 for pkg in packages:
-    # blue = published somewhere; red = never published and failed somewhere;
-    # grey (lightgrey) = in flight/never attempted, not a failure
+    # blue = published; red = failed, never published; yellow = build live in
+    # COPR; grey = idle (canceled/never attempted, no failure)
     if pkg in latest:
         badge(pkg, pkg, f"v{latest[pkg]}", "blue")
     elif pkg in has_fail:
         badge(pkg, pkg, f"v{attempted.get(pkg, '?')} \u2717", "red")
+    elif pkg in inflight:
+        badge(pkg, pkg, f"v{known.get(pkg, '?')}", "yellow")
     else:
         badge(pkg, pkg, f"v{known.get(pkg, '?')}", "lightgrey")
     ver = latest.get(pkg) or attempted.get(pkg) or known.get(pkg) or "?"
