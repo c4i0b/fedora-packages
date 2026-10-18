@@ -83,6 +83,7 @@ resolve() {
     body="$(get "$pkg" "https://api.github.com/repos/${source}/tags?per_page=1" "${auth[@]}")" || true
     latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
     latest="${latest#v}"
+    [ -n "$latest" ] && echo "::notice::[tags-fallback] pkg=$pkg source=$source resolved=$latest (no GitHub Releases; releases/latest is re-checked every run)"
   fi
 
   if [ -z "$latest" ]; then
@@ -149,10 +150,12 @@ fi
 
 packages_total="$(find "$root/packages" -name upstream -maxdepth 2 | wc -l)"
 total_req="$(grep -c '^REQ' "$stats" || true)"
-read -r c200 c403 c429 minrl <<< "$(awk -F'\t' '$1=="REQ"{c[$3]++; if($5+0>0 && (m==0||$5+0<m)) m=$5+0} END{print c[200]+0, c[403]+0, c[429]+0, m+0}' "$stats")"
-cother=$(( total_req - c200 - c403 - c429 ))
+read -r c200 c403 c429 c404 minrl <<< "$(awk -F'\t' '$1=="REQ"{c[$3]++; if($5+0>0 && (m==0||$5+0<m)) m=$5+0} END{print c[200]+0, c[403]+0, c[429]+0, c[404]+0, m+0}' "$stats")"
+cother=$(( total_req - c200 - c403 - c429 - c404 ))
 retries="$(grep -c '^RETRY' "$stats" || true)"
 # a failed request is not a failed package: the tags fallback 404s first
 final_fail=$(( packages_total - $(find "$resolved" -type f | wc -l) ))
 wall=$(( $(date +%s) - job_start ))
-echo "::notice::[rate-summary] packages=$packages_total requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
+# a 404 on releases/latest is expected for tags-only repos (the fallback
+# resolves them), so it gets its own bucket instead of polluting "other"
+echo "::notice::[rate-summary] packages=$packages_total requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
