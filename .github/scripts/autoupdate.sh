@@ -33,7 +33,7 @@ get() {
     elapsed=$(( (t1 - t0) / 1000000 ))
     printf 'REQ\t%s\t%s\t%s\n' "$pkg" "$code" "$attempt" >> "$stats"
     if [ "$code" = 200 ]; then
-      echo "::notice::[rate] pkg=$pkg attempt=$attempt status=200 wait=$SUCCESS_DELAY wait_src=success-delay elapsed=${elapsed}ms"
+      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=200 wait=$SUCCESS_DELAY wait_src=success-delay elapsed=${elapsed}ms"
       sleep "$SUCCESS_DELAY"
       cat "$body"
       return 0
@@ -47,10 +47,10 @@ get() {
         wait=$(( RETRY_BASE * (1 << (attempt - 1)) + RANDOM % 2 ))
       fi
       echo "RETRY" >> "$stats"
-      echo "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=$wait wait_src=$src elapsed=${elapsed}ms"
+      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=$wait wait_src=$src elapsed=${elapsed}ms"
       sleep "$wait"
     else
-      echo "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=0 wait_src=none elapsed=${elapsed}ms"
+      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=0 wait_src=none elapsed=${elapsed}ms"
       echo "FAIL\t$pkg\t$code" >> "$stats"
       return 1
     fi
