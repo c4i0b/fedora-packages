@@ -88,7 +88,7 @@ for chroot, cell_list in sorted(chroots.items(), key=lambda kv: sort_key(kv[0]))
     ok = sum(c["state"] == "succeeded" for c in cell_list)
     bad = sum(c["state"] == "failed" for c in cell_list)
     inflight = len(cell_list) - ok - bad
-    msg = f"{ok} \u2713" if not bad else f"{ok} \u2713 \u00b7 {bad} \u2717"
+    msg = str(ok) if not bad else f"{bad} \u2717"
     color = "red" if bad else ("yellow" if inflight else "brightgreen")
     badge(bname(chroot), label(chroot), msg, color)
 
