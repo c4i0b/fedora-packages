@@ -53,7 +53,7 @@
 [![mangojuice](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmangojuice.json%3Fv%3D1.0.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/mangojuice/)
 [![mdk4](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmdk4.json%3Fv%3D4.2%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/mdk4/)
 [![meslo-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmeslo-nerd-fonts.json%3Fv%3D3.5.1%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/meslo-nerd-fonts/)
-[![openclaw-bin](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopenclaw-bin.json%3Fv%3D?%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/openclaw-bin/)
+[![openclaw-bin](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopenclaw-bin.json%3Fv%3D2026.10.5%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/openclaw-bin/)
 [![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.0.32%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/opencode/)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D1.19.3%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/opencode-desktop/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3D0.13.4%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/oxker/)
@@ -81,7 +81,7 @@
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-10-18 22:03 UTC automatically by GitHub Actions.**
+**Updated 2026-10-18 22:04 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 
 ---
