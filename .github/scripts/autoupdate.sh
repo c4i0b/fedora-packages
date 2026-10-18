@@ -31,9 +31,10 @@ get() {
     code="$(curl -s -o "$body" -D "$headers" -w '%{http_code}' "$@" "$url")" || true
     t1="$(date +%s%N)"
     elapsed=$(( (t1 - t0) / 1000000 ))
+    rlrem="$(tr -d '\r' < "$headers" | awk 'tolower($1)=="x-ratelimit-remaining:"{print $2}' | head -1)"
     printf 'REQ\t%s\t%s\t%s\n' "$pkg" "$code" "$attempt" >> "$stats"
     if [ "$code" = 200 ]; then
-      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=200 wait=$SUCCESS_DELAY wait_src=success-delay elapsed=${elapsed}ms"
+      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=200 wait=$SUCCESS_DELAY wait_src=success-delay elapsed=${elapsed}ms rlrem=${rlrem:--}"
       sleep "$SUCCESS_DELAY"
       cat "$body"
       return 0
@@ -47,15 +48,13 @@ get() {
         wait=$(( RETRY_BASE * (1 << (attempt - 1)) + RANDOM % 2 ))
       fi
       echo "RETRY" >> "$stats"
-      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=$wait wait_src=$src elapsed=${elapsed}ms"
+      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=$wait wait_src=$src elapsed=${elapsed}ms rlrem=${rlrem:--}"
       sleep "$wait"
     else
-      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=0 wait_src=none elapsed=${elapsed}ms"
-      echo "FAIL\t$pkg\t$code" >> "$stats"
+      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=0 wait_src=none elapsed=${elapsed}ms rlrem=${rlrem:--}"
       return 1
     fi
   done
-  echo "FAIL\t$pkg\t$code" >> "$stats"
   return 1
 }
 
@@ -153,6 +152,7 @@ total_req="$(grep -c '^REQ' "$stats" || true)"
 read -r c200 c403 c429 <<< "$(awk -F'\t' '$1=="REQ"{c[$3]++} END{print c[200]+0, c[403]+0, c[429]+0}' "$stats")"
 cother=$(( total_req - c200 - c403 - c429 ))
 retries="$(grep -c '^RETRY' "$stats" || true)"
-final_fail="$(grep -c '^FAIL' "$stats" || true)"
+# a failed request is not a failed package: the tags fallback 404s first
+final_fail=$(( packages_total - $(find "$resolved" -type f | wc -l) ))
 wall=$(( $(date +%s) - job_start ))
 echo "::notice::[rate-summary] packages=$packages_total requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 other=$cother retries=$retries final_failures=$final_fail wall=${wall}s"
