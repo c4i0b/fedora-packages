@@ -2,8 +2,26 @@ name: validate
 
 on:
   pull_request:
+    paths:
+      - packages/**
+      - tools/**
+      - templates/**
+      - .copr/**
+      - justfile
+      - .github/workflows/validate.yml
   push:
     branches: [main]
+    paths:
+      - packages/**
+      - tools/**
+      - templates/**
+      - .copr/**
+      - justfile
+      - .github/workflows/validate.yml
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
