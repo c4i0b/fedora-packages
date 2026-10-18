@@ -5,11 +5,11 @@
 [![badges](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml)
 
 <!-- chroot-badges begin -->
-[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D9bf1cc3a%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D4fdcf5d2%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3De7111ba2%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3Dc883ead4%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3D8cae5bb0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3Dd2f9fdf0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D9ab7a722%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3D5b67ff79%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3D42bf239c%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3D7e9c63e1%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 [![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3Df1c40d6e%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
 <!-- chroot-badges end -->
 
@@ -81,7 +81,13 @@
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-10-18 19:59 UTC automatically by GitHub Actions.**
+### :x: build failures
+
+| package | published | attempted | failed in | build |
+|---|---|---|---|---|
+| mdk4 | — never published | 4.2-1 | epel 10 | [#11169186](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11169186/) |
+
+*Updated 2026-10-18 20:07 UTC automatically by GitHub Actions.*
 <!-- build-status end -->
 
 ---
