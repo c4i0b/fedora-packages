@@ -77,9 +77,10 @@ packages = sorted({c["name"] for c in mon})
 badge("packages", "packages", str(len(packages)), "blue")
 
 # ---- per-package version badges (any succeeded chroot wins) ----------------
+# pkg_version is None for fresh/queued builds: fall back to "?"
 latest, attempted = {}, {}
 for c in iter_cells():
-    pkg, ver = c["name"], c["pkg_version"].rsplit("-", 1)[0]
+    pkg, ver = c["name"], (c["pkg_version"] or "").rsplit("-", 1)[0]
     if c["state"] == "succeeded" and pkg not in latest:
         latest[pkg] = ver
     if c["state"] == "failed" and pkg not in attempted:
@@ -96,7 +97,7 @@ for pkg in packages:
     badge_lines.append(
         f"[![{pkg}]({url}"
         f"%2F{pkg}.json%3Fv%3D{ver}%2Er{BADGE_REV})"
-        f"](packages/{pkg}/)")
+        f"]({copr}/package/{pkg}/)")
 
 # ---- failures table (published comes from chroot repodata) ----------------
 def published_versions(chroot):
