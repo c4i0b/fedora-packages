@@ -173,7 +173,7 @@ for pkg in sorted(failed):
             else ", ".join(f"{v or DASH} ({label(ch)})"
                            for v, ch in zip(pub_parts, ch_list))
     else:
-        pub = f"{DASH} never published"
+        pub = DASH
     failed_in = ", ".join(label(ch) for ch in ch_list)
     lines.append(f"| {pkg} | {pub} | {attempted} | {failed_in} "
                  f"| [#{build_id}]({copr}/build/{build_id}/) |")
@@ -198,16 +198,16 @@ def bust(path):
         return hashlib.sha1(f.read()).hexdigest()[:8]
 
 chroot_lines = []
+chroot_lines.append(
+    f"[![packages]({url}"
+    f"%2Fpackages.json%3Fv%3D{bust(f'{root}/badges/packages.json')}%2Er{BADGE_REV})"
+    f"]({copr}/packages/)")
 for chroot in sorted(chroots, key=sort_key):
     b = bname(chroot)
     chroot_lines.append(
         f"[![{label(chroot)}]({url}"
         f"%2F{b}.json%3Fv%3D{bust(f'{root}/badges/{b}.json')}%2Er{BADGE_REV})"
         f"]({copr}/monitor/)")
-chroot_lines.append(
-    f"[![packages]({url}"
-    f"%2Fpackages.json%3Fv%3D{bust(f'{root}/badges/packages.json')}%2Er{BADGE_REV})"
-    f"]({copr}/packages/)")
 
 cbegin, cend = "<!-- chroot-badges begin -->", "<!-- chroot-badges end -->"
 if cbegin not in readme or cend not in readme:
