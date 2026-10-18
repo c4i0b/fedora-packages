@@ -41,7 +41,7 @@ spec/SRPM name in the output matches the package you are diagnosing.
   for `exec:|fatal error:|error:` before concluding a silent kill/OOM.
 - A noarch package failing every chroot with `Arch dependent binaries in
   noarch package` means ELFs/wasm/platform dirs in the payload — strip them in
-  `%install` (see openclaw-bin).
+  `%install` (see openclaw).
 
 ## If the log is still inconclusive
 

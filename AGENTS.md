@@ -196,7 +196,7 @@ npm:
   ships it as -bin, that is the signal.
 - Prefer plain package names, no `-bin` suffix. Reserve the suffix for a
   package that exists (or will exist) in Fedora official under the same name,
-  paired with Provides/Conflicts (see openclaw-bin vs rawhide's openclaw).
+  paired with Provides/Conflicts.
 - BuildRequire every package providing the macros you use (pyproject macros,
   rust-packaging, go-vendor-tools...): an undefined macro reaches the shell
   literally and dies as "fg: no job control". Include build backends too
