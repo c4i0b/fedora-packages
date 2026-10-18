@@ -41,6 +41,10 @@ HOME=%{_builddir} OPENCLAW_FS_SAFE_NATIVE_MODE=off \
 %install
 install -d -m755 %{buildroot}%{_prefix}/lib/node_modules/openclaw
 cp -a . %{buildroot}%{_prefix}/lib/node_modules/openclaw/
+# the shipped lifecycle marker makes the CLI run postinstall scripts inside
+# this (root-owned) tree on first run; completion above only happens when the
+# chroot runtime passes the >=24.16 admission, so drop it unconditionally
+rm -f %{buildroot}%{_prefix}/lib/node_modules/openclaw/.openclaw-lifecycle-pending
 
 # Upstream tree ships arch payloads: prebuilt binaries in skills/, wasm and
 # per-platform dirs in node_modules; drop them all to keep the payload noarch
@@ -75,6 +79,8 @@ HOME=%{_builddir} OPENCLAW_FS_SAFE_NATIVE_MODE=off \
 - Update to 2026.10.5; rename to openclaw (was openclaw-bin): same
   packaging as the Fedora rawhide package, so it upgrades it cleanly
   instead of conflicting
+- Drop the shipped .openclaw-lifecycle-pending marker: it made the CLI
+  try to run postinstall scripts inside the root-owned install tree
 
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 2026.10.4-1
 - Initial package
