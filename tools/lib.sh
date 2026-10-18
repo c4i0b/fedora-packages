@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+# Shared helpers for package scaffolding and validation.
+
+# Shared rpmlint invocation (kept in one place so packages and rendered
+# templates are held to the exact same standard)
+lint_spec() {
+  # lint_spec <spec-file>; prints rpmlint output, returns non-zero on errors
+  local spec="$1" out
+  # vendor archives are local files by design; the invalid-url noise is expected
+  out="$(rpmlint "$spec" 2>/dev/null)" || true
+  grep -v 'invalid-url Source[0-9]*: .*vendor\.tar' <<<"$out" || true
+  # rpmlint exit code is unreliable across configs; re-derive it from the
+  # error count so filtered noise cannot mask real findings
+  [ "$(grep -c 'E: ' <<<"$out")" -eq 0 ]
+}
+
+render_spec() {
+  # render_spec <template> <outfile> <name> [full]
+  local template="$1" out="$2" name="$3" full="${4:-0}"
+  local values=()
+  local key val
+  while read -r key val; do
+    if [ "$full" = 1 ]; then
+      values+=(-e "s|$key|$val|g")
+    fi
+  done <<EOF
+__VERSION__ 0.0.1
+__SUMMARY__ Template check
+__LICENSE__ MIT
+__URL__ https://example.com
+__SOURCE0__ https://example.com/$name-%{version}.tar.gz
+__TAG__ 1970-01-01
+__LICENSEFILE__ LICENSE
+__THEMEPREFIX__ Payload
+__APPID__ org.example.$name
+__GOIPATH__ github.com/example/$name
+__SOURCE1__ https://example.com/$name-%{version}-extra.tar.gz
+__PAYLOAD_DIR__ payload
+__PAYLOADDIR__ payload-dir
+__BIN__ $name
+__EXTRAREQ__
+__EXTRAINSTALL__
+__EXTRAFILES__
+__DATE__ $(date '+%a %b %d %Y')
+__PACKAGER__ Template Check <check@localhost>
+EOF
+  # ___NAME__ must be replaced before __NAME__ (it contains it)
+  sed -e "s|___NAME__|_$name|g" \
+    -e "s|__NAME__|$name|g" \
+    "${values[@]}" "$template" > "$out"
+}
+
+check_package() {
+  # check_package <pkg-dir>; prints FAIL lines, returns non-zero on failure
+  local dir="$1" fail=0
+  local name
+  name="$(basename "$dir")"
+  local specs=("$dir"/*.spec)
+  local spec="${specs[0]}"
+
+  if [ ${#specs[@]} -ne 1 ] || [ ! -f "$spec" ]; then
+    echo "FAIL: $name: exactly one .spec file is required"
+    return 1
+  fi
+
+  local spec_name version release changelog
+  spec_name="$(awk '/^Name:/{print $2; exit}' "$spec")"
+  [ "$spec_name" = "$name" ] || { echo "FAIL: $name: spec Name '$spec_name' != directory name"; fail=1; }
+
+  version="$(awk '/^Version:/{print $2; exit}' "$spec")"
+  release="$(awk '/^Release:/{print $2; exit}' "$spec" | sed 's/%{.*//')"
+  changelog="$(awk '/^%changelog/{getline; print $NF; exit}' "$spec")"
+  [ "$changelog" = "${version}-${release}" ] \
+    || { echo "FAIL: $name: changelog entry '$changelog' != Version-Release '${version}-${release}'"; fail=1; }
+
+  # rpm rejects a changelog date whose weekday doesn't match ("bogus date")
+  local centry wk cdate real
+  centry="$(awk '/^%changelog/{getline; print; exit}' "$spec")"
+  wk="$(awk '{print $2}' <<<"$centry")"
+  cdate="$(awk '{print $3, $4, $5}' <<<"$centry")"
+  real="$(LC_ALL=C date -d "$cdate" +%a 2>/dev/null || true)"
+  if [ -n "$real" ] && [ "$wk" != "$real" ]; then
+    echo "FAIL: $name: changelog weekday '$wk' != actual '$real' for '$cdate'"
+    fail=1
+  fi
+
+  # Undefined macros pass through to scriptlets as literal text (the %__npm /
+  # %pyproject_build_wheel failures): expand the spec fully, then flag
+  # own-line %tokens that are not sections of THIS spec (sections are the
+  # column-0 %lines in the source, so custom sections never false-positive)
+  local expanded sections undefined
+  expanded="$(rpmspec -P "$spec" 2>/dev/null || true)"
+  sections="$(grep -oE '^%[a-zA-Z_][a-zA-Z0-9_]*' "$spec" | tr -d '%' || true)"
+  undefined="$(echo "$expanded" | grep -oE '^[[:space:]]+%[a-zA-Z_][a-zA-Z0-9_]*[[:space:]]*$' \
+    | tr -d ' %' | sort -u | { grep -vxF -f <(echo "$sections") || true; })"
+  if [ -n "$undefined" ]; then
+    echo "FAIL: $name: undefined macro in scriptlet: $(echo "$undefined" | head -1)"
+    fail=1
+  fi
+
+  # rpm < 4.20 (EPEL) expands macros inside comments: a commented-out
+  # %install/%files/... breaks the whole spec parse ("Name field must be
+  # present") and parameterized macros (%meson et al) inject their entire
+  # body as spec text — spell names out in prose instead. %{braced} forms
+  # expand harmlessly and are allowed.
+  if grep -qE '^\s*#.*[[:space:](>]%[a-zA-Z_][a-zA-Z0-9_]*([^a-zA-Z0-9_{]|$)' "$spec"; then
+    echo "FAIL: $name: comment mentions a bare macro token (breaks rpm < 4.20/EPEL parse)"
+    fail=1
+  fi
+
+  # install -D requires a FILE destination; a trailing slash fails at build time
+  if grep -qE 'install +-([a-zA-Z]*D[a-zA-Z]*|D) +.*[^ ]/ *$' "$spec"; then
+    echo "FAIL: $name: install -D with directory destination (needs explicit file path)"
+    fail=1
+  fi
+
+  # Upstream theme install.sh scripts end with gtk-update-icon-cache, which
+  # is absent from the minimal buildroot (caches are rpm file triggers).
+  if grep -qE '^\s*\./install\.sh' "$spec" && ! grep -q 'gtk-update-icon-cache/d' "$spec"; then
+    echo "FAIL: $name: runs ./install.sh but does not strip gtk-update-icon-cache"
+    fail=1
+  fi
+
+  # fish plugin installs: vendor dirs are vendor_conf.d/vendor_functions.d/
+  # vendor_completions.d — the bare name (a forgotten .d) silently installs
+  # to a dead path that %files globs then miss
+  if grep -qE 'vendor_(conf|functions|completions)($|[^d.])' "$spec"; then
+    echo "FAIL: $name: fish vendor dir without .d suffix"
+    fail=1
+  fi
+
+  if grep -qE '^Source[0-9]*:.*%(\{_?target_cpu\}|{_?arch\}|npm_arch)' "$spec"; then
+    echo "FAIL: $name: Source URLs must not depend on build arch (SRPM builder arch is arbitrary)"
+    fail=1
+  fi
+
+  # Scriptlets run in a minimal chroot: every interpreter they invoke must be
+  # BuildRequired; bash/sh are always present (they run the scriptlet itself).
+  local scriptlets tools tool
+  scriptlets="$(awk '/^%(build|check|install)$/{f=1;next} /^%[a-zA-Z]/{f=0} f' "$spec")"
+
+  # COPR runs rpmbuild unprivileged: writing to system paths outside
+  # %{buildroot} dies with permission denied (the ghostty harfbuzz header case)
+  if echo "$scriptlets" \
+    | grep -E '(>>>?|(^|[[:space:];&])(install|cp|mv) +|mkdir +-[dp] +)[^|]*[[:space:]]/(usr|etc|opt|var)([[:space:]/]|$)' \
+    | grep -qv buildroot; then
+    echo "FAIL: $name: scriptlet writes outside the buildroot"
+    fail=1
+  fi
+
+  tools="$(echo "$scriptlets" | grep -oE '(^|[;&|[:space:]])(python3|node|npm|cargo|go) ' | grep -oE '(python3|node|npm|cargo|go)' | sort -u || true)"
+  for tool in $tools; do
+    grep -qE "^BuildRequires:.*${tool}\b" "$spec" \
+      || { echo "FAIL: $name: '$tool' used in scriptlet but not BuildRequired"; fail=1; }
+  done
+
+  if [ -f "$dir/upstream" ]; then
+    local src
+    src="$(cat "$dir/upstream")"
+    [[ "$src" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ || "$src" == npm:* ]] \
+      || { echo "FAIL: $name: invalid upstream '$src' (expected 'owner/repo' or 'npm:<package>')"; fail=1; }
+  fi
+
+  return "$fail"
+}

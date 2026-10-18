@@ -1,0 +1,24 @@
+name: autoupdate
+
+on:
+  schedule:
+    - cron: "23 1-21/4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-latest
+    container: registry.fedoraproject.org/fedora:rawhide
+    steps:
+      - run: dnf -y install git rpmdevtools
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: .github/scripts/autoupdate.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # retry once on a lost race (concurrent run pushed first)
+      - run: git push --follow-tags origin main || (sleep 15; git pull --rebase origin main && git push --follow-tags origin main)

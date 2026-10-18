@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# bash completion for wifite — generated offline from `wifite --help -v`.
+# WIFITE=/path/to/Wifite.py overrides the target binary.
+
+_wifite_complete() {
+    local cur opts help
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+
+    if [[ "$cur" == -* ]]; then
+        help=$(PYTHONPATH="${WIFITE_PYTHONPATH:-}" WIFITE_SKIP_DEPENDENCY_CHECK=1 \
+               "${WIFITE:-wifite}" --help -v 2>/dev/null)
+        opts=$(printf '%s\n' "$help" | grep -oE '(^|[,[:space:]])-{1,2}[a-zA-Z0-9][a-zA-Z0-9-]*' \
+               | tr -d ' ,' | sort -u)
+        COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
+    fi
+    return 0
+}
+
+complete -F _wifite_complete wifite

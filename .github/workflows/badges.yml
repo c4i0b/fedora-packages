@@ -1,0 +1,33 @@
+name: badges
+
+on:
+  schedule:
+    - cron: "41 2,8,14,20 * * *"
+  workflow_dispatch:
+  # autoupdate pushes bumps; refresh soon after (builds may still be running,
+  # the schedule catches the finished state)
+  workflow_run:
+    workflows: [autoupdate]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  badges:
+    runs-on: ubuntu-latest
+    container: registry.fedoraproject.org/fedora:rawhide
+    steps:
+      - run: dnf -y install git python3
+      - uses: actions/checkout@v4
+      - run: tools/update-badges.sh caiobruno/fedora-packages c4i0b/fedora-packages
+      # [skip ci] keeps the push from re-triggering validate; badge commits
+      # never touch packages/, so the COPR webhook stays quiet too
+      - run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add badges README.md
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -qm "chore(badges): refresh [skip ci]"
+          git push origin main || (sleep 15; git pull --rebase -X theirs origin main && git push origin main)

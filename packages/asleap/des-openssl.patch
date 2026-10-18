@@ -1,0 +1,45 @@
+--- a/utils.c
++++ b/utils.c
+@@ -26,6 +26,7 @@
+ #include <stdio.h>
+ #include <stdarg.h>
+ #include <string.h>
++#include <openssl/des.h>
+ #include <stdint.h>
+ #include <crypt.h>
+ #include <unistd.h>
+@@ -169,18 +170,15 @@
+ 
+ void DesEncrypt(unsigned char *clear, unsigned char *key, unsigned char *cipher)
+ {
+-    unsigned char des_key[8];
+-    unsigned char crypt_key[66];
+-    unsigned char des_input[66];
++    DES_cblock des_key, des_input, des_cipher;
++    DES_key_schedule ks;
+ 
+     MakeKey(key, des_key);
++    memcpy(des_input, clear, 8);
+ 
+-    Expand(des_key, crypt_key);
+-    setkey((char *)crypt_key);
+-
+-    Expand(clear, des_input);
+-    encrypt((char *)des_input, 0);
+-    Collapse(des_input, cipher);
++    DES_set_key_unchecked(&des_key, &ks);
++    DES_ecb_encrypt(&des_input, &des_cipher, &ks, DES_ENCRYPT);
++    memcpy(cipher, des_cipher, 8);
+ }
+ 
+ int IsBlank(char *s)
+--- a/asleap.c
++++ b/asleap.c
+@@ -39,7 +39,6 @@
+ #include <sys/ioctl.h>
+ 
+ #include <net/ethernet.h>
+-#include <pcap-bpf.h>
+ #include <sys/types.h>
+ #include <pcap.h>
+ #include <netpacket/packet.h>

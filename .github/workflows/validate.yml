@@ -1,0 +1,20 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    container: registry.fedoraproject.org/fedora:rawhide
+    steps:
+      - run: dnf -y install git make nodejs rpmdevtools rpmlint just
+      - uses: actions/checkout@v4
+      - run: just test
+        env:
+          FEDORA_PACKAGES_DIRECT: "1"
+      - run: just validate
+        env:
+          FEDORA_PACKAGES_DIRECT: "1"

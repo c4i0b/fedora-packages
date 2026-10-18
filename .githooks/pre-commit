@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+# shellcheck source=tools/lib.sh
+source "$root/tools/lib.sh"
+
+fail=0
+pkgs=""
+
+while IFS= read -r file; do
+  case "$file" in
+    packages/*)
+      # Package dirs are flat: anything nested deeper is an extracted build tree
+      if [ "$(echo "$file" | awk -F/ 'NF>=4{print 1}')" ]; then
+        echo "FAIL: $file: package directories must stay flat (extracted tree?)"
+        fail=1
+      fi
+      pkg="${file#packages/}"
+      pkg="${pkg%%/*}"
+      case " $pkgs " in *" $pkg "*) ;; *) pkgs="$pkgs $pkg" ;; esac
+      case "$file" in
+        *.spec)
+          if git show ":$file" 2>/dev/null | grep -qE '__[A-Z]+__'; then
+            echo "FAIL: $file: unfilled __PLACEHOLDER__ values"
+            fail=1
+          fi
+          ;;
+      esac
+      ;;
+  esac
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+for pkg in $pkgs; do
+  dir="$root/packages/$pkg"
+  if [ -d "$dir" ] && ls "$dir"/*.spec >/dev/null 2>&1; then
+    check_package "$dir" || fail=1
+  fi
+done
+
+exit "$fail"
