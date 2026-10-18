@@ -2,6 +2,7 @@
 
 [![validate](https://github.com/c4i0b/fedora-packages/actions/workflows/validate.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/validate.yml)
 [![autoupdate](https://github.com/c4i0b/fedora-packages/actions/workflows/autoupdate.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/autoupdate.yml)
+[![badges](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml)
 
 <!-- chroot-badges begin -->
 [![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D34429cca%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
