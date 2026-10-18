@@ -73,6 +73,13 @@ check_package() {
   [ "$changelog" = "${version}-${release}" ] \
     || { echo "FAIL: $name: changelog entry '$changelog' != Version-Release '${version}-${release}'"; fail=1; }
 
+  # pip/venv into the buildroot bundles manylinux libs with hashed sonames
+  # whose versioned requires nothing provides: uninstallable rpm (AGENTS.md)
+  if grep -Eq '(-m venv|pip +install)' "$spec"; then
+    grep -q '__requires_exclude' "$spec" \
+      || { echo "FAIL: $name: pip/venv install without __requires_exclude for hashed manylinux sonames"; fail=1; }
+  fi
+
   # rpm rejects a changelog date whose weekday doesn't match ("bogus date")
   local centry wk cdate real
   centry="$(awk '/^%changelog/{getline; print; exit}' "$spec")"
