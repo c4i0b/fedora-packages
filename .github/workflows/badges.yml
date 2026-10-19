@@ -1,14 +1,11 @@
 name: badges
 
 on:
+  # ~1h15 after each autoupdate slot, when most COPR builds have finished;
+  # in-flight ones show yellow with the last published version
   schedule:
-    - cron: "41 2,8,14,20 * * *"
+    - cron: "41 2,6,10,14,18,22 * * *"
   workflow_dispatch:
-  # autoupdate pushes bumps; refresh soon after (builds may still be running,
-  # the schedule catches the finished state)
-  workflow_run:
-    workflows: [autoupdate]
-    types: [completed]
 
 permissions:
   contents: write

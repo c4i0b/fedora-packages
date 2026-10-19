@@ -106,6 +106,27 @@ for f in os.listdir(d):
 # ---- per-package version badges (any succeeded chroot wins) ----------------
 # pkg_version is None for fresh/queued builds: fall back to "?"
 latest, attempted, known, has_fail, inflight = {}, {}, {}, set(), set()
+
+def published_versions(chroot):
+    """name -> version of packages actually in the chroot binary repo"""
+    try:
+        repomd = get(f"{base}/{chroot}/repodata/repomd.xml").decode()
+        href = re.search(r'href="(repodata/[^"]*primary\.xml\.gz)"', repomd).group(1)
+        xml = gzip.decompress(get(f"{base}/{chroot}/{href}")).decode(errors="replace")
+        return dict(re.findall(
+            r'<name>([^<]+)</name>.*?<version[^>]*?ver="([^"]+)"', xml, re.S))
+    except Exception:
+        return {}
+
+pub_cache = {}
+# name -> version actually installable; once a rebuild is submitted the
+# monitor stops reporting the previous succeeded state, so the repodata is
+# the only source for "last complete build" while one is in flight
+published = {}
+for chroot in chroots:
+    pub_cache.setdefault(chroot, published_versions(chroot))
+    for pkg_name, ver in pub_cache[chroot].items():
+        published.setdefault(pkg_name, ver)
 for c in iter_cells():
     pkg, ver = c["name"], (c["pkg_version"] or "").rsplit("-", 1)[0]
     if c["state"] == "succeeded" and pkg not in latest:
@@ -121,34 +142,25 @@ badge_lines = []
 url = (f"https://img.shields.io/endpoint?url="
        + raw.replace(":", "%3A").replace("/", "%2F"))
 for pkg in packages:
-    # blue = published; red = failed, never published; yellow = build live in
-    # COPR; grey = idle (canceled/never attempted, no failure)
+    # blue = published; yellow = build live in COPR (message keeps the last
+    # fully published version, not the in-flight one); red = failed, never
+    # published; grey = idle (canceled/never attempted, no failure)
     if pkg in latest:
         badge(pkg, pkg, f"v{latest[pkg]}", "blue")
     elif pkg in has_fail:
         badge(pkg, pkg, f"v{attempted.get(pkg, '?')} \u2717", "red")
     elif pkg in inflight:
-        badge(pkg, pkg, f"v{known.get(pkg, '?')}", "yellow")
+        badge(pkg, pkg, f"v{published.get(pkg, known.get(pkg, '?'))}", "yellow")
     else:
         badge(pkg, pkg, f"v{known.get(pkg, '?')}", "lightgrey")
-    ver = latest.get(pkg) or attempted.get(pkg) or known.get(pkg) or "?"
+    ver = (latest.get(pkg) or attempted.get(pkg) or published.get(pkg)
+           or known.get(pkg) or "?")
     badge_lines.append(
         f"[![{pkg}]({url}"
         f"%2F{pkg}.json%3Fv%3D{ver}%2Er{BADGE_REV})"
         f"]({copr}/package/{pkg}/)")
 
 # ---- failures table (published comes from chroot repodata) ----------------
-def published_versions(chroot):
-    """name -> version of packages actually in the chroot binary repo"""
-    try:
-        repomd = get(f"{base}/{chroot}/repodata/repomd.xml").decode()
-        href = re.search(r'href="(repodata/[^"]*primary\.xml\.gz)"', repomd).group(1)
-        xml = gzip.decompress(get(f"{base}/{chroot}/{href}")).decode(errors="replace")
-        return dict(re.findall(
-            r'<name>([^<]+)</name>.*?<version[^>]*?ver="([^"]+)"', xml, re.S))
-    except Exception:
-        return {}
-
 DASH = "\u2014"
 failed = {}
 for c in iter_cells():
