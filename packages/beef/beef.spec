@@ -59,9 +59,10 @@ ruby -c beef
 %files
 %{_bindir}/beef
 %config(noreplace) %{_datadir}/beef/config.yaml
-%exclude %{_datadir}/beef/config.yaml
 %{_datadir}/beef/
 
 %changelog
 * Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 0.6.0.0-1
 - Initial package
+- Ship config.yaml: a stray %exclude dropped it and the server
+  could not start
