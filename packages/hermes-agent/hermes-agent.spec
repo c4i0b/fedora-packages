@@ -82,7 +82,3 @@ HOME="%{_builddir}/home" %{buildroot}%{_libdir}/%{name}/bin/python \
 %changelog
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 0.22.2-1
 - Initial package
-- Filter hashed-soname requires from bundled manylinux wheels; the rpm
-  was uninstallable (nothing provides libjpeg-31e2ca52.so.62.4.0(LIBJPEG_6.2) etc)
-- Build the venv with python3.14 on EL10: upstream deps carry
-  python_version >= '3.14' markers and 3.12 silently installed none
