@@ -8,6 +8,12 @@ on:
 permissions:
   contents: write
 
+# serializes manual × delayed-schedule overlaps (seen once on a GitHub cron
+# delay day); idempotent, so the newest run may cancel an in-flight one
+concurrency:
+  group: autoupdate
+  cancel-in-progress: true
+
 # no container: bump falls back to python when rpmdev-bumpspec is missing
 jobs:
   autoupdate:
