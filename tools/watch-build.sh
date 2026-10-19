@@ -68,7 +68,9 @@ echo
 echo "watched builds finished:"
 rc=0
 for id in $watched; do
-  state="$(curl -fsSL "https://copr.fedorainfracloud.org/api_3/build/$id" | python3 -c "import json,sys; print(json.load(sys.stdin)['state'])")"
+  state="$(curl -fsSL "https://copr.fedorainfracloud.org/api_3/build/$id" \
+    | python3 -c "import json,sys; print(json.load(sys.stdin)['state'])" 2>/dev/null || true)"
+  [ -n "$state" ] || state="unknown (deleted mid-watch?)"
   echo "  $id $state"
   [ "$state" = "succeeded" ] || rc=1
 done
