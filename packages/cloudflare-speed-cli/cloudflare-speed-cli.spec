@@ -13,6 +13,10 @@ BuildRequires:  cargo-rpm-macros
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
 
+# debugsource copies vendor/*.rs; brp-mangle-shebangs reads Rust inner
+# attributes (#![no_std]) as broken shebangs
+%global debug_package %{nil}
+
 # aws-lc-sys jitterentropy errors on RPM's -O2; see AGENTS.md
 %global build_cflags %(echo "%{build_cflags}" | sed 's/ *-O2//g')
 
