@@ -142,9 +142,11 @@ badge_lines = []
 url = (f"https://img.shields.io/endpoint?url="
        + raw.replace(":", "%3A").replace("/", "%2F"))
 for pkg in packages:
-    # blue = published; yellow = build live in COPR (message keeps the last
-    # fully published version, not the in-flight one); red = failed, never
-    # published; grey = idle (canceled/never attempted, no failure)
+    # blue = published
+    # yellow = build live in COPR (message keeps the last fully published
+    # version, not the in-flight one)
+    # red = failed, never published
+    # grey = idle (canceled/never attempted, no failure)
     if pkg in latest:
         badge(pkg, pkg, f"v{latest[pkg]}", "blue")
     elif pkg in has_fail:

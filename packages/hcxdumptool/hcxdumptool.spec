@@ -40,5 +40,5 @@ install -Dpm644 man/hcxdumptool.1 %{buildroot}%{_mandir}/man1/hcxdumptool.1
 %{_mandir}/man1/hcxdumptool.1*
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 7.1.2-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 7.1.2-1
 - Initial package

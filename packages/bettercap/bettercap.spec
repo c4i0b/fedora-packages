@@ -41,5 +41,5 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 %{_bindir}/bettercap
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 2.41.7-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 2.41.7-1
 - Initial package

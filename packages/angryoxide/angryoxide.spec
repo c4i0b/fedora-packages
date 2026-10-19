@@ -46,5 +46,5 @@ install -Dpm644 completions/zsh_angryoxide_completions %{buildroot}%{_datadir}/z
 %{_datadir}/zsh/site-functions/_angryoxide
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 0.9.2-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 0.9.2-1
 - Initial package

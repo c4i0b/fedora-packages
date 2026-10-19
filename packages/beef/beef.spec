@@ -62,5 +62,5 @@ ruby -c beef
 %{_datadir}/beef/
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 0.6.0.0-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 0.6.0.0-1
 - Initial package

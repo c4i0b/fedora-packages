@@ -57,5 +57,5 @@ echo "$out" | grep -q "hostapd-WPE v%{version}"
 %{_sysconfdir}/hostapd-wpe/certs
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 2.12-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 2.12-1
 - Initial package

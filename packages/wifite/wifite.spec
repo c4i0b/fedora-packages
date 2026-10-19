@@ -81,5 +81,5 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 %{_datadir}/dict/wordlist-top4800-probable.txt
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 2.2.5-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 2.2.5-1
 - Initial package

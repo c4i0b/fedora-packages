@@ -50,5 +50,5 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 * Mon Oct 19 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.5.1-1
 - Update to 0.5.1
 
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 0.5.0-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 0.5.0-1
 - Initial package

@@ -91,5 +91,5 @@ bash -n airgeddon.sh
 %{_datadir}/airgeddon/plugins/
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 12.02-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 12.02-1
 - Initial package

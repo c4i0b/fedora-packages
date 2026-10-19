@@ -45,5 +45,5 @@ make -C src prefix=%{_prefix} bindir=%{_bindir} DESTDIR=%{buildroot} install
 %{_bindir}/bully-cleanup
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 1.2-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 1.2-1
 - Initial package

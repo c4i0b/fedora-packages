@@ -37,5 +37,5 @@ install -Dpm755 genkeys %{buildroot}%{_bindir}/genkeys
 %{_bindir}/genkeys
 
 %changelog
-* Sun Oct 18 2026 Caio Bruno <caioibruno@gmail.com> - 2.3-1
+* Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 2.3-1
 - Initial package
