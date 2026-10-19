@@ -49,8 +49,11 @@ for b in dnsping dnstraceroute dnseval; do
 done
 
 %check
+# console-script shebangs point at final installed paths: run them through
+# the venv interpreter instead of executing the wrappers directly
 for b in dnsping dnstraceroute dnseval; do
-    %{buildroot}%{_libdir}/%{name}/bin/$b --help >/dev/null
+    %{buildroot}%{_libdir}/%{name}/bin/python \
+        %{buildroot}%{_libdir}/%{name}/bin/$b --help >/dev/null
 done
 
 %files
