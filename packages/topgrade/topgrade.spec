@@ -1,5 +1,5 @@
 Name:           topgrade
-Version:        17.13.1
+Version:        17.14.0
 Release:        1%{?dist}
 Summary:        Upgrade everything with one command
 
@@ -56,6 +56,9 @@ install -Dpm644 topgrade.1    %{buildroot}%{_mandir}/man1/topgrade.1*
 %{_mandir}/man1/topgrade.1*
 
 %changelog
+* Mon Oct 19 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 17.14.0-1
+- Update to 17.14.0
+
 * Sat Oct 17 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 17.13.1-1
 - Update to 17.13.1
 
