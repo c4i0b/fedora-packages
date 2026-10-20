@@ -13,7 +13,7 @@
 ExclusiveArch:  x86_64 aarch64
 
 Name:           opencode
-Version:        2.0.32
+Version:        2.1.1
 Release:        1%{?dist}
 Summary:        Open source AI coding agent for the terminal, IDE, and desktop
 
@@ -87,6 +87,9 @@ install -Dpm644 opencode.fish %{buildroot}%{fish_completions_dir}/opencode.fish
 %{fish_completions_dir}/opencode.fish
 
 %changelog
+* Tue Oct 20 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.1.1-1
+- Update to 2.1.1
+
 * Fri Oct 16 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.0.32-1
 - Update to 2.0.32
 
