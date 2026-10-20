@@ -10,7 +10,7 @@
 ExclusiveArch:  x86_64 aarch64
 
 Name:           desktop-plus
-Version:        3.6.7.2
+Version:        3.6.8.0
 Release:        1%{?dist}
 Summary:        A GitHub Desktop fork with advanced functionality and improvements
 
@@ -76,6 +76,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_metainfodir}/org.desktop-plus.DesktopPlus.metainfo.xml
 
 %changelog
+* Tue Oct 20 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 3.6.8.0-1
+- Update to 3.6.8.0
+
 * Sat Oct 17 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 3.6.7.2-1
 - Update to 3.6.7.2
 
