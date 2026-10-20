@@ -14,6 +14,7 @@ Source1:        %{archivename}-vendor.tar.bz2
 Source2:        speedtest-go.service
 
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  go-vendor-tools
 
 %generate_buildrequires
 %go_vendor_license_buildrequires
