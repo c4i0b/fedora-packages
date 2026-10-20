@@ -1,0 +1,14 @@
+[Unit]
+Description=LibreSpeed speedtest-go server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/speedtest-go -c /etc/speedtest-go/settings.toml
+WorkingDirectory=/var/lib/speedtest-go
+StateDirectory=speedtest-go
+DynamicUser=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
