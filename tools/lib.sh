@@ -73,6 +73,17 @@ check_package() {
   [ "$changelog" = "${version}-${release}" ] \
     || { echo "FAIL: $name: changelog entry '$changelog' != Version-Release '${version}-${release}'"; fail=1; }
 
+  # macros from external packages reach the shell literally in mock and die
+  # as "fg: no job control" (AGENTS.md): BuildRequire their providers
+  if grep -q '%go_vendor_license' "$spec" && ! grep -q '^BuildRequires:.*go-vendor-tools' "$spec"; then
+    echo "FAIL: $name: uses %go_vendor_license_* without BuildRequires: go-vendor-tools"
+    fail=1
+  fi
+  if grep -q '^%cargo_' "$spec" && ! grep -q '^BuildRequires:.*cargo-rpm-macros' "$spec"; then
+    echo "FAIL: $name: uses %cargo_* without BuildRequires: cargo-rpm-macros"
+    fail=1
+  fi
+
   # pip/venv into the buildroot bundles manylinux libs with hashed sonames
   # whose versioned requires nothing provides: uninstallable rpm (AGENTS.md)
   if grep -Eq '(-m venv|pip +install)' "$spec"; then
