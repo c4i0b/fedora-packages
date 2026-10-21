@@ -1,5 +1,5 @@
 Name:           designcraft
-Version:        0.10.0
+Version:        0.11.0
 Release:        1%{?dist}
 Summary:        Page layout and desktop publishing studio
 
@@ -73,5 +73,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.design
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.designcraft.*
 
 %changelog
+* Wed Oct 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.11.0-1
+- Update to 0.11.0
+
 * Wed Oct 21 2026 Caio Bruno <cbrunofb@gmail.com> - 0.10.0-1
 - Initial package
