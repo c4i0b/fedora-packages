@@ -1,7 +1,7 @@
 Name:           pdfcraft
 Version:        0.10.1
 Release:        1%{?dist}
-Summary:        Pure-Rust PDF reader and editor with annotations, forms and signing
+Summary:        PDF reader and editor with annotations, forms and signing
 
 License:        MIT OR Apache-2.0
 URL:            https://github.com/storytold/pdfcraft

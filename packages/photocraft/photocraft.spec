@@ -1,7 +1,7 @@
 Name:           photocraft
 Version:        0.11.1
 Release:        1%{?dist}
-Summary:        Open-source native photo editor with layers, masks and PSD support
+Summary:        Photo editor with layers, masks and PSD support
 
 License:        MIT OR Apache-2.0
 URL:            https://github.com/storytold/photocraft

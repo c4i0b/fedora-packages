@@ -1,7 +1,7 @@
 Name:           effectcraft
 Version:        0.13.0
 Release:        1%{?dist}
-Summary:        Open-source motion graphics and visual effects compositor
+Summary:        Motion graphics and compositing tool
 
 License:        MIT OR Apache-2.0
 URL:            https://github.com/storytold/effectcraft

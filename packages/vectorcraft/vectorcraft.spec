@@ -1,7 +1,7 @@
 Name:           vectorcraft
 Version:        0.14.0
 Release:        1%{?dist}
-Summary:        Open-source native vector editor for illustrations, SVG and PDF
+Summary:        Vector art editor for illustrations, SVG and PDF
 
 License:        MIT OR Apache-2.0
 URL:            https://github.com/storytold/vectorcraft

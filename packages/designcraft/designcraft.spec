@@ -1,7 +1,7 @@
 Name:           designcraft
 Version:        0.10.0
 Release:        1%{?dist}
-Summary:        Open-source page layout and desktop publishing studio in pure Rust
+Summary:        Page layout and desktop publishing studio
 
 License:        MIT OR Apache-2.0
 URL:            https://github.com/storytold/designcraft

@@ -1,7 +1,7 @@
 Name:           filmcraft
 Version:        0.10.0
 Release:        1%{?dist}
-Summary:        Open-source nonlinear video editor with timeline, color and audio tools
+Summary:        Nonlinear video editor with timeline, color and audio tools
 
 License:        MIT OR Apache-2.0
 URL:            https://github.com/storytold/filmcraft
