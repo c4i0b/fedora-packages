@@ -38,23 +38,22 @@ elif grep -q '^%cargo_prep' "$spec"; then
       if [ -f "${d}Cargo.toml" ] && [ -f "${d}Cargo.lock" ]; then ws="${d%/}"; break; fi
     done
   fi
+  # absolute: the merge below cds around and would break relative paths
+  ws="$(cd "$ws" && pwd)"
   # vendor into a fresh dir name: some trees already carry a "vendor" dir
   (cd "$ws" && cargo vendor --locked vendor-deps 2>/dev/null || cargo vendor vendor-deps 2>/dev/null) > vendor-cargo-config.toml
   # git-sourced crates (e.g. storytold craft-libs) need their own [source]
   # replacements appended to the config %cargo_prep generates
   awk 'BEGIN{RS=""; ORS="\n\n"} /\[source\."git\+/' vendor-cargo-config.toml > git-sources.conf
   rm -f vendor-cargo-config.toml
-  mv "$ws/vendor-deps" "$ws/vendor-new"
-  # some trees ship their own vendor/ (patched crates via [patch.crates-io]):
-  # merge ours in instead of nesting vendor-deps inside it
-  if [ -d "$ws/vendor" ]; then
-    (cd "$ws/vendor-new" && find . -mindepth 1 -maxdepth 1 -exec mv -t "$ws/vendor" {} +)
-    rmdir "$ws/vendor-new"
-  else
-    mv "$ws/vendor-new" "$ws/vendor"
-  fi
-  tar --zstd -cf vendor.tar.zst vendor git-sources.conf
-  rm -rf vendor git-sources.conf "$dir"
+  # trees that ship their own vendor/ (patched crates via [patch.crates-io])
+  # keep it for the patches: our vendored deps go to a SEPARATE dir — a merged
+  # dir breaks (registry replacement demands checksums the patched copies
+  # lack, and drops the vendored ones)
+  mv "$ws/vendor-deps" vendor-deps
+  mv git-sources.conf vendor-deps/
+  tar --zstd -cf vendor.tar.zst vendor-deps
+  rm -rf vendor-deps "$dir"
   vendor_archive="vendor.tar.zst"
 fi
 

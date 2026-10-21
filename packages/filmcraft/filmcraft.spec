@@ -31,10 +31,10 @@ formats via its own codec suite.
 
 %prep
 %autosetup -n %{name}-%{version} -p1 -a 1
-%cargo_prep -v vendor
+%cargo_prep -v vendor-deps
 # git-sourced crates (craft-libs) need the source replacements cargo vendor
 # printed; the prep macro only rewrites crates-io
-cat git-sources.conf >> .cargo/config.toml
+cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
 # %%cargo_build cannot select a workspace member: its -n flag is
@@ -43,7 +43,7 @@ cat git-sources.conf >> .cargo/config.toml
 # being compiled: in a vendored tree that resolves to the vendored "xml"
 # crate (whose extensionless LICENSE panics the macro) instead of
 # atspi-common's D-Bus XML dir
-[ -d vendor/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor/atspi-common/xml"
+[ -d vendor-deps/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor-deps/atspi-common/xml"
 %{__cargo} build %{?_smp_mflags} -Z avoid-dev-deps --profile rpm -p %{name}
 
 %install
