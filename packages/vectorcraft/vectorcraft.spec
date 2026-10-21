@@ -22,6 +22,8 @@ BuildRequires:  desktop-file-utils
 # winit/wgpu dlopen these at runtime; Rust binaries declare no auto-deps
 Requires:       libX11%{?_isa}
 Requires:       libXcursor%{?_isa}
+Requires:       libXi%{?_isa}
+Requires:       libXrandr%{?_isa}
 Requires:       libxkbcommon%{?_isa}
 Requires:       libxkbcommon-x11%{?_isa}
 Requires:       libwayland-client%{?_isa}
