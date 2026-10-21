@@ -1,0 +1,138 @@
+# Last tested and validated: May 2026
+
+## Cloudflare
+# Fast, privacy-focused DNS with no logging policy
+1.0.0.1
+1.1.1.1
+1.0.0.2
+1.1.1.2
+1.0.0.3
+1.1.1.3
+
+## SafeDNS
+# DNS filtering service with malware and content blocking
+195.46.39.39
+195.46.39.40
+
+## OpenDNS
+# Cisco-owned DNS service with content filtering
+208.67.220.220
+208.67.222.222
+208.67.220.123
+208.67.222.123
+
+## DYN DNS
+# Legacy DNS service, now part of Oracle
+216.146.35.35
+216.146.36.36
+
+## Level3
+# Legacy telecommunications DNS (now Lumen Technologies)
+209.244.0.3
+209.244.0.4
+4.2.2.1
+4.2.2.2
+4.2.2.3
+4.2.2.4
+4.2.2.5
+
+## Freenom World
+# Free DNS service from domain registrar
+80.80.80.80
+80.80.81.81
+
+## Google
+# Google's public DNS service
+8.8.4.4
+8.8.8.8
+
+## Quad9
+# Security-focused DNS with malware blocking
+9.9.9.9
+9.9.9.10
+9.9.9.11
+149.112.112.112
+149.112.112.10
+149.112.112.11
+
+## Verisign
+# Enterprise-grade public DNS
+64.6.64.6
+64.6.65.6
+
+## Comodo
+# Cybersecurity company's DNS service
+8.26.56.26
+8.20.247.20
+
+## Hurricane Electric
+# Internet backbone provider's public DNS
+74.82.42.42
+
+## Yandex.DNS
+# Russian search engine company's DNS service
+77.88.8.88
+77.88.8.2
+
+## DNS4all
+# European DNS service with focus on neutrality
+194.0.5.3
+
+## AdGuard DNS
+# Ad-blocking DNS service with privacy protection
+94.140.14.14
+94.140.15.15
+94.140.14.15
+94.140.15.16
+
+## Control D
+# Customizable DNS service with filtering
+76.76.2.11
+76.76.10.11
+
+## NextDNS
+# Highly customizable DNS service
+45.90.28.157
+45.90.30.157
+
+## DNS4EU
+# European Union's public DNS resolver
+86.54.11.100
+86.54.11.200
+
+## DNS.SB
+# Privacy-focused European DNS
+185.222.222.222
+45.11.45.11
+
+## Mullvad DNS
+# Protocols: DoT, DoH only (plain UDP/TCP returns REFUSED by design)
+194.242.2.2
+194.242.2.3
+194.242.2.4
+194.242.2.5
+194.242.2.6
+194.242.2.9
+
+## BlahDNS
+# Protocols: DoT only (plain UDP/TCP not available)
+78.46.244.143
+
+## UncensoredDNS
+# Protocols: DoT only (plain UDP/TCP not available)
+91.239.100.100
+89.233.43.71
+
+## LibreDNS
+# NOTE: 116.202.176.26 is DoT only
+116.202.176.26
+
+## Neustar DNS
+# Enterprise-grade DNS with threat protection
+156.154.70.1
+156.154.71.1
+
+## Dismail DNS
+# Privacy-focused German DNS service
+116.203.32.217
+

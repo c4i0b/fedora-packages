@@ -14,6 +14,11 @@ Summary:        DNS measurement, troubleshooting and security auditing toolset
 License:        BSD-2-Clause
 URL:            https://github.com/farrokhi/dnsdiag
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
+# upstream server lists, not shipped in the wheel
+Source1:        %{url}/raw/v%{version}/public-servers.txt
+Source2:        %{url}/raw/v%{version}/public-v4.txt
+Source3:        %{url}/raw/v%{version}/rootservers.txt
+Source4:        dnseval-public
 
 BuildRequires:  python3
 BuildRequires:  python3-devel
@@ -43,7 +48,11 @@ grep -rlZ '%{buildroot}' %{buildroot}%{_libdir}/%{name}/bin/ \
     | xargs -0r sed -i "s|%{buildroot}||g"
 sed -i "s|%{buildroot}||g" %{buildroot}%{_libdir}/%{name}/pyvenv.cfg
 
+install -d -m755 %{buildroot}%{_datadir}/%{name}
+install -m 0644 %{S:1} %{S:2} %{S:3} %{buildroot}%{_datadir}/%{name}/
+
 install -d -m755 %{buildroot}%{_bindir}
+install -m 0755 %{SOURCE4} %{buildroot}%{_bindir}/dnseval-public
 for b in dnsping dnstraceroute dnseval; do
     ln -s %{_libdir}/%{name}/bin/$b %{buildroot}%{_bindir}/$b
 done
@@ -62,7 +71,9 @@ done
 %{_bindir}/dnsping
 %{_bindir}/dnstraceroute
 %{_bindir}/dnseval
+%{_bindir}/dnseval-public
 %{_libdir}/%{name}/
+%{_datadir}/%{name}/
 
 %changelog
 * Mon Oct 19 2026 Caio Bruno <cbrunofb@gmail.com> - 2.10.0-1

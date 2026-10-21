@@ -1,0 +1,21 @@
+#!/bin/sh
+# dnseval against the packaged public resolver lists: full list when the
+# host has IPv6 connectivity, v4-only otherwise (v6 entries on a v4-only
+# network just burn the reply timeout)
+list=/usr/share/dnsdiag/public-servers.txt
+if ! { command -v ip >/dev/null 2>&1 && ip -6 route show default 2>/dev/null | grep -q .; } \
+    && [ -z "$(getent ahostsv6 ipv6.test 2>/dev/null | head -1)" ]; then
+    list=/usr/share/dnsdiag/public-v4.txt
+fi
+# dnseval requires a hostname positional: default it when none was given
+hostname_seen=0; skip=0
+for a in "$@"; do
+    if [ "$skip" = 1 ]; then skip=0; continue; fi
+    case "$a" in
+        -f|-c|-t|-p|-w|-S|-j|--file|--count|--type|--port|--wait|--json|--srcip) skip=1 ;;
+        -*) ;;
+        *) hostname_seen=1; break ;;
+    esac
+done
+[ "$hostname_seen" = 0 ] && set -- "$@" example.com
+exec dnseval -f "$list" "$@"

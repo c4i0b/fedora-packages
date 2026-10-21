@@ -25,6 +25,17 @@ done < <(git -C "$root" ls-files 'packages/*' | while IFS= read -r f; do
     esac
   done)
 
+# Wrapper/helper scripts shipped as package sources must parse
+while IFS= read -r script; do
+  if ! sh -n "$script" >/dev/null 2>&1; then
+    echo "FAIL: sh -n $script" >&2
+    fail=1
+  fi
+done < <(git -C "$root" ls-files 'packages/*' | grep -vE '\.(spec|patch|txt|md|toml|json|desktop|service|svg|png|metainfo.xml|appdata.xml)$' \
+  | while IFS= read -r f; do
+    head -c2 "$root/$f" 2>/dev/null | grep -q '#!' && echo "$f"
+  done)
+
 for dir in "$root"/packages/*/; do
   check_package "$dir" || fail=1
 done

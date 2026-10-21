@@ -1,0 +1,272 @@
+# Last tested and validated: May 2026
+
+## Cloudflare
+# Fast, privacy-focused DNS with no logging policy
+# Offers standard DNS, malware blocking, and family protection variants
+# Website: https://1.1.1.1/
+# DNSSEC: YES | ECS: NO | EDE: NO
+# Protocols: UDP, TCP, DoT, DoH
+# DoT: one.one.one.one (port 853)
+# DoH: https://cloudflare-dns.com/dns-query
+1.0.0.1
+1.1.1.1
+1.0.0.2
+1.1.1.2
+1.0.0.3
+1.1.1.3
+2606:4700:4700::1001
+2606:4700:4700::1111
+2606:4700:4700::1002
+2606:4700:4700::1112
+2606:4700:4700::1003
+2606:4700:4700::1113
+
+## SafeDNS
+# DNS filtering service with malware and content blocking
+# Provides web security and parental control features
+# Website: https://www.safedns.com/
+195.46.39.39
+195.46.39.40
+2a05:d014:939:3300::39
+2a05:d014:939:3300::40
+
+## OpenDNS
+# Cisco-owned DNS service with content filtering and security features
+# Provides phishing protection and customizable content blocking
+# Website: https://www.opendns.com/
+# DNSSEC: YES | ECS: NO | EDE: NO
+208.67.220.220
+208.67.222.222
+2620:0:ccc::2
+2620:0:ccd::2
+
+## DYN DNS
+# Legacy DNS service, now part of Oracle's infrastructure
+# Basic DNS resolution without advanced filtering
+# Website: https://dyn.com/
+# DNSSEC: YES | ECS: NO | EDE: NO
+216.146.35.35
+216.146.36.36
+
+## Level3
+# Legacy telecommunications company DNS servers
+# Now part of Lumen Technologies (formerly CenturyLink)
+# Website: https://www.lumen.com/
+# DNSSEC: NO | ECS: NO | EDE: NO
+209.244.0.3
+209.244.0.4
+4.2.2.1
+4.2.2.2
+4.2.2.3
+4.2.2.4
+4.2.2.5
+
+## Freenom World
+# Free DNS service from domain registrar Freenom
+# Basic DNS resolution service
+# Website: https://www.freenom.com/
+# DNSSEC: YES | ECS: NO | EDE: NO
+80.80.80.80
+80.80.81.81
+
+## Google
+# Google's public DNS service with high performance and reliability
+# Features DNS-over-HTTPS, DNS-over-TLS, and DNSSEC validation
+# Website: https://developers.google.com/speed/public-dns
+# DNSSEC: YES | ECS: YES | EDE: NO
+# Protocols: UDP, TCP, DoT, DoH, DoH3 (HTTP/3)
+# DoT: dns.google (port 853)
+# DoH: https://dns.google/dns-query
+8.8.4.4
+8.8.8.8
+2001:4860:4860::8844
+2001:4860:4860::8888
+
+## Quad9
+# Security-focused DNS with malware blocking and privacy protection
+# Variants: .9 (secure with blocking), .10 (unsecured, no blocking), .11 (ECS-enabled)
+# Website: https://quad9.net/
+# DNSSEC: YES (.9/.11), NO (.10) | ECS: YES (.11), NO (.9/.10) | EDE: NO
+# Protocols: UDP, TCP, DoT, DoH, DoQ, DoH3
+# DoT: dns.quad9.net (port 853)
+# DoH: https://dns.quad9.net/dns-query
+# DoQ: dns.quad9.net (port 853)
+9.9.9.9
+9.9.9.10
+9.9.9.11
+149.112.112.112
+149.112.112.10
+149.112.112.11
+2620:fe::fe
+2620:fe::9
+2620:fe::fe:9
+2620:fe::10
+2620:fe::fe:10
+2620:fe::11
+2620:fe::fe:11
+
+## Verisign
+# Enterprise-grade public DNS with high availability and security
+# Provides stable, reliable DNS resolution worldwide
+# Website: https://www.verisign.com/en_US/security-services/public-dns/index.xhtml
+# DNSSEC: YES | ECS: YES | EDE: NO
+64.6.64.6
+64.6.65.6
+2620:74:1b::1:1
+2620:74:1c::2:2
+
+## Comodo
+# Cybersecurity company's DNS service with threat protection
+# Blocks malicious domains and provides security filtering
+# Website: https://www.comodo.com/secure-dns/
+8.26.56.26
+8.20.247.20
+
+## Hurricane Electric
+# Internet backbone provider's public DNS service
+# Basic DNS resolution from major internet infrastructure company
+# Website: https://he.net/
+74.82.42.42
+2001:470:20::2
+
+## Yandex.DNS
+# Russian search engine company's DNS service
+# Offers basic, safe, and family protection modes
+# Website: https://dns.yandex.com/
+# DNSSEC: NO | ECS: NO | EDE: NO
+77.88.8.88
+77.88.8.2
+2a02:6b8::feed:0ff
+2a02:6b8:0:1::feed:0ff
+
+## DNS4all
+# European DNS service with focus on neutrality and performance
+# Provides unfiltered DNS resolution
+# Website: http://dns4all.eu/
+194.0.5.3
+
+## AdGuard DNS
+# Ad-blocking DNS service with privacy protection
+# Blocks ads, trackers, and malicious domains at DNS level
+# Website: https://adguard-dns.io/
+# DNSSEC: YES | ECS: YES | EDE: YES
+# Protocols: UDP, TCP, DoT, DoH, DoQ (QUIC)
+# DoT: dns-unfiltered.adguard.com (port 853)
+# DoH: https://dns-unfiltered.adguard.com/dns-query
+94.140.14.14
+94.140.15.15
+94.140.14.15
+94.140.15.16
+2a10:50c0::ad1:ff
+2a10:50c0::ad2:ff
+2a10:50c0::1:ff
+2a10:50c0::2:ff
+
+## Control D
+# Customizable DNS service with filtering and unblocking capabilities
+# Offers granular control over content filtering and geographic unblocking
+# Website: https://controld.com/
+# DNSSEC: YES | ECS: YES | EDE: NO
+76.76.2.11
+76.76.10.11
+2606:1a40::11
+2606:1a40:1::11
+
+## NextDNS
+# Highly customizable DNS service with extensive filtering options
+# Cloud-based DNS with detailed analytics and custom block lists
+# Website: https://nextdns.io/
+# DNSSEC: YES | ECS: NO | EDE: NO
+45.90.28.157
+45.90.30.157
+2a07:a8c0::84:9d
+2a07:a8c1::84:9d
+
+## DNS4EU
+# European Union's public DNS resolver initiative
+# GDPR-compliant DNS service for EU citizens and organizations
+# Website: https://dns4eu.eu/
+# Protocols: UDP, TCP, DoT
+# DoT: unfiltered.joindns4.eu (port 853)
+86.54.11.100
+86.54.11.200
+2a13:1001::86:54:11:100
+2a13:1001::86:54:11:200
+
+## DNS.SB
+# Privacy-focused European DNS with no logging policy
+# Open source DNS resolver with strong privacy protection
+# Website: https://dns.sb/
+# DNSSEC: YES | ECS: NO | EDE: NO
+185.222.222.222
+45.11.45.11
+2a09::
+2a11::
+
+## Mullvad DNS
+# Privacy-focused public DNS service, accessible without a VPN subscription
+# Offers multiple filtering tiers: unfiltered (.2), adblock (.3), base (.4), extended (.5), family (.6), all (.9)
+# Website: https://mullvad.net/en/help/dns-over-https-and-dns-over-tls
+# Protocols: DoT, DoH
+# NOTE: Plain UDP/TCP queries return REFUSED by design; use -X (DoT) or -H (DoH)
+# DoT: dns.mullvad.net (port 853)
+# DoH: https://dns.mullvad.net/dns-query
+194.242.2.2
+194.242.2.3
+194.242.2.4
+194.242.2.5
+194.242.2.6
+194.242.2.9
+2a07:e340::2
+2a07:e340::3
+2a07:e340::4
+2a07:e340::5
+2a07:e340::6
+2a07:e340::9
+
+## BlahDNS
+# Hobby adblock DNS project with DoH, DoT, and DoQ support
+# Open source DNS service with ad and malware blocking
+# Website: https://blahdns.com/
+# Protocols: DoT (plain UDP/TCP not available)
+78.46.244.143
+
+## UncensoredDNS
+# Censorship-resistant DNS service
+# Provides unfiltered internet access without content blocking
+# Website: https://blog.uncensoreddns.org/
+# Protocols: DoT (plain UDP/TCP not available)
+# DoT: unicast.censurfridns.dk (port 853)
+91.239.100.100
+89.233.43.71
+2001:67c:28a4::
+2a01:3a0:53:53::
+
+## LibreDNS
+# Open source DNS service with ad blocking capabilities
+# Community-driven DNS resolver with privacy focus
+# Website: https://libredns.gr/
+# NOTE: some servers are DoT only; plain UDP works on 2a01:4f8:1c0c:40db::1
+116.202.176.26
+2a01:4f8:1c0c:40db::1
+
+## Neustar DNS
+# Enterprise-grade DNS with threat protection and filtering options
+# Now part of Vercara, offers multiple security service tiers
+# Website: https://vercara.com/public-dns
+# DNSSEC: YES | ECS: YES | EDE: NO
+156.154.70.1
+156.154.71.1
+2610:a1:1018::1
+2610:a1:1019::1
+
+## Dismail DNS
+# Privacy-focused German DNS service
+# Community-run DNS resolver with no logging
+# Website: https://dismail.de/
+# Protocols: UDP, TCP, DoT
+# DoT: fdns1.dismail.de (port 853)
+116.203.32.217
+2a01:4f8:1c1b:44aa::32:217
+
+
