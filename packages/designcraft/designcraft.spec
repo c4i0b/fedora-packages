@@ -57,12 +57,10 @@ install -Dm755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
 
 install -Dm644 %{SOURCE2} %{buildroot}%{_datadir}/applications/ai.storyteller.designcraft.desktop
 
-for size in 16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512; do
-    install -Dm644 assets/app-icon/hicolor/$size/apps/ai.storyteller.designcraft.png \
-        %{buildroot}%{_datadir}/icons/hicolor/$size/apps/ai.storyteller.designcraft.png
+# ship whatever sizes upstream provides (they change between releases)
+for icon in assets/app-icon/hicolor/*/apps/*; do
+    install -Dm644 "$icon" "%{buildroot}%{_datadir}/icons/hicolor/${icon#assets/app-icon/hicolor/}"
 done
-install -Dm644 assets/app-icon/hicolor/scalable/apps/ai.storyteller.designcraft.svg \
-    %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/ai.storyteller.designcraft.svg
 
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.designcraft.desktop
