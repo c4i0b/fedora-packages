@@ -14,6 +14,7 @@ BuildRequires:  gcc
 # aws-lc-sys (via rustls, from pdfcraft-sign) builds C with cmake; no bindgen
 # users in the app's tree, so no clang-devel needed
 BuildRequires:  cmake
+BuildRequires:  python3
 BuildRequires:  desktop-file-utils
 
 # Bin-only crate: do not install sources into the cargo registry
@@ -37,6 +38,24 @@ OCR, preflight audits, and encryption with granular permissions.
 # git-sourced crates (craft-libs) need the source replacements cargo vendor
 # printed; the prep macro only rewrites crates-io
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
+%if 0%{?fedora} == 43
+# F43's rustc pairs a pre-LLVM-19 backend with a newer stdarch: any use of
+# the avx512 VNNI intrinsic dies with "intrinsic signature mismatch"
+# (reproduced with a plain rustc probe, toolchain-wide). Drop rten-gemm's
+# VNNI fast path there and re-stamp the vendor checksum.
+python3 - <<'PYEOF'
+import json, hashlib, pathlib
+p = pathlib.Path("vendor-deps/rten-gemm/src/i8dot.rs")
+s = p.read_text()
+block = s[s.index("            // Base ISA features"):s.index("            // Base ISA features (no extensions required)")]
+s = s.replace(block, "")
+p.write_text(s)
+cj = pathlib.Path("vendor-deps/rten-gemm/.cargo-checksum.json")
+d = json.loads(cj.read_text())
+d["files"]["src/i8dot.rs"] = hashlib.sha256(p.read_bytes()).hexdigest()
+cj.write_text(json.dumps(d))
+PYEOF
+%endif
 
 %build
 # %%cargo_build cannot select a workspace member: its -n flag is
