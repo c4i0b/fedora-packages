@@ -21,6 +21,14 @@ BuildRequires:  desktop-file-utils
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
 
+# winit/wgpu dlopen these at runtime; Rust binaries declare no auto-deps
+Requires:       libX11%{?_isa}
+Requires:       libXcursor%{?_isa}
+Requires:       libxkbcommon%{?_isa}
+Requires:       libxkbcommon-x11%{?_isa}
+Requires:       libwayland-client%{?_isa}
+Requires:       vulkan-loader%{?_isa}
+
 %description
 EffectCraft is an open-source, native motion graphics and compositing
 application with a keyframe timeline, layer-based compositing, GPU rendering,

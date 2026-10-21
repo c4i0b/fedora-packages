@@ -19,6 +19,14 @@ BuildRequires:  desktop-file-utils
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
 
+# winit/wgpu dlopen these at runtime; Rust binaries declare no auto-deps
+Requires:       libX11%{?_isa}
+Requires:       libXcursor%{?_isa}
+Requires:       libxkbcommon%{?_isa}
+Requires:       libxkbcommon-x11%{?_isa}
+Requires:       libwayland-client%{?_isa}
+Requires:       vulkan-loader%{?_isa}
+
 %description
 LightCraft is a non-destructive photo library and raw developer. It organises
 photos and develops raw files with a GPU pipeline, using XMP-style sidecar
