@@ -90,6 +90,8 @@ resolve() {
     echo "::warning::$pkg: could not resolve latest release of $source"
     return 0
   fi
+  # prefixed tags like openai/codex's "rust-v0.163.0": keep the version part
+  latest="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$latest")"
   printf 'latest\t%s\t%s\n' "$pkg" "$latest" > "$resolved/$pkg"
 }
 

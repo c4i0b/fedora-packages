@@ -3,6 +3,10 @@ Version:        0.98.1
 
 %gometa -L -f
 
+# the build-time downloaded Go toolchain is not annobin-instrumented: an empty
+# debugsource list aborts the build
+%global debug_package %{nil}
+
 %bcond_with check
 
 Name:           crush

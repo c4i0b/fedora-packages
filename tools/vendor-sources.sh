@@ -30,8 +30,16 @@ elif grep -q '^%cargo_prep' "$spec"; then
   tar -xf "$src_file"
   dir="$(tar -tf "$src_file" | head -1 | cut -d/ -f1 || true)"
   [ -d "$dir" ] || dir=.
-  (cd "$dir" && cargo vendor --locked >/dev/null 2>&1 || cargo vendor >/dev/null)
-  [ -d "$dir/vendor" ] && mv "$dir/vendor" vendor
+  # workspace may live in a subdirectory (e.g. openai/codex keeps it in codex-rs/)
+  ws="$dir"
+  if [ ! -f "$ws/Cargo.toml" ]; then
+    for d in "$dir"/*/; do
+      if [ -f "${d}Cargo.toml" ] && [ -f "${d}Cargo.lock" ]; then ws="${d%/}"; break; fi
+    done
+  fi
+  # vendor into a fresh dir name: some trees already carry a "vendor" dir
+  (cd "$ws" && cargo vendor --locked vendor-deps >/dev/null 2>&1 || cargo vendor vendor-deps >/dev/null)
+  mv "$ws/vendor-deps" vendor
   tar --zstd -cf vendor.tar.zst vendor
   rm -rf vendor "$dir"
   vendor_archive="vendor.tar.zst"
