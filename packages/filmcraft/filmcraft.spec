@@ -12,7 +12,7 @@ Source2:        %{name}.desktop
 BuildRequires:  cargo-rpm-macros
 BuildRequires:  gcc
 # cpal -> alsa -> alsa-sys resolves libasound via pkg-config
-BuildRequires:  alsa-devel
+BuildRequires:  pkgconfig(alsa)
 BuildRequires:  desktop-file-utils
 
 # Bin-only crate: do not install sources into the cargo registry

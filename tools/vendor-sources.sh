@@ -44,7 +44,15 @@ elif grep -q '^%cargo_prep' "$spec"; then
   # replacements appended to the config %cargo_prep generates
   awk 'BEGIN{RS=""; ORS="\n\n"} /\[source\."git\+/' vendor-cargo-config.toml > git-sources.conf
   rm -f vendor-cargo-config.toml
-  mv "$ws/vendor-deps" vendor
+  mv "$ws/vendor-deps" "$ws/vendor-new"
+  # some trees ship their own vendor/ (patched crates via [patch.crates-io]):
+  # merge ours in instead of nesting vendor-deps inside it
+  if [ -d "$ws/vendor" ]; then
+    (cd "$ws/vendor-new" && find . -mindepth 1 -maxdepth 1 -exec mv -t "$ws/vendor" {} +)
+    rmdir "$ws/vendor-new"
+  else
+    mv "$ws/vendor-new" "$ws/vendor"
+  fi
   tar --zstd -cf vendor.tar.zst vendor git-sources.conf
   rm -rf vendor git-sources.conf "$dir"
   vendor_archive="vendor.tar.zst"
