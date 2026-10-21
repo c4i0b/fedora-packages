@@ -23,7 +23,8 @@ if grep -qE '^%goprep|go-vendor-tools' "$spec"; then
   vendor_archive="$(ls ./*-vendor.tar.* 2>/dev/null | head -1 || true)"
 elif grep -q '^%cargo_prep' "$spec"; then
   command -v cargo >/dev/null 2>&1 \
-    || dnfinstall cargo rust-packaging rpmdevtools
+    || dnfinstall cargo rust-packaging
+  command -v spectool >/dev/null 2>&1 || dnfinstall rpmdevtools
   spectool -g "$(basename "$spec")"
   url="$(spectool --lf "$(basename "$spec")" | awk 'NR==1{print $2}')"
   src_file="$(basename "${url%%#*}")"
@@ -38,10 +39,14 @@ elif grep -q '^%cargo_prep' "$spec"; then
     done
   fi
   # vendor into a fresh dir name: some trees already carry a "vendor" dir
-  (cd "$ws" && cargo vendor --locked vendor-deps >/dev/null 2>&1 || cargo vendor vendor-deps >/dev/null)
+  (cd "$ws" && cargo vendor --locked vendor-deps 2>/dev/null || cargo vendor vendor-deps 2>/dev/null) > vendor-cargo-config.toml
+  # git-sourced crates (e.g. storytold craft-libs) need their own [source]
+  # replacements appended to the config %cargo_prep generates
+  awk 'BEGIN{RS=""; ORS="\n\n"} /\[source\."git\+/' vendor-cargo-config.toml > git-sources.conf
+  rm -f vendor-cargo-config.toml
   mv "$ws/vendor-deps" vendor
-  tar --zstd -cf vendor.tar.zst vendor
-  rm -rf vendor "$dir"
+  tar --zstd -cf vendor.tar.zst vendor git-sources.conf
+  rm -rf vendor git-sources.conf "$dir"
   vendor_archive="vendor.tar.zst"
 fi
 
