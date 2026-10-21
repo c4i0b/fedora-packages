@@ -20,3 +20,4 @@ packages/*/*.woff2
 packages/*/*.rpm
 packages/*/cd_on_quit.*
 packages/*/*/
+*.AppImage
