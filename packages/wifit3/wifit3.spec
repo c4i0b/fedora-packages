@@ -30,6 +30,10 @@ feeds hashlines to hashcat.
 %autosetup -n wifit3-%{version} -p1
 # Windows-only installer; removing it pre-wheel keeps the RECORD valid
 rm -rf src/wifit3/setup/bin
+# Static.update(layout=) is textual>=5 (added 5.0.0); Fedora ships 4.x — drop the
+# perf-only kwarg, update() then just does a full layout refresh
+sed -i 's/, layout=False)/)/' \
+    src/wifit3/ui/screens/focus_v2/{packet_dashboard,router_endpoint,clients_list,art}.py
 
 %build
 %pyproject_wheel
