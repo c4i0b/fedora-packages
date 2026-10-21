@@ -5,12 +5,12 @@
 [![badges](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml)
 
 <!-- chroot-badges begin -->
-[![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3Dc7902917%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
-[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D0cc30b25%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D8c8aec52%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3D9f7d6b56%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3Da0d66ab9%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3Da79ddf46%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3Dd40f83ed%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
+[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3De92af507%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D66dd3331%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3D66c5bc8a%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3D00acc442%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3D4b134070%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 <!-- chroot-badges end -->
 
 <!-- package-badges begin -->
@@ -26,6 +26,7 @@
 [![colloid-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcolloid-icon-theme.json%3Fv%3D2026.08.10%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/colloid-icon-theme/)
 [![cozette-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcozette-fonts.json%3Fv%3D1.30.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/cozette-fonts/)
 [![crunch](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcrunch.json%3Fv%3D3.6%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/crunch/)
+[![crush](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcrush.json%3Fv%3D0.98.1%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/crush/)
 [![desktop-plus](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdesktop-plus.json%3Fv%3D3.6.8.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/desktop-plus/)
 [![dnsdiag](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnsdiag.json%3Fv%3D2.10.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/dnsdiag/)
 [![dnspyre](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnspyre.json%3Fv%3D3.12.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/dnspyre/)
@@ -58,7 +59,7 @@
 [![meslo-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmeslo-nerd-fonts.json%3Fv%3D3.5.1%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/meslo-nerd-fonts/)
 [![netscanner](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fnetscanner.json%3Fv%3D0.6.43%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/netscanner/)
 [![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3D2026.10.5%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/openclaw/)
-[![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.1.1%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/opencode/)
+[![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.1.2%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/opencode/)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D1.19.3%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/opencode-desktop/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3D0.13.4%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/oxker/)
 [![pear-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpear-desktop.json%3Fv%3D3.12.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/pear-desktop/)
@@ -87,7 +88,7 @@
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-10-20 21:51 UTC automatically by GitHub Actions.**
+**Updated 2026-10-21 07:59 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 
 ---
