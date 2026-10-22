@@ -82,7 +82,7 @@
 [![scientifica-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fscientifica-fonts.json%3Fv%3D2.3%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/scientifica-fonts/)
 [![selawik-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fselawik-fonts.json%3Fv%3D1.01%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/selawik-fonts/)
 [![slimbrave](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fslimbrave.json%3Fv%3D2.3.2%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/slimbrave/)
-[![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3D0.11.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/soundcraft/)
+[![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3D0.12.1%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/soundcraft/)
 [![superfile](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsuperfile.json%3Fv%3D1.6.0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/superfile/)
 [![tela-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftela-icon-theme.json%3Fv%3D2026.07.07%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/tela-icon-theme/)
 [![television](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftelevision.json%3Fv%3D0.15.9%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/package/television/)
@@ -102,7 +102,7 @@
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-10-22 15:38 UTC automatically by GitHub Actions.**
+**Updated 2026-10-22 21:54 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 
 ---
