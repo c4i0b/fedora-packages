@@ -10,7 +10,7 @@
 ExclusiveArch:  x86_64 aarch64
 
 Name:           opencode-desktop
-Version:        1.19.3
+Version:        1.19.4
 Release:        1%{?dist}
 Summary:        Desktop app for OpenCode, the open source AI coding agent (Electron)
 
@@ -85,5 +85,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/metainfo/ai.opencode.desktop.metainfo.xml
 
 %changelog
+* Thu Oct 22 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.19.4-1
+- Update to 1.19.4
+
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 1.19.3-1
 - Initial package
