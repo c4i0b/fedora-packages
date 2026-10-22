@@ -1,5 +1,5 @@
 Name:           soundcraft
-Version:        0.11.0
+Version:        0.12.1
 Release:        1%{?dist}
 Summary:        Digital audio workstation with multitrack editing, mixer and MIDI
 
@@ -79,5 +79,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.soundc
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.soundcraft.*
 
 %changelog
+* Thu Oct 22 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.12.1-1
+- Update to 0.12.1
+
 * Wed Oct 21 2026 Caio Bruno <cbrunofb@gmail.com> - 0.11.0-1
 - Initial package
