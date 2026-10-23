@@ -31,6 +31,10 @@ test:
 validate:
     {{runner}} tools/validate.sh
 
+# Drop untracked unreferenced files from package dirs (bounds the CI sources cache)
+prune-sources:
+    {{runner}} tools/prune-sources.sh
+
 # Full mock build (rawhide + oldest stable, with network) — ONLY to reproduce
 # an inconclusive COPR failure; never preemptively, COPR is the validator
 build-local name chroot="default":

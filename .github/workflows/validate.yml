@@ -48,6 +48,18 @@ jobs:
             /github/home/.cargo/git
           key: vendor-caches-${{ hashFiles('packages/*/go.*', 'packages/*/Cargo.*', 'tools/vendor-sources.sh') }}
           restore-keys: vendor-caches-
+      # upstream tarballs rpmbuild downloads into the package dirs; the
+      # restore-keys prefix makes invalidation per-package-lazy: after a bump
+      # only the changed tarball is re-fetched, the prune bounds the size
+      - uses: actions/cache/restore@v4
+        id: sources_cache
+        with:
+          path: |
+            packages/**/*.tar.*
+            packages/**/*.tgz
+            packages/**/*.zip
+          key: sources-v1-${{ hashFiles('packages/*/*.spec') }}
+          restore-keys: sources-v1-
       - run: |
           t0=$(date +%s)
           just test
@@ -57,8 +69,20 @@ jobs:
       - run: |
           t0=$(date +%s)
           just validate
-          v=$(( $(date +%s) - t0 ))
-          echo "validate=$v" >> "$GITHUB_ENV"
-          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=$v cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} total=$(( $(date +%s) - job_start ))"
+          echo "validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
+      - run: |
+          just prune-sources
+          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_files=$(find packages -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
+        env:
+          FEDORA_PACKAGES_DIRECT: "1"
+      # exact key already stored means nothing changed; save would fail on it
+      - uses: actions/cache/save@v4
+        if: steps.sources_cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            packages/**/*.tar.*
+            packages/**/*.tgz
+            packages/**/*.zip
+          key: sources-v1-${{ hashFiles('packages/*/*.spec') }}
