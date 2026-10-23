@@ -33,10 +33,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
+          # the job container gets HOME=/github/home (not /root), so that is
+          # where go/cargo put their module caches
           path: |
-            /root/go/pkg/mod
-            /root/.cargo/registry
-            /root/.cargo/git
+            /github/home/go/pkg/mod
+            /github/home/.cargo/registry
+            /github/home/.cargo/git
           key: vendor-caches-${{ hashFiles('packages/*/go.*', 'packages/*/Cargo.*', 'tools/vendor-sources.sh') }}
           restore-keys: vendor-caches-
       - run: just test

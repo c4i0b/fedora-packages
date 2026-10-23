@@ -36,6 +36,24 @@ done < <(git -C "$root" ls-files 'packages/*' | grep -vE '\.(spec|patch|txt|md|t
     head -c2 "$root/$f" 2>/dev/null | grep -q '#!' && echo "$f"
   done)
 
+# host.sh must parse every remote syntax the repo may use (a past regression
+# silently dropped the owner and every host-dependent tool died on "/repo")
+# shellcheck source=host.sh
+source "$root/tools/host.sh"
+while IFS='|' read -r url host owner repo; do
+  host_detect "$url"
+  if [ "$GIT_HOST/$GIT_OWNER/$GIT_REPO" != "$host/$owner/$repo" ]; then
+    echo "FAIL: host.sh parsed '$url' as $GIT_HOST/$GIT_OWNER/$GIT_REPO (expected $host/$owner/$repo)" >&2
+    fail=1
+  fi
+done <<'EOF'
+https://github.com/o/r.git|github.com|o|r
+git@github.com:o/r.git|github.com|o|r
+https://gitlab.com/group/sub/r.git|gitlab.com|sub|r
+ssh://git@codeberg.org:2222/o/r.git|codeberg.org|o|r
+https://github.com/o/r|github.com|o|r
+EOF
+
 for dir in "$root"/packages/*/; do
   check_package "$dir" || fail=1
 done

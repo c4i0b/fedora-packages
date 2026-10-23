@@ -13,7 +13,9 @@ workflow="${1:-autoupdate}"
 days="${2:-7}"
 pattern="${3:-rate-summary}"
 
-repo="${GIT_SLUG}"
+repo="${GIT_SLUG:-}"
+[ -n "$repo" ] && [ "$repo" != "/" ] && [[ "$repo" == */* && "${repo%%/*}" != "" ]] \
+  || { echo "could not detect a valid OWNER/REPO from the origin remote (got '${repo:-empty}')" >&2; exit 1; }
 since="$(date -u -d "$days days ago" +%Y-%m-%d)"
 
 mapfile -t runs < <(gh run list -R "$repo" -w "$workflow" --created ">$since" \

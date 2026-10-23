@@ -9,19 +9,20 @@ host_detect() {
   GIT_HOST=""
   GIT_OWNER=""
   GIT_REPO=""
-  if [[ "$url" =~ [/:]([^/:]+)\.git$ ]]; then
-    local tail="${BASH_REMATCH[1]}"
-    GIT_REPO="$(basename "$tail")"
-    local ownerpath="$(dirname "$tail")"
-    # scp-like: git@host:owner/repo
-    if [[ "$url" =~ @([^:]+): ]]; then
-      GIT_HOST="${BASH_REMATCH[1]}"
-      GIT_OWNER="$(basename "$ownerpath")"
-    elif [[ "$url" =~ ://([^/]+)/(.*)$ ]]; then
-      GIT_HOST="${BASH_REMATCH[1]}"
-      GIT_OWNER="$(basename "$ownerpath")"
-    fi
+  # accepts https://host/owner/repo.git, git@host:owner/repo.git and bare
+  # forms; nested groups (gitlab) keep only the last path segment as owner
+  if [[ "$url" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*://([^/]+)/(.+)/([^/]+?)(\.git)?/?$ ]]; then
+    GIT_HOST="${BASH_REMATCH[1]}"
+    GIT_OWNER="${BASH_REMATCH[2]##*/}"
+    GIT_REPO="${BASH_REMATCH[3]}"
+  elif [[ "$url" =~ ^([^@]+@)?([^:/]+):(.+)/([^/]+?)(\.git)?/?$ ]]; then
+    GIT_HOST="${BASH_REMATCH[2]}"
+    GIT_OWNER="${BASH_REMATCH[3]##*/}"
+    GIT_REPO="${BASH_REMATCH[4]}"
   fi
+  GIT_HOST="${GIT_HOST##*@}"
+  GIT_HOST="${GIT_HOST%%:*}"
+  GIT_REPO="${GIT_REPO%.git}"
   [ -n "$GIT_HOST" ] || GIT_HOST="github.com"
   [ -n "$GIT_OWNER" ] || GIT_OWNER=""
   [ -n "$GIT_REPO" ] || GIT_REPO=""
@@ -50,4 +51,6 @@ host_detect() {
       ;;
   esac
 }
-host_detect "$@"
+# no "$@" here: sourcing scripts must not leak their own positional args
+# in as a URL (host_detect defaults to the origin remote when argless)
+host_detect
