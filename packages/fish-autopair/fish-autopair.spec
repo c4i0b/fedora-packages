@@ -1,8 +1,3 @@
-# fish plugin installed into fish's vendor dirs — the same layout fisher
-# uses under ~/.config/fish: conf.d/*.fish run at shell startup, functions/
-# and completions/ autoload on demand. A plugin is plain fish source: there
-# is nothing to build. Per-package: trim the vendor dirs the upstream
-# actually ships (unmatched %%files globs fail the build).
 Name:           fish-autopair
 Version:        1.0.4
 Release:        1%{?dist}

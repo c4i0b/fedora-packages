@@ -1,9 +1,3 @@
-# fish plugin installed into fish's vendor dirs — the same layout fisher
-# uses under ~/.config/fish: conf.d/*.fish run at shell startup, functions/
-# and completions/ autoload on demand. A plugin is plain fish source: there
-# is nothing to build. Per-package: trim the vendor dirs the upstream
-# actually ships (unmatched %%files globs fail the build) and fill the
-# __EXTRA*__ slots for subdirs, man pages or prompt conflicts.
 Name:           fish-tide
 Version:        6.2.0
 Release:        1%{?dist}

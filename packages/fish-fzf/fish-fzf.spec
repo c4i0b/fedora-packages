@@ -1,8 +1,3 @@
-# fish plugin installed into fish's vendor dirs — the same layout fisher
-# uses under ~/.config/fish: conf.d/*.fish run at shell startup, functions/
-# and completions/ autoload on demand. fzf.fish powers its key bindings
-# with fzf; fd and bat are the README-recommended companions (directory
-# search previews), pulled in so the bindings work out of the box.
 Name:           fish-fzf
 Version:        11.0
 Release:        1%{?dist}
