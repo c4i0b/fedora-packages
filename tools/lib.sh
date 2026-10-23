@@ -83,6 +83,16 @@ check_package() {
     echo "FAIL: $name: uses %cargo_* without BuildRequires: cargo-rpm-macros"
     fail=1
   fi
+  if grep -q '%pyproject_' "$spec" && ! grep -q '^BuildRequires:.*pyproject-rpm-macros' "$spec"; then
+    echo "FAIL: $name: uses %pyproject_* without BuildRequires: pyproject-rpm-macros"
+    fail=1
+  fi
+  # uv applies upstream's [tool.uv] override-dependencies where pip cannot
+  # (hermes-agent's Pillow/browser-harness ResolutionImpossible)
+  if grep -q 'uv pip install' "$spec" && ! grep -q '^BuildRequires:.*\<uv\>' "$spec"; then
+    echo "FAIL: $name: uses 'uv pip install' without BuildRequires: uv"
+    fail=1
+  fi
 
   # pip/venv into the buildroot bundles manylinux libs with hashed sonames
   # whose versioned requires nothing provides: uninstallable rpm (AGENTS.md)
