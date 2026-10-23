@@ -1,5 +1,5 @@
 Name:           gridcraft
-Version:        0.10.0
+Version:        0.11.1
 Release:        1%{?dist}
 Summary:        Spreadsheet with formulas, charts and pivot tables
 
@@ -77,5 +77,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.gridcr
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.gridcraft.*
 
 %changelog
+* Fri Oct 23 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.11.1-1
+- Update to 0.11.1
+
 * Wed Oct 21 2026 Caio Bruno <cbrunofb@gmail.com> - 0.10.0-1
 - Initial package
