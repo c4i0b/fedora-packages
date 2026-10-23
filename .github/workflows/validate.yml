@@ -48,6 +48,10 @@ jobs:
             /github/home/.cargo/registry
             /github/home/.cargo/git
           key: vendor-caches-${{ hashFiles('packages/*/go.*', 'packages/*/Cargo.*', 'tools/vendor-sources.sh') }}
+          # module/registry caches are content-addressed by dependency version,
+          # NOT by toolchain, so a golang/cargo bump in the Fedora image must
+          # not invalidate them; bump the vendor-caches-v2- prefix manually
+          # only on real cache corruption
           restore-keys: vendor-caches-
       # upstream tarballs rpmbuild downloads into the package dirs; the
       # restore-keys prefix makes invalidation per-package-lazy: after a bump
