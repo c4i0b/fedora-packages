@@ -68,6 +68,8 @@ jobs:
             packages/**/*.tar.*
             packages/**/*.tgz
             packages/**/*.zip
+            !packages/**/*-vendor.tar.bz2
+            !packages/**/vendor.tar.zst
           key: sources-v2-${{ hashFiles('packages/*/*.spec') }}
           restore-keys: sources-v2-
       - run: |
@@ -77,21 +79,23 @@ jobs:
         env:
           FEDORA_PACKAGES_DIRECT: "1"
       - run: |
-          srcs_before=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l)
+          # vendor archives are REGENERATED each run (not downloads) and their
+          # size wobbles, so both the counter and the epoch ignore them
+          srcs_before=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l)
           t0=$(date +%s)
           just validate
           echo "validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
           # downloads = files rpmbuild had to fetch: on a healthy cache-hit run
           # only the 'releases/latest' volatiles (pruned before every save);
           # anything more without a spec change means a prune/cache bug
-          echo "downloads=$(( $(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l) - srcs_before ))" >> "$GITHUB_ENV"
+          echo "downloads=$(( $(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l) - srcs_before ))" >> "$GITHUB_ENV"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
           KEEP_SOURCES: "1"
       - run: |
           just prune-sources
-          echo "srcs_epoch=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -printf '%P %s\n' | sort | sha256sum | cut -c1-12)" >> "$GITHUB_ENV"
-          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
+          echo "srcs_epoch=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) -printf '%P %s\n' | sort | sha256sum | cut -c1-12)" >> "$GITHUB_ENV"
+          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
       # save only when the post-prune content set differs from what was
@@ -104,4 +108,6 @@ jobs:
             packages/**/*.tar.*
             packages/**/*.tgz
             packages/**/*.zip
+            !packages/**/*-vendor.tar.bz2
+            !packages/**/vendor.tar.zst
           key: sources-v2-${{ hashFiles('packages/*/*.spec') }}-${{ env.srcs_epoch }}
