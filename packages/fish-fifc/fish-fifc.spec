@@ -12,8 +12,9 @@ BuildRequires:  fish
 Requires:       fish
 Requires:       fzf
 Requires:       file
-# best preview/search companions (all optional, type -q guarded upstream);
-# procs/broot fill the same roles but are not in the Fedora repos
+# type -q guarded upstream; broot upgrades ctrl-o on a directory to an
+# interactive tree (it comes from this COPR)
+Requires:       broot
 Requires:       bat
 Requires:       eza
 Requires:       fd-find
