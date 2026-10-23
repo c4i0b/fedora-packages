@@ -37,8 +37,8 @@ jobs:
           t0=$(date +%s)
           dnf -y install git make rpmdevtools rpmlint just
           echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
+      - uses: actions/checkout@v5
+      - uses: actions/cache@v5
         id: module_cache
         with:
           # the job container gets HOME=/github/home (not /root), so that is
@@ -56,7 +56,7 @@ jobs:
       # upstream tarballs rpmbuild downloads into the package dirs; the
       # restore-keys prefix makes invalidation per-package-lazy: after a bump
       # only the changed tarball is re-fetched, the prune bounds the size
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@v5
         id: sources_cache
         with:
           path: |
@@ -88,7 +88,7 @@ jobs:
         env:
           FEDORA_PACKAGES_DIRECT: "1"
       # exact key already stored means nothing changed; save would fail on it
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/save@v5
         if: steps.sources_cache.outputs.cache-hit != 'true'
         with:
           path: |

@@ -14,7 +14,7 @@ jobs:
   badges:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: tools/update-badges.sh caiobruno/fedora-packages c4i0b/fedora-packages
       # [skip ci] keeps the push from re-triggering validate; badge commits
       # never touch packages/, so the COPR webhook stays quiet too
