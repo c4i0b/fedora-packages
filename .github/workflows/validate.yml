@@ -67,14 +67,18 @@ jobs:
         env:
           FEDORA_PACKAGES_DIRECT: "1"
       - run: |
+          srcs_before=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l)
           t0=$(date +%s)
           just validate
           echo "validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
+          # downloads = files rpmbuild had to fetch: 0 on a healthy cache-hit
+          # run, >0 without a spec change means a prune/cache bug
+          echo "downloads=$(( $(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l) - srcs_before ))" >> "$GITHUB_ENV"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
       - run: |
           just prune-sources
-          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_files=$(find packages -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
+          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
       # exact key already stored means nothing changed; save would fail on it
