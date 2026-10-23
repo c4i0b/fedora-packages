@@ -12,8 +12,8 @@ BuildRequires:  fish
 Requires:       fish
 Requires:       fzf
 Requires:       file
-# type -q guarded upstream; broot upgrades ctrl-o on a directory to an
-# interactive tree (it comes from this COPR)
+# several tools below are optional upstream but required here for the
+# full preview experience
 Requires:       broot
 Requires:       bat
 Requires:       eza
