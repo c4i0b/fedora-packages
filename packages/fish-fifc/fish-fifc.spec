@@ -12,15 +12,16 @@ BuildRequires:  fish
 Requires:       fish
 Requires:       fzf
 Requires:       file
-# several tools below are optional upstream but required here for the
-# full preview experience
-Requires:       broot
+# optional upstream, required here for the full preview experience
 Requires:       bat
 Requires:       eza
 Requires:       fd-find
 Requires:       chafa
 Requires:       hexyl
 Requires:       ripgrep
+# broot upgrades ctrl-o on a directory to an interactive tree; without it
+# the shortcut falls back to eza above
+Recommends:     broot
 
 %description
 Fzf powered fish history and tab completions
