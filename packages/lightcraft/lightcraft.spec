@@ -1,5 +1,5 @@
 Name:           lightcraft
-Version:        0.11.0
+Version:        0.12.0
 Release:        1%{?dist}
 Summary:        Non-destructive photo library and raw developer
 
@@ -74,6 +74,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.lightc
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.lightcraft.*
 
 %changelog
+* Fri Oct 23 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.12.0-1
+- Update to 0.12.0
+
 * Wed Oct 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.11.0-1
 - Update to 0.11.0
 
