@@ -205,6 +205,7 @@ npm:
 - Squash/amend + force-push to `main` is acceptable; keep a small clean history.
 - Never commit archives (`*.tgz`, `*.tar.gz` gitignored) — sources are
   downloaded at build time.
+- When trimming comments from `.spec` files, never remove required headers (`Name:`, `Version:`, `Release:`, `Summary:`, `License:`, `URL:`). Some templates rely on those tags appearing early; stripping leading comment blocks blindly can drop them. Always run `just test` after bulk spec edits.
 - Source builds are the priority: `just new-package <name> source|go|rust`
   (vendoring runs automatically at SRPM time, which has network). The COPR
   project also has build network enabled (`--enable-net on`, see

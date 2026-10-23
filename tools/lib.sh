@@ -65,7 +65,13 @@ check_package() {
 
   local spec_name version release changelog
   spec_name="$(awk '/^Name:/{print $2; exit}' "$spec")"
-  [ "$spec_name" = "$name" ] || { echo "FAIL: $name: spec Name '$spec_name' != directory name"; fail=1; }
+  if [ -z "$spec_name" ]; then
+    echo "FAIL: $name: missing Name: tag"
+    fail=1
+  elif [ "$spec_name" != "$name" ]; then
+    echo "FAIL: $name: spec Name '$spec_name' != directory name"
+    fail=1
+  fi
 
   version="$(awk '/^Version:/{print $2; exit}' "$spec")"
   release="$(awk '/^Release:/{print $2; exit}' "$spec" | sed 's/%{.*//')"
