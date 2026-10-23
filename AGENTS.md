@@ -76,8 +76,9 @@ put new logic in a script, not inline in the justfile.
 ## Automatic updates
 
 - `packages/<name>/upstream` selects the tracker: `owner/repo` → GitHub
-  Releases latest (leading `v` stripped) or `npm:<package>` → npm dist-tag
-  `latest`.
+  Releases latest (leading `v` stripped), `tags:owner/repo` → latest git tag
+  via `ls-remote` (tags-only repos, any forge, zero API quota) or
+  `npm:<package>` → npm dist-tag `latest`.
 - Registry/GitHub API responses are **compact JSON (single line)**: extract
   fields with `grep -oE`, never with per-line `awk -F'"'`.
 - Scheduled multiple times per day (see `autoupdate.yml` for the cron);

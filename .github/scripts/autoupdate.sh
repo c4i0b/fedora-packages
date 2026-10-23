@@ -67,7 +67,21 @@ resolve() {
   auth=()
   [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
   # ordered by frequency: bare owner/repo (GitHub) dominates, then npm
-  if [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+  if [[ "$source" == tags:* ]]; then
+    # tags-only repos: ls-remote is forge-agnostic and costs no API quota
+    # (nested forge prefixes reuse their own base: tags:gitlab:o/r, ...)
+    local repo_url="${source#tags:}"
+    case "$repo_url" in
+      gitlab:*) repo_url="https://gitlab.com/${repo_url#gitlab:}" ;;
+      codeberg:*) repo_url="https://codeberg.org/${repo_url#codeberg:}" ;;
+      forgejo:*) repo_url="${FORGEJO_HOME:-https://codeberg.org}/${repo_url#forgejo:}" ;;
+      *) repo_url="https://github.com/$repo_url" ;;
+    esac
+    # -v:refname sorts by version; skip annotated-tag deref (^{}) lines
+    latest="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
+      | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2; exit}')"
+    latest="${latest#v}"
+  elif [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
     # repos without any GitHub Release (only prereleases) 404 here
     body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
     latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true

@@ -8,6 +8,8 @@ upstream_home() {
   # prefixed forms also match */*, so they must come first; GitHub (the most
   # frequent) is the fallthrough
   case "$src" in
+    # tags-only repo on any forge: same homepage as its bare form
+    tags:*) upstream_home "${src#tags:}" ;;
     npm:*) echo "https://www.npmjs.com/package/${src#npm:}" ;;
     gitlab:*) echo "https://gitlab.com/${src#gitlab:}" ;;
     codeberg:*) echo "https://codeberg.org/${src#codeberg:}" ;;
@@ -210,6 +212,7 @@ check_package() {
     src="$(cat "$dir/upstream")"
     [[ "$src" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ || "$src" == npm:* \
        || "$src" == gitlab:* || "$src" == codeberg:* || "$src" == forgejo:* \
+       || "$src" == tags:* \
        || "$src" =~ ^https?:// ]] \
       || { echo "FAIL: $name: invalid upstream '$src' (expected 'owner/repo', '<forge>:owner/repo', 'npm:<package>' or an URL)"; fail=1; }
     [ -n "$(upstream_home "$src")" ] \
