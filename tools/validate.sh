@@ -20,9 +20,13 @@ printf '%s\n' packages/*/ \
   | xargs -P "$jobs" -I{} make -f .copr/Makefile srpm "pkg={}" outdir=/tmp/srpm
 wait "$lintpid"
 
-# Remove downloaded/generated build artifacts (legit files are tracked)
-find packages -maxdepth 2 -type f \( \
-    -name '*.tar.gz' -o -name '*.tar.xz' -o -name '*.tgz' -o -name '*.zip' \
-    -o -name 'vendor.tar.zst' -o -name '*-vendor.tar.bz2' -o -name 'COPYING' \
-  \) -delete
-rm -rf packages/*/bun-linux-*
+# Remove downloaded/generated build artifacts (legit files are tracked).
+# CI sets KEEP_SOURCES=1 so the sources cache can save them after the prune;
+# locally the default keeps the working tree clean.
+if [ "${KEEP_SOURCES:-0}" != "1" ]; then
+  find packages -maxdepth 2 -type f \( \
+      -name '*.tar.gz' -o -name '*.tar.xz' -o -name '*.tgz' -o -name '*.zip' \
+      -o -name 'vendor.tar.zst' -o -name '*-vendor.tar.bz2' -o -name 'COPYING' \
+    \) -delete
+  rm -rf packages/*/bun-linux-*
+fi
