@@ -22,7 +22,7 @@ File browser and launcher: navigates as an interactive tree, fuzzy-searches name
 
 %prep
 %autosetup -n %{name}-%{version} -p1 -a 1
-%cargo_prep -v vendor
+%cargo_prep -v vendor-deps
 
 %build
 %cargo_build
