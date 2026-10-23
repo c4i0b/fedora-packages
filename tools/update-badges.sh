@@ -19,7 +19,7 @@ gname="${github#*/}"
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 python3 - "$root" "$owner" "$name" "$gowner" "$gname" <<'PY'
-import json, gzip, os, re, sys, urllib.request
+import json, gzip, os, re, sys, time, urllib.request
 
 root, owner, project, gowner, gproject = sys.argv[1:6]
 base = f"https://download.copr.fedorainfracloud.org/results/{owner}/{project}"
@@ -29,10 +29,18 @@ raw = f"https://raw.githubusercontent.com/{gowner}/{gproject}/main/badges"
 HIGHLIGHTS = []  # deprecated: all packages get badges now
 BADGE_REV = 2  # bump to force GitHub camo to re-fetch every badge URL
 
-def get(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "update-badges"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return r.read()
+def get(url, tries=3):
+    # the results CDN (CloudFront -> packages.redhat.com/S3 redirects) drops
+    # or mis-serves occasional requests; retry with growing backoff
+    for attempt in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "update-badges"})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.read()
+        except Exception:
+            if attempt == tries - 1:
+                raise
+            time.sleep(2 * (attempt + 1))
 
 mon = json.loads(get(
     f"https://copr.fedorainfracloud.org/api_3/monitor?ownername={owner}&projectname={project}"
@@ -63,8 +71,10 @@ def split_chroot(c):
 
 arches_by_base = {}
 for c in chroots:
-    base, arch = split_chroot(c)
-    arches_by_base.setdefault(base, set()).add(arch)
+    # careful not to shadow the module-level `base` (the download URL):
+    # published_versions() depends on it
+    cbase, carch = split_chroot(c)
+    arches_by_base.setdefault(cbase, set()).add(carch)
 
 def bname(c):
     base, arch = split_chroot(c)
@@ -88,7 +98,8 @@ for chroot, cell_list in sorted(chroots.items(), key=lambda kv: sort_key(kv[0]))
     ok = sum(c["state"] == "succeeded" for c in cell_list)
     bad = sum(c["state"] == "failed" for c in cell_list)
     inflight = len(cell_list) - ok - bad
-    msg = str(ok) if not bad else f"{bad} \u2717"
+    # the message keeps the succeeded count; only the color flags failures
+    msg = str(ok)
     color = "red" if bad else ("yellow" if inflight else "brightgreen")
     badge(bname(chroot), label(chroot), msg, color)
 
@@ -108,15 +119,21 @@ for f in os.listdir(d):
 latest, attempted, known, has_fail, inflight = {}, {}, {}, set(), set()
 
 def published_versions(chroot):
-    """name -> version of packages actually in the chroot binary repo"""
+    """name -> version of packages actually in the chroot binary repo.
+    Returns None when the repodata cannot be fetched/parsed (so callers can
+    tell 'fetch failed' from 'package not in repo'); the cache-buster works
+    around the results CDN serving stale content."""
+    url = f"{base}/{chroot}/repodata/repomd.xml?nc={time.time_ns()}"
     try:
-        repomd = get(f"{base}/{chroot}/repodata/repomd.xml").decode()
+        repomd = get(url).decode()
         href = re.search(r'href="(repodata/[^"]*primary\.xml\.gz)"', repomd).group(1)
-        xml = gzip.decompress(get(f"{base}/{chroot}/{href}")).decode(errors="replace")
+        xml = gzip.decompress(
+            get(f"{base}/{chroot}/{href}?nc={time.time_ns()}")).decode(errors="replace")
         return dict(re.findall(
             r'<name>([^<]+)</name>.*?<version[^>]*?ver="([^"]+)"', xml, re.S))
-    except Exception:
-        return {}
+    except Exception as e:
+        print(f"WARNING: repodata fetch failed for {chroot}: {e}")
+        return None
 
 pub_cache = {}
 # name -> version actually installable; once a rebuild is submitted the
@@ -124,7 +141,7 @@ pub_cache = {}
 # the only source for "last complete build" while one is in flight
 published = {}
 for chroot in chroots:
-    pub_cache.setdefault(chroot, published_versions(chroot))
+    pub_cache.setdefault(chroot, published_versions(chroot) or {})
     for pkg_name, ver in pub_cache[chroot].items():
         published.setdefault(pkg_name, ver)
 for c in iter_cells():
@@ -173,22 +190,27 @@ pub_cache = {}
 lines = []
 for pkg in sorted(failed):
     cell_list = failed[pkg]
-    ch_list = [c["chroot"] for c in cell_list]
+    ch_list = sorted((c["chroot"] for c in cell_list), key=sort_key)
     attempted = cell_list[0]["pkg_version"] or "?"
     build_id = max(c["build_id"] for c in cell_list)
     pub_parts = []
     for ch in ch_list:
         if ch not in pub_cache:
             pub_cache[ch] = published_versions(ch)
-        pub_parts.append(pub_cache[ch].get(pkg))
-    if any(pub_parts):
+        pub_parts.append("?" if pub_cache[ch] is None else pub_cache[ch].get(pkg))
+    if all(v == "?" for v in pub_parts):
+        # every lookup failed: publishing "—" would claim the package was
+        # never published; fail the run and keep the previous table instead
+        sys.exit(f"repodata unfetchable for every failing chroot of {pkg}; "
+                 "keeping the previous build-status block")
+    if any(v and v != "?" for v in pub_parts):
         # per-chroot only when they diverge
         pub = pub_parts[0] if len(set(pub_parts)) == 1 and pub_parts[0] \
-            else ", ".join(f"{v or DASH} ({label(ch)})"
-                           for v, ch in zip(pub_parts, ch_list))
+            else "<br>".join(f"{v or DASH} ({label(ch)})"
+                             for v, ch in zip(pub_parts, ch_list))
     else:
         pub = DASH
-    failed_in = ", ".join(label(ch) for ch in ch_list)
+    failed_in = "<br>".join(label(ch) for ch in ch_list)
     lines.append(f"| {pkg} | {pub} | {attempted} | {failed_in} "
                  f"| [#{build_id}]({copr}/build/{build_id}/) |")
 
