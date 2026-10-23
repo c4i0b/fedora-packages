@@ -19,11 +19,9 @@ host_detect() {
       GIT_OWNER="$(basename "$ownerpath")"
     elif [[ "$url" =~ ://([^/]+)/(.*)$ ]]; then
       GIT_HOST="${BASH_REMATCH[1]}"
-      # https: strip first path component(s)? owner/repo may be nested rarely
       GIT_OWNER="$(basename "$ownerpath")"
     fi
   fi
-  # fallback
   [ -n "$GIT_HOST" ] || GIT_HOST="github.com"
   [ -n "$GIT_OWNER" ] || GIT_OWNER=""
   [ -n "$GIT_REPO" ] || GIT_REPO=""
@@ -46,7 +44,6 @@ host_detect() {
       GIT_API_BASE="https://codeberg.org/api/v1"
       ;;
     *)
-      # generic forgejo/gitea/gitlab self-hosted: try common patterns
       GIT_WEB_BASE="https://$GIT_HOST"
       GIT_RAW_BASE="https://$GIT_HOST"
       GIT_API_BASE="https://$GIT_HOST/api/v1"

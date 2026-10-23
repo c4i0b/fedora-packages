@@ -17,7 +17,6 @@ export resolved tmp stats root
 # shellcheck source=/dev/null
 [ -f "$root/tools/host.sh" ] && source "$root/tools/host.sh" >/dev/null 2>&1 || true
 
-# rate-limit tuning knobs
 SUCCESS_DELAY=0.3
 RETRY_BASE=3
 export SUCCESS_DELAY RETRY_BASE
@@ -67,8 +66,19 @@ resolve() {
 
   auth=()
   [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
-  # GitLab/Codeberg tokens: prefer CI_JOB_TOKEN/GITLAB_TOKEN/CODEBERG_TOKEN
-  if [[ "$source" == gitlab:* ]]; then
+  # ordered by frequency: bare owner/repo (GitHub) dominates, then npm
+  if [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+    # repos without any GitHub Release (only prereleases) 404 here
+    body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
+    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+    latest="${latest#v}"
+  elif [[ "$source" == npm:* ]]; then
+    npm_pkg="${source#npm:}"
+    npm_slug="$(echo "$npm_pkg" | sed 's|/|%2f|')"
+    body="$(get "$pkg" "https://registry.npmjs.org/${npm_slug}/latest")" || true
+    # with set -o pipefail an empty body must not abort before the fallback
+    latest="$(grep -oE '"version": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+  elif [[ "$source" == gitlab:* ]]; then
     src="${source#gitlab:}"; proj="$(echo "$src" | sed 's|/|%2f|')"
     [ -n "${GITLAB_TOKEN:-}" ] && auth=(-H "PRIVATE-TOKEN: $GITLAB_TOKEN")
     body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/releases" "${auth[@]}")" || true
@@ -90,19 +100,8 @@ resolve() {
       latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
       latest="${latest#v}"
     fi
-  elif [[ "$source" == npm:* ]]; then
-    npm_pkg="${source#npm:}"
-    npm_slug="$(echo "$npm_pkg" | sed 's|/|%2f|')"
-    body="$(get "$pkg" "https://registry.npmjs.org/${npm_slug}/latest")" || true
-    # with set -o pipefail an empty body must not abort before the fallback
-    latest="$(grep -oE '"version": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-  else
-    # repos without any GitHub Release (only prereleases) 404 here
-    body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
-    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
   fi
-  if [ -z "$latest" ]; then
+  if [ -z "$latest" ] && [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
     # Tag-only repos (no GitHub Releases): fall back to the latest tag
     body="$(get "$pkg" "https://api.github.com/repos/${source}/tags?per_page=1" "${auth[@]}")" || true
     latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true

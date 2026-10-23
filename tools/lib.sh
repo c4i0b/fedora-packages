@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 # Shared helpers for package scaffolding and validation.
 
+# Map an `upstream` source to the project homepage; empty when unmappable.
+# Formats must stay in sync with resolve() in autoupdate.sh and check_package.
+upstream_home() {
+  local src="$1"
+  # prefixed forms also match */*, so they must come first; GitHub (the most
+  # frequent) is the fallthrough
+  case "$src" in
+    npm:*) echo "https://www.npmjs.com/package/${src#npm:}" ;;
+    gitlab:*) echo "https://gitlab.com/${src#gitlab:}" ;;
+    codeberg:*) echo "https://codeberg.org/${src#codeberg:}" ;;
+    forgejo:*)
+      echo "${FORGEJO_HOME:-https://codeberg.org}/${src#forgejo:}" ;;
+    http://*|https://*) echo "$src" ;;
+    */*) echo "https://github.com/$src" ;;
+  esac
+}
+
 # Shared rpmlint invocation (kept in one place so packages and rendered
 # templates are held to the exact same standard)
 lint_spec() {
@@ -191,8 +208,12 @@ check_package() {
   if [ -f "$dir/upstream" ]; then
     local src
     src="$(cat "$dir/upstream")"
-    [[ "$src" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ || "$src" == npm:* ]] \
-      || { echo "FAIL: $name: invalid upstream '$src' (expected 'owner/repo' or 'npm:<package>')"; fail=1; }
+    [[ "$src" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ || "$src" == npm:* \
+       || "$src" == gitlab:* || "$src" == codeberg:* || "$src" == forgejo:* \
+       || "$src" =~ ^https?:// ]] \
+      || { echo "FAIL: $name: invalid upstream '$src' (expected 'owner/repo', '<forge>:owner/repo', 'npm:<package>' or an URL)"; fail=1; }
+    [ -n "$(upstream_home "$src")" ] \
+      || { echo "FAIL: $name: upstream '$src' has no mappable homepage"; fail=1; }
   fi
 
   return "$fail"

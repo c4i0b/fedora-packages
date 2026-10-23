@@ -20,15 +20,35 @@ github="${2:-${GIT_SLUG}}"
 gowner="${github%%/*}"
 gname="${github#*/}"
 
-python3 - "$root" "$owner" "$name" "$gowner" "$gname" "$GIT_RAW_BASE" "$GIT_WEB_BASE" <<'PY'
+# pkg -> upstream homepage for the README badge links: the `upstream` file
+# when it resolves (GitHub/GitLab/Codeberg/forgejo/npm/URL), else the spec's
+# URL: tag, else nothing (the badge falls back to our package directory)
+links_file="$(mktemp)"
+trap 'rm -f "$links_file"' EXIT
+for dir in "$root"/packages/*/; do
+  pkg="$(basename "$dir")"
+  spec=("$dir"/*.spec)
+  link=""
+  [ -f "$dir/upstream" ] && link="$(upstream_home "$(cat "$dir/upstream")")"
+  if [ -z "$link" ] && [ -e "${spec[0]}" ]; then
+    link="$(sed -n 's/^URL:[[:space:]]*//p' "${spec[0]}" | head -1 | tr -d '[:space:]')"
+  fi
+  [ -n "$link" ] && printf '%s\t%s\n' "$pkg" "$link" >>"$links_file"
+done
+
+python3 - "$root" "$owner" "$name" "$gowner" "$gname" "$GIT_RAW_BASE" "$GIT_WEB_BASE" "$links_file" <<'PY'
 import json, gzip, os, re, sys, time, urllib.request
 
-root, owner, project, gowner, gproject, git_raw_base, git_web_base = sys.argv[1:9]
+root, owner, project, gowner, gproject, git_raw_base, git_web_base, links_file = sys.argv[1:9]
+
+links = {}
+for line in open(links_file):
+    pkg, url = line.rstrip("\n").split("\t", 1)
+    links[pkg] = url
 base = f"https://download.copr.fedorainfracloud.org/results/{owner}/{project}"
 copr = f"https://copr.fedorainfracloud.org/coprs/{owner}/{project}"
 raw = f"{git_raw_base}/{gowner}/{gproject}/main/badges"
 
-HIGHLIGHTS = []  # deprecated: all packages get badges now
 BADGE_REV = 2  # bump to force GitHub camo to re-fetch every badge URL
 
 def get(url, tries=3):
@@ -108,7 +128,6 @@ for chroot, cell_list in sorted(chroots.items(), key=lambda kv: sort_key(kv[0]))
 packages = sorted({c["name"] for c in mon})
 badge("packages", "packages", str(len(packages)), "blue")
 
-# prune badge files of packages/chroots that are gone from COPR
 expected = {bname(c) for c in chroots} | set(packages) | {"packages"}
 d = f"{root}/badges"
 for f in os.listdir(d):
@@ -117,7 +136,7 @@ for f in os.listdir(d):
         print(f"pruned stale badge: {f}")
 
 # ---- per-package version badges (any succeeded chroot wins) ----------------
-# pkg_version is None for fresh/queued builds: fall back to "?"
+# pkg_version is None for fresh/queued builds
 latest, attempted, known, has_fail, inflight = {}, {}, {}, set(), set()
 
 def published_versions(chroot):
@@ -270,7 +289,6 @@ _, tail = rest.split(end, 1)
 # when the status itself changed, so refreshes with no change do not commit
 current = rest.split(end, 1)[0]
 def essence(t):
-    t = re.sub(r"Updated [0-9-]+ [0-9:]+ UTC automatically by GitHub Actions", "", t)
     t = re.sub(r"Updated [0-9-]+ [0-9:]+ UTC automatically by GitHub Actions", "", t)
     return "\n".join(l for l in t.split("\n") if l.strip()).strip()
 # unchanged status keeps its existing timestamp; the chroot/package blocks are
