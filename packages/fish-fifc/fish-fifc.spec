@@ -28,6 +28,18 @@ Fzf powered fish history and tab completions
 
 %prep
 %autosetup -n fifc-%{version}
+# late \t rebinders (autopair's --on-variable handler) clobber our TAB
+# binding (fifc issue #81): re-apply on the same event, registered after
+cat >> conf.d/fifc.fish <<'EOF'
+
+function __fifc_rebind_tab --on-variable fish_key_bindings
+    if status is-interactive
+        for mode in default insert
+            bind --mode $mode $fifc_keybinding _fifc
+        end
+    end
+end
+EOF
 
 %build
 

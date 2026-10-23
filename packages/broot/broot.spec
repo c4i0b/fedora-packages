@@ -29,10 +29,14 @@ File browser and launcher: navigates as an interactive tree, fuzzy-searches name
 
 %install
 %cargo_install
+# without the br function broot shows a first-run "install it now?" prompt
+target/release/broot --print-shell-function fish > br.fish
+install -Dpm644 br.fish %{buildroot}%{_datadir}/fish/vendor_functions.d/br.fish
 
 %files
 %license LICENSE
 %{_bindir}/broot
+%{_datadir}/fish/vendor_functions.d/br.fish
 
 %changelog
 * Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 1.61.0-1
