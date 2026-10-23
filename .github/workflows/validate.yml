@@ -55,7 +55,12 @@ jobs:
           restore-keys: vendor-caches-
       # upstream tarballs rpmbuild downloads into the package dirs; the
       # restore-keys prefix makes invalidation per-package-lazy: after a bump
-      # only the changed tarball is re-fetched, the prune bounds the size
+      # only the changed tarball is re-fetched, the prune bounds the size.
+      # Saved keys carry a content epoch (name+size manifest) because GitHub
+      # caches are immutable: an exact-key hit can never be updated, so a
+      # cache saved with an incomplete set would re-download the difference
+      # forever. The primary key never matches (saved keys have an epoch
+      # suffix); the prefix picks the newest entry.
       - uses: actions/cache/restore@v5
         id: sources_cache
         with:
@@ -63,8 +68,8 @@ jobs:
             packages/**/*.tar.*
             packages/**/*.tgz
             packages/**/*.zip
-          key: sources-v1-${{ hashFiles('packages/*/*.spec') }}
-          restore-keys: sources-v1-
+          key: sources-v2-${{ hashFiles('packages/*/*.spec') }}
+          restore-keys: sources-v2-
       - run: |
           t0=$(date +%s)
           just test
@@ -76,23 +81,27 @@ jobs:
           t0=$(date +%s)
           just validate
           echo "validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
-          # downloads = files rpmbuild had to fetch: 0 on a healthy cache-hit
-          # run, >0 without a spec change means a prune/cache bug
+          # downloads = files rpmbuild had to fetch: on a healthy cache-hit run
+          # only the 'releases/latest' volatiles (pruned before every save);
+          # anything more without a spec change means a prune/cache bug
           echo "downloads=$(( $(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l) - srcs_before ))" >> "$GITHUB_ENV"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
           KEEP_SOURCES: "1"
       - run: |
           just prune-sources
-          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
+          echo "srcs_epoch=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -printf '%P %s\n' | sort | sha256sum | cut -c1-12)" >> "$GITHUB_ENV"
+          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
-      # exact key already stored means nothing changed; save would fail on it
+      # save only when the post-prune content set differs from what was
+      # restored (same set = the immutable entry already holds it); volatile
+      # "releases/latest" payloads are pruned before this point and never saved
       - uses: actions/cache/save@v5
-        if: steps.sources_cache.outputs.cache-hit != 'true'
+        if: steps.sources_cache.outputs.cache-matched-key != format('sources-v2-{0}-{1}', hashFiles('packages/*/*.spec'), env.srcs_epoch)
         with:
           path: |
             packages/**/*.tar.*
             packages/**/*.tgz
             packages/**/*.zip
-          key: sources-v1-${{ hashFiles('packages/*/*.spec') }}
+          key: sources-v2-${{ hashFiles('packages/*/*.spec') }}-${{ env.srcs_epoch }}
