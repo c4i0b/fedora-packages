@@ -14,6 +14,8 @@ name="${project#*/}"
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=host.sh
 source "$root/tools/host.sh"
+# shellcheck source=lib.sh
+source "$root/tools/lib.sh"
 # COPR owner/name and the repo identity differ in this repo: badges link to
 # raw/web (repo owner) but to the COPR monitor (COPR owner).
 github="${2:-${GIT_SLUG}}"
@@ -199,7 +201,7 @@ for pkg in packages:
     badge_lines.append(
         f"[![{pkg}]({url}"
         f"%2F{pkg}.json%3Fv%3D{ver}%2Er{BADGE_REV})"
-        f"]({gh_pkg_url}/)")
+        f"]({links.get(pkg) or gh_pkg_url}/)")
 
 # ---- failures table (published comes from chroot repodata) ----------------
 DASH = "\u2014"
