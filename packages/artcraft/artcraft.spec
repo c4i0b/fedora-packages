@@ -15,6 +15,8 @@ BuildRequires:  gcc-c++
 BuildRequires:  cmake
 # a -sys crate in the graph runs bindgen at build time
 BuildRequires:  clang-devel
+# boring-sys2 (BoringSSL, via wreq) git-inits its source tree to apply patches
+BuildRequires:  /usr/bin/git
 BuildRequires:  desktop-file-utils
 # native webview used by the desktop shell
 BuildRequires:  pkgconfig(webkit2gtk-4.1)
