@@ -174,10 +174,11 @@ for pkg in packages:
         badge(pkg, pkg, f"v{known.get(pkg, '?')}", "lightgrey")
     ver = (latest.get(pkg) or attempted.get(pkg) or published.get(pkg)
            or known.get(pkg) or "?")
+    gh_pkg_url = f"https://github.com/{gowner}/{gproject}/tree/main/packages/{pkg}"
     badge_lines.append(
         f"[![{pkg}]({url}"
         f"%2F{pkg}.json%3Fv%3D{ver}%2Er{BADGE_REV})"
-        f"]({copr}/package/{pkg}/)")
+        f"]({gh_pkg_url}/)")
 
 # ---- failures table (published comes from chroot repodata) ----------------
 DASH = "\u2014"
