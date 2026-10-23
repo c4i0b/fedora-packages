@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Fetch recent GitHub Actions run logs and aggregate key=value fields from
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=host.sh
+source "$root/tools/host.sh"
+
+# Fetch recent CI run logs and aggregate key=value fields from
 # lines matching a pattern, so new log fields need no changes here.
 # usage: analyze-logs.sh [workflow=autoupdate] [days=7] [pattern=rate-summary]
 
@@ -9,7 +13,7 @@ workflow="${1:-autoupdate}"
 days="${2:-7}"
 pattern="${3:-rate-summary}"
 
-repo="$(git remote get-url origin | sed -E 's#.*github.com[:/]##; s#\.git$##')"
+repo="${GIT_SLUG}"
 since="$(date -u -d "$days days ago" +%Y-%m-%d)"
 
 mapfile -t runs < <(gh run list -R "$repo" -w "$workflow" --created ">$since" \

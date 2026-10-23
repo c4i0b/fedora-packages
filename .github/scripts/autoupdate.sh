@@ -13,7 +13,9 @@ git -C "$root" config user.email "41898282+github-actions[bot]@users.noreply.git
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 resolved="$tmp/resolved"; mkdir "$resolved"
 stats="$tmp/stats"; : > "$stats"
-export resolved tmp stats
+export resolved tmp stats root
+# shellcheck source=/dev/null
+[ -f "$root/tools/host.sh" ] && source "$root/tools/host.sh" >/dev/null 2>&1 || true
 
 # rate-limit tuning knobs
 SUCCESS_DELAY=0.3
@@ -65,8 +67,30 @@ resolve() {
 
   auth=()
   [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
-
-  if [[ "$source" == npm:* ]]; then
+  # GitLab/Codeberg tokens: prefer CI_JOB_TOKEN/GITLAB_TOKEN/CODEBERG_TOKEN
+  if [[ "$source" == gitlab:* ]]; then
+    src="${source#gitlab:}"; proj="$(echo "$src" | sed 's|/|%2f|')"
+    [ -n "${GITLAB_TOKEN:-}" ] && auth=(-H "PRIVATE-TOKEN: $GITLAB_TOKEN")
+    body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/releases" "${auth[@]}")" || true
+    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+    latest="${latest#v}"
+    if [ -z "$latest" ]; then
+      body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/repository/tags?per_page=1" "${auth[@]}")" || true
+      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+      latest="${latest#v}"
+    fi
+  elif [[ "$source" == codeberg:* || "$source" == forgejo:* ]]; then
+    src="${source#*:}"; baseh="https://codeberg.org/api/v1"
+    [[ "$source" == forgejo:* ]] && baseh="${FORGEJO_API:-$baseh}"
+    body="$(get "$pkg" "${baseh}/repos/${src}/releases?limit=1" "${auth[@]}")" || true
+    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+    latest="${latest#v}"
+    if [ -z "$latest" ]; then
+      body="$(get "$pkg" "${baseh}/repos/${src}/tags?limit=1" "${auth[@]}")" || true
+      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+      latest="${latest#v}"
+    fi
+  elif [[ "$source" == npm:* ]]; then
     npm_pkg="${source#npm:}"
     npm_slug="$(echo "$npm_pkg" | sed 's|/|%2f|')"
     body="$(get "$pkg" "https://registry.npmjs.org/${npm_slug}/latest")" || true

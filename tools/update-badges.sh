@@ -11,20 +11,22 @@ set -euo pipefail
 project="${1:?usage: update-badges.sh copr_owner/project [github_owner/project]}"
 owner="${project%%/*}"
 name="${project#*/}"
-# COPR owner/name and the GitHub identity differ in this repo: badges link to
-# raw.githubusercontent (GitHub owner) but to the COPR monitor (COPR owner).
-github="${2:?missing the GitHub slug: update-badges.sh <copr owner/project> <github owner/project>}"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=host.sh
+source "$root/tools/host.sh"
+# COPR owner/name and the repo identity differ in this repo: badges link to
+# raw/web (repo owner) but to the COPR monitor (COPR owner).
+github="${2:-${GIT_SLUG}}"
 gowner="${github%%/*}"
 gname="${github#*/}"
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-python3 - "$root" "$owner" "$name" "$gowner" "$gname" <<'PY'
+python3 - "$root" "$owner" "$name" "$gowner" "$gname" "$GIT_RAW_BASE" "$GIT_WEB_BASE" <<'PY'
 import json, gzip, os, re, sys, time, urllib.request
 
-root, owner, project, gowner, gproject = sys.argv[1:6]
+root, owner, project, gowner, gproject, git_raw_base, git_web_base = sys.argv[1:9]
 base = f"https://download.copr.fedorainfracloud.org/results/{owner}/{project}"
 copr = f"https://copr.fedorainfracloud.org/coprs/{owner}/{project}"
-raw = f"https://raw.githubusercontent.com/{gowner}/{gproject}/main/badges"
+raw = f"{git_raw_base}/{gowner}/{gproject}/main/badges"
 
 HIGHLIGHTS = []  # deprecated: all packages get badges now
 BADGE_REV = 2  # bump to force GitHub camo to re-fetch every badge URL
@@ -174,7 +176,7 @@ for pkg in packages:
         badge(pkg, pkg, f"v{known.get(pkg, '?')}", "lightgrey")
     ver = (latest.get(pkg) or attempted.get(pkg) or published.get(pkg)
            or known.get(pkg) or "?")
-    gh_pkg_url = f"https://github.com/{gowner}/{gproject}/tree/main/packages/{pkg}"
+    gh_pkg_url = f"{git_web_base}/{gowner}/{gproject}/tree/main/packages/{pkg}"
     badge_lines.append(
         f"[![{pkg}]({url}"
         f"%2F{pkg}.json%3Fv%3D{ver}%2Er{BADGE_REV})"
