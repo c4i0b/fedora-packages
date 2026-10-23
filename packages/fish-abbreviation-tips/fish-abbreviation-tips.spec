@@ -31,22 +31,17 @@ install_vendor() {
 }
 install_vendor conf.d conf.d
 install_vendor functions functions.d
-install_vendor completions completions.d
-
 
 %check
-for f in conf.d/*.fish functions/*.fish completions/*.fish; do
-  if [ -f "$f" ]; then
-    fish -n "$f"
-  fi
+for f in conf.d/*.fish functions/*.fish; do
+  fish -n "$f"
 done
 
 %files
 %license LICENSE
-
-%{_datadir}/fish/vendor_conf.d/*.fish
+%doc README.md
+%{_datadir}/fish/vendor_conf.d/abbr_tips.fish
 %{_datadir}/fish/vendor_functions.d/*.fish
-%{_datadir}/fish/vendor_completions.d/*.fish
 
 %changelog
 * Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 0.7.0-1

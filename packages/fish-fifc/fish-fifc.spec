@@ -1,4 +1,4 @@
-Name:           fifc
+Name:           fish-fifc
 Version:        0.3.4
 Release:        1%{?dist}
 Summary:        Fzf powered fish history and tab completions
@@ -10,7 +10,8 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
 BuildRequires:  fish
 Requires:       fish
-
+Requires:       fzf
+Requires:       file
 
 %description
 Fzf powered fish history and tab completions

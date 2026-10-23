@@ -1,23 +1,22 @@
-Name:           nvm-fish
-Version:        2.2.17
+Name:           fish-gitnow
+Version:        2.13.0
 Release:        1%{?dist}
-Summary:        The Node.js version manager for fish
+Summary:        Speed up your Git workflow with these few fish shell keybindings
 BuildArch:      noarch
 
 License:        MIT
-URL:            https://github.com/jorgebucaran/nvm.fish
+URL:            https://github.com/joseluisq/gitnow
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz
 
 BuildRequires:  fish
 Requires:       fish
-Requires:       curl
 Requires:       git
 
 %description
-The Node.js version manager for fish
+Speed up your Git workflow with these few fish shell keybindings
 
 %prep
-%autosetup -n nvm.fish-%{version}
+%autosetup -n gitnow-%{version}
 
 %build
 
@@ -29,7 +28,8 @@ install_vendor() {
     install -Dpm644 "$f" "%{buildroot}%{_datadir}/fish/vendor_$2/$(basename "$f")"
   done
 }
-install_vendor conf.d conf.d
+install -Dpm644 conf.d/gitnow.fish %{buildroot}%{_datadir}/fish/vendor_conf.d/gitnow.fish
+install -Dpm644 conf.d/.gitnow %{buildroot}%{_datadir}/fish/vendor_conf.d/.gitnow
 install_vendor functions functions.d
 install_vendor completions completions.d
 
@@ -43,11 +43,12 @@ done
 
 %files
 %license LICENSE.md
-
-%{_datadir}/fish/vendor_conf.d/*.fish
+%doc README.md
+%{_datadir}/fish/vendor_conf.d/gitnow.fish
+%{_datadir}/fish/vendor_conf.d/.gitnow
 %{_datadir}/fish/vendor_functions.d/*.fish
 %{_datadir}/fish/vendor_completions.d/*.fish
 
 %changelog
-* Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2.2.17-1
+* Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2.13.0-1
 - Initial package

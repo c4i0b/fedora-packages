@@ -1,23 +1,24 @@
-Name:           gitnow
-# __EXTRA*__ slots for subdirs, man pages or prompt conflicts.
-Version:        2.13.0
+Name:           fish-nvm
+Version:        2.2.17
 Release:        1%{?dist}
-Summary:        Speed up your Git workflow with these few fish shell keybindings
+Summary:        The Node.js version manager for fish
 BuildArch:      noarch
 
 License:        MIT
-URL:            https://github.com/joseluisq/gitnow
+URL:            https://github.com/jorgebucaran/nvm.fish
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz
 
 BuildRequires:  fish
 Requires:       fish
-Requires:       git
+# version downloads (curl) and tarball extraction (tar) are unguarded
+Requires:       curl
+Requires:       tar
 
 %description
-Speed up your Git workflow with these few fish shell keybindings
+The Node.js version manager for fish
 
 %prep
-%autosetup -n gitnow-%{version}
+%autosetup -n nvm.fish-%{version}
 
 %build
 
@@ -49,5 +50,5 @@ done
 %{_datadir}/fish/vendor_completions.d/*.fish
 
 %changelog
-* Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2.13.0-1
+* Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2.2.17-1
 - Initial package
