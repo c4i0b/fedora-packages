@@ -53,9 +53,11 @@ while true; do
 
   echo "$(date '+%H:%M:%S')"
   for id in $watched; do
+    # 2>/dev/null: a build deleted mid-watch makes the API 404 and python
+    # would spam a JSONDecodeError traceback before the || fallback runs
     curl -fsSL "https://copr.fedorainfracloud.org/api_3/build/$id" \
-      | python3 -c "import json,sys; d=json.load(sys.stdin); sp=d.get('source_package') or {}; print(f\"  {d['id']} {(sp.get('name') or '?'):24} {d['state']}\")" \
-      || echo "  $id ? (API error)"
+      | python3 -c "import json,sys; d=json.load(sys.stdin); sp=d.get('source_package') or {}; print(f\"  {d['id']} {(sp.get('name') or '?'):24} {d['state']}\")" 2>/dev/null \
+      || echo "  $id ? (deleted mid-watch or API error)"
   done
 
   # done when none of the watched ids is pending/starting/running anymore
