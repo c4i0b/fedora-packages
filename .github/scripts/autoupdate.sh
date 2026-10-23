@@ -136,6 +136,7 @@ find "$root/packages" -name upstream -maxdepth 2 \
   | xargs -P 8 -I{} bash -c "$(declare -f get resolve); resolve \"{}\""
 
 packages="$(mktemp)"
+bumped=0
 for f in "$resolved"/*; do
   [ -f "$f" ] || continue
   cat "$f"
@@ -176,6 +177,7 @@ while IFS=$'\t' read -r _ pkg latest; do
   fi
   git -C "$root" add "packages/$pkg"
   git -C "$root" commit -m "chore($pkg): update to $latest"
+  bumped=$((bumped + 1))
   git -C "$root" tag -f "$pkg/$latest"
 done < "$packages"
 
@@ -197,4 +199,4 @@ final_fail=$(( packages_total - $(find "$resolved" -type f | wc -l) ))
 wall=$(( $(date +%s) - job_start ))
 # a 404 on releases/latest is expected for tags-only repos (the fallback
 # resolves them), so it gets its own bucket instead of polluting "other"
-echo "::notice::[rate-summary] packages=$packages_total requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
+echo "::notice::[rate-summary] packages=$packages_total bumped=$bumped requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"

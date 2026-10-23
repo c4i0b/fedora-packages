@@ -29,9 +29,16 @@ jobs:
     # bump the tag at each Fedora release
     container: registry.fedoraproject.org/fedora:43
     steps:
-      - run: dnf -y install git make rpmdevtools rpmlint just
+      - run: echo "job_start=$(date +%s)" >> "$GITHUB_ENV"
+      # dnf on every run is the price of the bare container image; timed so
+      # the [phase-summary] telemetry can flag if it ever becomes the bottleneck
+      - run: |
+          t0=$(date +%s)
+          dnf -y install git make rpmdevtools rpmlint just
+          echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
+        id: module_cache
         with:
           # the job container gets HOME=/github/home (not /root), so that is
           # where go/cargo put their module caches
@@ -41,9 +48,17 @@ jobs:
             /github/home/.cargo/git
           key: vendor-caches-${{ hashFiles('packages/*/go.*', 'packages/*/Cargo.*', 'tools/vendor-sources.sh') }}
           restore-keys: vendor-caches-
-      - run: just test
+      - run: |
+          t0=$(date +%s)
+          just test
+          echo "test=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
-      - run: just validate
+      - run: |
+          t0=$(date +%s)
+          just validate
+          v=$(( $(date +%s) - t0 ))
+          echo "validate=$v" >> "$GITHUB_ENV"
+          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=$v cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} total=$(( $(date +%s) - job_start ))"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
