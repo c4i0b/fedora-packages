@@ -1,5 +1,5 @@
 Name:           figcraft
-Version:        0.9.0
+Version:        0.10.0
 Release:        1%{?dist}
 Summary:        Interface design and prototyping tool with live collaboration
 
@@ -78,6 +78,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.figcra
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.figcraft.*
 
 %changelog
+* Fri Oct 23 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.10.0-1
+- Update to 0.10.0
+
 * Wed Oct 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.9.0-1
 - Update to 0.9.0
 
