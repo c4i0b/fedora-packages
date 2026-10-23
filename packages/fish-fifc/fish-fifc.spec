@@ -12,6 +12,14 @@ BuildRequires:  fish
 Requires:       fish
 Requires:       fzf
 Requires:       file
+# best preview/search companions (all optional, type -q guarded upstream);
+# procs/broot fill the same roles but are not in the Fedora repos
+Requires:       bat
+Requires:       eza
+Requires:       fd-find
+Requires:       chafa
+Requires:       hexyl
+Requires:       ripgrep
 
 %description
 Fzf powered fish history and tab completions
