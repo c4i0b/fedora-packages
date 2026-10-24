@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: tools/update-badges.sh caiobruno/fedora-packages c4i0b/fedora-packages
+      # owners derive from the origin remote + COPR_OWNER (see tools/host.sh)
+      - run: tools/update-badges.sh
       # [skip ci] keeps the push from re-triggering validate; badge commits
       # never touch packages/, so the COPR webhook stays quiet too
       - run: |

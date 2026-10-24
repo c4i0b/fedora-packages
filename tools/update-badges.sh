@@ -8,7 +8,7 @@
 # version; the last failed build never enters the repo).
 set -euo pipefail
 
-project="${1:?usage: update-badges.sh copr_owner/project [github_owner/project]}"
+project="${1:-}"
 owner="${project%%/*}"
 name="${project#*/}"
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -16,6 +16,14 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$root/tools/host.sh"
 # shellcheck source=lib.sh
 source "$root/tools/lib.sh"
+# No args: derive the repo side from the origin remote and the COPR owner
+# from COPR_OWNER (same env the justfile honors; default must stay in sync
+# with the owner default there)
+[ -n "$project" ] || {
+  project="${COPR_OWNER:-caiobruno}/${GIT_REPO_CLEAN:-fedora-packages}"
+  owner="${project%%/*}"
+  name="${project#*/}"
+}
 # COPR owner/name and the repo identity differ in this repo: badges link to
 # raw/web (repo owner) but to the COPR monitor (COPR owner).
 github="${2:-${GIT_SLUG}}"
