@@ -35,9 +35,13 @@ jobs:
       # the [phase-summary] telemetry can flag if it ever becomes the bottleneck
       - run: |
           t0=$(date +%s)
-          dnf -y install git make rpmdevtools rpmlint just
+          dnf -y install git make rpmdevtools rpmlint just curl
           echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
       - uses: actions/checkout@v5
+        with:
+          # full history: the scope step diffs HEAD against the sha of the
+          # last successful run, which force-pushes can orphan (then: full)
+          fetch-depth: 0
       - uses: actions/cache@v5
         id: module_cache
         with:
@@ -72,6 +76,17 @@ jobs:
             !packages/**/vendor.tar.zst
           key: sources-v2-${{ hashFiles('packages/*/*.spec') }}
           restore-keys: sources-v2-
+      # subset validation: only packages changed since the last green run
+      # (cancelled runs leave their changes pending for the next one); every
+      # ambiguity — dispatch, tools/templates changes, orphaned sha — is full
+      - id: scope
+        run: |
+          read -r scope pkgs <<< "$(bash tools/validate-scope.sh "$GITHUB_EVENT_NAME")"
+          echo "scope=$scope" >> "$GITHUB_OUTPUT"
+          echo "pkgs=${pkgs:-}" >> "$GITHUB_OUTPUT"
+          echo "validate scope: $scope${pkgs:+ ($pkgs)}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           t0=$(date +%s)
           just test
@@ -83,7 +98,7 @@ jobs:
           # size wobbles, so both the counter and the epoch ignore them
           srcs_before=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l)
           t0=$(date +%s)
-          just validate
+          just validate ${{ steps.scope.outputs.pkgs }}
           echo "validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
           # downloads = files rpmbuild had to fetch: on a healthy cache-hit run
           # only the 'releases/latest' volatiles (pruned before every save);
@@ -95,7 +110,7 @@ jobs:
       - run: |
           just prune-sources
           echo "srcs_epoch=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) -printf '%P %s\n' | sort | sha256sum | cut -c1-12)" >> "$GITHUB_ENV"
-          echo "::notice::[phase-summary] dnf=${dnf} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
+          echo "::notice::[phase-summary] scope=${{ steps.scope.outputs.scope }}${{ steps.scope.outputs.pkgs && format(' pkgs={0}', steps.scope.outputs.pkgs) || ' pkgs=all' }} dnf=${dnf} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
       # save only when the post-prune content set differs from what was

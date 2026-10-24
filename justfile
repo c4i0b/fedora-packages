@@ -27,9 +27,10 @@ srpm name:
 test:
     {{runner}} tools/test.sh
 
-# Lint and build SRPMs for all packages (same as CI)
-validate:
-    {{runner}} tools/validate.sh
+# Lint and build SRPMs for all packages (same as CI); pass package names to
+# restrict to a subset (CI does this for changed-since-last-green packages)
+validate *pkgs:
+    {{runner}} tools/validate.sh {{pkgs}}
 
 # Drop untracked unreferenced files from package dirs (bounds the CI sources cache)
 prune-sources:
