@@ -161,7 +161,7 @@ for f in os.listdir(d):
 
 # ---- per-package version badges (any succeeded chroot wins) ----------------
 # pkg_version is None for fresh/queued builds
-latest, attempted, known, building, has_fail, inflight = {}, {}, {}, {}, set(), set()
+latest, attempted, known, has_fail, inflight = {}, {}, {}, set(), set()
 
 def published_versions(chroot):
     """name -> version of packages actually in the chroot binary repo.
@@ -195,11 +195,11 @@ for c in iter_cells():
         latest[pkg] = ver
     if c["state"] == "failed":
         has_fail.add(pkg)
-        attempted.setdefault(pkg, ver)
     if c["state"] in ("waiting", "pending", "starting", "importing", "running"):
         inflight.add(pkg)
-        if ver:
-            building.setdefault(pkg, ver)
+    if c["state"] != "succeeded" and ver:
+        # last attempted (failed, canceled or in flight) for the right side
+        attempted.setdefault(pkg, ver)
     if ver and pkg not in known:
         known[pkg] = ver
 badge_lines = []
@@ -207,23 +207,19 @@ url = (f"https://img.shields.io/endpoint?url="
        + raw.replace(":", "%3A").replace("/", "%2F"))
 for pkg in packages:
     # blue = published; yellow = build live; red = failed; grey = idle
-    # (canceled/never attempted, no failure). Message convention: left side
-    # is what is installable (last published), right side what was attempted;
-    # arrow = in transit, ✗ = failed
-    pub = published.get(pkg, known.get(pkg))
-    if pkg in latest:
-        badge(pkg, pkg, f"v{latest[pkg]}", "blue")
-    elif pkg in has_fail:
-        att = attempted.get(pkg, "?")
-        msg = f"v{pub} → v{att} ✗" if pub and pub != att else f"v{att} ✗"
-        badge(pkg, pkg, msg, "red")
-    elif pkg in inflight:
-        bld = building.get(pkg)
-        msg = (f"v{pub} → v{bld}" if pub and bld and pub != bld
-               else f"v{pub or bld or '?'}")
-        badge(pkg, pkg, msg, "yellow")
-    else:
-        badge(pkg, pkg, f"v{pub or known.get(pkg, '?')}", "lightgrey")
+    # (canceled, no failure). Message convention, same for every state: left
+    # side is what is installable, right side the last attempt (in flight,
+    # failed or canceled); color carries the outcome. Blue prefers the
+    # monitor's succeeded version: repodata can lag right after publishing
+    pub = latest.get(pkg) or published.get(pkg, known.get(pkg))
+    att = attempted.get(pkg)
+    msg = (f"v{pub} → v{att}" if pub and att and pub != att
+           else f"v{pub or att or '?'}")
+    color = ("blue" if pkg in latest
+             else "red" if pkg in has_fail
+             else "yellow" if pkg in inflight
+             else "lightgrey")
+    badge(pkg, pkg, msg, color)
     ver = (latest.get(pkg) or attempted.get(pkg) or published.get(pkg)
            or known.get(pkg) or "?")
     gh_pkg_url = f"{git_web_base}/{gowner}/{gproject}/tree/main/packages/{pkg}"
