@@ -61,7 +61,7 @@ watch name="" interval="90":
 setup:
     {{runner}} tools/setup-project.sh {{project}}
 
-# Scaffold a new package from a template (source or bin)
+# Scaffold a new package from a template (source, bin, icon-theme, wallpaper, ...)
 new-package name kind="source":
     tools/new-package.sh {{name}} {{kind}}
 

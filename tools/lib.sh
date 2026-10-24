@@ -59,6 +59,8 @@ __LICENSE__ MIT
 __URL__ https://example.com
 __SOURCE0__ https://example.com/$name-%{version}.tar.gz
 __TAG__ 1970-01-01
+__COMMIT__ 0123456789abcdef0123456789abcdef0123456789ab
+__SNAPSHOT__ 19700101
 __LICENSEFILE__ LICENSE
 __THEMEPREFIX__ Payload
 __APPID__ org.example.$name
@@ -182,6 +184,21 @@ check_package() {
   if grep -qE '^\s*\./install\.sh' "$spec" && ! grep -q 'gtk-update-icon-cache/d' "$spec"; then
     echo "FAIL: $name: runs ./install.sh but does not strip gtk-update-icon-cache"
     fail=1
+  fi
+
+  # Wallpaper collections are blind in a desktop unless its picker finds the
+  # payload: GNOME/Cinnamon/MATE list gnome-background-properties XML only,
+  # Plasma lists kpackages under wallpapers/ only, everything else reads the
+  # raw backgrounds/ footprint. The trio must ship together.
+  if grep -q 'backgrounds/' "$spec" \
+    || grep -q 'gnome-background-properties' "$spec" \
+    || grep -q '%{_datadir}/wallpapers/' "$spec"; then
+    grep -q '%{_datadir}/backgrounds/' "$spec" \
+      || { echo "FAIL: $name: wallpaper without a backgrounds/ raw footprint"; fail=1; }
+    grep -q 'gnome-background-properties' "$spec" \
+      || { echo "FAIL: $name: wallpaper without a gnome-background-properties XML (invisible in GNOME/Cinnamon/MATE)"; fail=1; }
+    grep -qE 'metadata\.(json|desktop)' "$spec" \
+      || { echo "FAIL: $name: Plasma kpackage without metadata.json/metadata.desktop (invisible in Plasma)"; fail=1; }
   fi
 
   # fish plugin installs: vendor dirs are vendor_conf.d/vendor_functions.d/

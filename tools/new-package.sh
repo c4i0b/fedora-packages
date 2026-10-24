@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage="usage: new-package.sh <name> [bin|source|go|rust|electron|bun|python]"
+usage="usage: new-package.sh <name> [bin|source|go|rust|electron|bun|python|icon-theme|wallpaper]"
 name="${1:?$usage}"
 kind="${2:-bin}"
 
