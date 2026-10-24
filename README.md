@@ -17,7 +17,7 @@
 [![airgeddon](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fairgeddon.json%3Fv%3D12.02%2Er2)](https://github.com/v1s1t0r1sh3r3/airgeddon/)
 [![angryoxide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fangryoxide.json%3Fv%3D0.9.2%2Er2)](https://github.com/Ragnt/AngryOxide/)
 [![asleap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fasleap.json%3Fv%3D2.3%2Er2)](https://github.com/joswr1ght/asleap/)
-[![beads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbeads.json%3Fv%3D1.3.1%2Er2)](https://github.com/gastownhall/beads/)
+[![beads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbeads.json%3Fv%3D1.3.2%2Er2)](https://github.com/gastownhall/beads/)
 [![beef](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbeef.json%3Fv%3D0.6.0.0%2Er2)](https://github.com/beefproject/beef/)
 [![bettercap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbettercap.json%3Fv%3D2.41.7%2Er2)](https://github.com/bettercap/bettercap/)
 [![broot](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbroot.json%3Fv%3D1.61.0%2Er2)](https://github.com/Canop/broot/)
@@ -107,7 +107,7 @@
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-10-24 01:43 UTC automatically by GitHub Actions.**
+**Updated 2026-10-24 07:35 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 
 ---
