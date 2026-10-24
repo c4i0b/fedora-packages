@@ -13,6 +13,7 @@ git -C "$root" config user.email "41898282+github-actions[bot]@users.noreply.git
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 resolved="$tmp/resolved"; mkdir "$resolved"
 stats="$tmp/stats"; : > "$stats"
+bumps="$tmp/bumps"; : > "$bumps"
 export resolved tmp stats root
 # shellcheck source=/dev/null
 [ -f "$root/tools/host.sh" ] && source "$root/tools/host.sh" >/dev/null 2>&1 || true
@@ -178,6 +179,7 @@ while IFS=$'\t' read -r _ pkg latest; do
   git -C "$root" add "packages/$pkg"
   git -C "$root" commit -m "chore($pkg): update to $latest"
   bumped=$((bumped + 1))
+  printf '| %s | %s | %s |\n' "$pkg" "$current" "$latest_rpm" >> "$bumps"
   git -C "$root" tag -f "$pkg/$latest"
 done < "$packages"
 
@@ -199,4 +201,24 @@ final_fail=$(( packages_total - $(find "$resolved" -type f | wc -l) ))
 wall=$(( $(date +%s) - job_start ))
 # a 404 on releases/latest is expected for tags-only repos (the fallback
 # resolves them), so it gets its own bucket instead of polluting "other"
-echo "::notice::[rate-summary] packages=$packages_total bumped=$bumped requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
+summary="packages=$packages_total bumped=$bumped requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
+echo "::notice::[rate-summary] $summary"
+
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+  {
+    echo "## autoupdate"
+    echo
+    if [ -s "$bumps" ]; then
+      echo "| package | from | to |"
+      echo "|---|---|---|"
+      cat "$bumps"
+      echo
+    else
+      echo "no updates this run"
+      echo
+    fi
+    echo '```'
+    echo "$summary"
+    echo '```'
+  } >> "$GITHUB_STEP_SUMMARY"
+fi
