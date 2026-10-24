@@ -120,8 +120,23 @@ def label(c):
 
 os.makedirs(f"{root}/badges", exist_ok=True)
 
+# per-badge state transitions since the last refresh (the previous JSONs sit
+# in the worktree): what moved is the interesting signal, current state alone
+# is already public in the README
+changes = []
+
 def badge(fname, lbl, message, color):
-    with open(f"{root}/badges/{fname}.json", "w") as f:
+    p = f"{root}/badges/{fname}.json"
+    old = None
+    if os.path.exists(p):
+        try:
+            d = json.load(open(p))
+            old = (d.get("message"), d.get("color"))
+        except ValueError:
+            pass
+    if old is not None and old != (message, color):
+        changes.append((fname, old, (message, color)))
+    with open(p, "w") as f:
         json.dump({"schemaVersion": 1, "label": lbl,
                    "message": message, "color": color}, f)
         f.write("\n")
@@ -312,4 +327,17 @@ if readme != open(rp).read():
     open(rp, "w").write(readme)
 print(f"badges refreshed: {len(chroots)} chroots, {len(packages)} packages, "
       f"{len(failed)} failing")
+
+summary = os.environ.get("GITHUB_STEP_SUMMARY")
+if summary:
+    with open(summary, "a") as f:
+        f.write("## badges\n\n")
+        if changes:
+            f.write("| badge | before | after |\n|---|---|---|\n")
+            for name, old, new in changes:
+                f.write(f"| {name} | {old[0]} ({old[1]}) | "
+                        f"{new[0]} ({new[1]}) |\n")
+        else:
+            f.write("no changes since last refresh\n")
+        f.write("\n")
 PY
