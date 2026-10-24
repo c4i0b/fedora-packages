@@ -103,8 +103,6 @@ def split_chroot(c):
 
 arches_by_base = {}
 for c in chroots:
-    # careful not to shadow the module-level `base` (the download URL):
-    # published_versions() depends on it
     cbase, carch = split_chroot(c)
     arches_by_base.setdefault(cbase, set()).add(carch)
 
@@ -163,7 +161,7 @@ for f in os.listdir(d):
 
 # ---- per-package version badges (any succeeded chroot wins) ----------------
 # pkg_version is None for fresh/queued builds
-latest, attempted, known, has_fail, inflight = {}, {}, {}, set(), set()
+latest, attempted, known, building, has_fail, inflight = {}, {}, {}, {}, set(), set()
 
 def published_versions(chroot):
     """name -> version of packages actually in the chroot binary repo.
@@ -241,7 +239,6 @@ for c in iter_cells():
     if c["state"] == "failed":
         failed.setdefault(c["name"], []).append(c)
 
-pub_cache = {}
 lines = []
 for pkg in sorted(failed):
     cell_list = failed[pkg]
