@@ -20,6 +20,16 @@ upstream_home() {
   esac
 }
 
+# The "downloaded sources set": what rpmbuild fetches into the package dirs,
+# minus the vendor archives that are regenerated (not fetched) each run.
+# Single definition shared by the CI counters, the content epoch and the
+# cache paths commentary — keep them from drifting apart.
+srcs_find() {
+  find packages -type f \
+    \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) \
+    -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) "$@"
+}
+
 # Shared rpmlint invocation (kept in one place so packages and rendered
 # templates are held to the exact same standard)
 lint_spec() {

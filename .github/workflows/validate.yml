@@ -1,5 +1,8 @@
 name: validate
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   pull_request:
@@ -93,26 +96,20 @@ jobs:
           echo "test=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
-      - run: |
-          # vendor archives are REGENERATED each run (not downloads) and their
-          # size wobbles, so both the counter and the epoch ignore them
-          srcs_before=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l)
-          t0=$(date +%s)
-          just validate ${{ steps.scope.outputs.pkgs }}
-          echo "validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
-          # downloads = files rpmbuild had to fetch: on a healthy cache-hit run
-          # only the 'releases/latest' volatiles (pruned before every save);
-          # anything more without a spec change means a prune/cache bug
-          echo "downloads=$(( $(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l) - srcs_before ))" >> "$GITHUB_ENV"
+      - run: just validate ${{ steps.scope.outputs.pkgs }}
         env:
           FEDORA_PACKAGES_DIRECT: "1"
           KEEP_SOURCES: "1"
       - run: |
           just prune-sources
-          echo "srcs_epoch=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) -printf '%P %s\n' | sort | sha256sum | cut -c1-12)" >> "$GITHUB_ENV"
-          echo "::notice::[phase-summary] scope=${{ steps.scope.outputs.scope }}${{ steps.scope.outputs.pkgs && format(' pkgs={0}', steps.scope.outputs.pkgs) || ' pkgs=all' }} dnf=${dnf} dnf_toolchain=${dnf_toolchain:-na} test=${test} validate=${validate} downloads=${downloads} cache=${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }} srcs_cache=${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }} srcs_files=$(find packages -type f \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -not \( -name '*-vendor.tar.bz2' -o -name 'vendor.tar.zst' \) | wc -l) srcs_mb=$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}') total=$(( $(date +%s) - job_start ))"
+          bash tools/ci-summary.sh
         env:
           FEDORA_PACKAGES_DIRECT: "1"
+          SCOPE: ${{ steps.scope.outputs.scope }}
+          PKGS: ${{ steps.scope.outputs.pkgs }}
+          CACHE: ${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }}
+          SRCS_CACHE: ${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }}
+          JOB_START: ${{ env.job_start }}
       # save only when the post-prune content set differs from what was
       # restored (same set = the immutable entry already holds it); volatile
       # "releases/latest" payloads are pruned before this point and never saved

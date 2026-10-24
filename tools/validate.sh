@@ -3,6 +3,8 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
+# shellcheck source=lib.sh
+source "$root/tools/lib.sh"
 
 # args restrict SRPM builds to those packages (CI validates only what changed
 # since the last green run); no args builds everything
@@ -30,9 +32,16 @@ echo "dnf_toolchain=$(( $(date +%s) - t0 ))" >> "${GITHUB_ENV:-/dev/null}"
 
 tools/lint.sh "$@" & lintpid=$!
 
+# downloads = files rpmbuild had to fetch: on a healthy cache-hit run only
+# the 'releases/latest' volatiles (pruned before every cache save); anything
+# more without a spec change means a prune/cache bug
+srcs_before="$(srcs_find | wc -l)"
+t1=$(date +%s)
 jobs=$(nproc); [ "$jobs" -gt 8 ] && jobs=8
 printf '%s\n' "${pkgs[@]}" \
   | xargs -P "$jobs" -I{} make -f .copr/Makefile srpm "pkg={}" outdir=/tmp/srpm
+echo "validate=$(( $(date +%s) - t1 ))" >> "${GITHUB_ENV:-/dev/null}"
+echo "downloads=$(( $(srcs_find | wc -l) - srcs_before ))" >> "${GITHUB_ENV:-/dev/null}"
 wait "$lintpid"
 
 # Remove downloaded/generated build artifacts (legit files are tracked).
