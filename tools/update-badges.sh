@@ -145,7 +145,8 @@ for chroot, cell_list in sorted(chroots.items(), key=lambda kv: sort_key(kv[0]))
     ok = sum(c["state"] == "succeeded" for c in cell_list)
     bad = sum(c["state"] == "failed" for c in cell_list)
     inflight = len(cell_list) - ok - bad
-    # the message keeps the succeeded count; only the color flags failures
+    # ok alone: the packages badge already carries the total; only the color
+    # flags failures/in-flight
     msg = str(ok)
     color = "red" if bad else ("yellow" if inflight else "brightgreen")
     badge(bname(chroot), label(chroot), msg, color)
@@ -199,25 +200,32 @@ for c in iter_cells():
         attempted.setdefault(pkg, ver)
     if c["state"] in ("waiting", "pending", "starting", "importing", "running"):
         inflight.add(pkg)
+        if ver:
+            building.setdefault(pkg, ver)
     if ver and pkg not in known:
         known[pkg] = ver
 badge_lines = []
 url = (f"https://img.shields.io/endpoint?url="
        + raw.replace(":", "%3A").replace("/", "%2F"))
 for pkg in packages:
-    # blue = published
-    # yellow = build live in COPR (message keeps the last fully published
-    # version, not the in-flight one)
-    # red = failed, never published
-    # grey = idle (canceled/never attempted, no failure)
+    # blue = published; yellow = build live; red = failed; grey = idle
+    # (canceled/never attempted, no failure). Message convention: left side
+    # is what is installable (last published), right side what was attempted;
+    # arrow = in transit, ✗ = failed
+    pub = published.get(pkg, known.get(pkg))
     if pkg in latest:
         badge(pkg, pkg, f"v{latest[pkg]}", "blue")
     elif pkg in has_fail:
-        badge(pkg, pkg, f"v{attempted.get(pkg, '?')} \u2717", "red")
+        att = attempted.get(pkg, "?")
+        msg = f"v{pub} → v{att} ✗" if pub and pub != att else f"v{att} ✗"
+        badge(pkg, pkg, msg, "red")
     elif pkg in inflight:
-        badge(pkg, pkg, f"v{published.get(pkg, known.get(pkg, '?'))}", "yellow")
+        bld = building.get(pkg)
+        msg = (f"v{pub} → v{bld}" if pub and bld and pub != bld
+               else f"v{pub or bld or '?'}")
+        badge(pkg, pkg, msg, "yellow")
     else:
-        badge(pkg, pkg, f"v{known.get(pkg, '?')}", "lightgrey")
+        badge(pkg, pkg, f"v{pub or known.get(pkg, '?')}", "lightgrey")
     ver = (latest.get(pkg) or attempted.get(pkg) or published.get(pkg)
            or known.get(pkg) or "?")
     gh_pkg_url = f"{git_web_base}/{gowner}/{gproject}/tree/main/packages/{pkg}"
