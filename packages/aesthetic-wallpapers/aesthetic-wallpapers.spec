@@ -4,24 +4,24 @@
 
 Name:           aesthetic-wallpapers
 Version:        2025.06.17
-Release:        1.20261024git%{?dist}
+Release:        2.20261024git%{?dist}
 Summary:        D3Ext collection of aesthetic wallpapers
+BuildArch:      noarch
+BuildRequires:  python3
 
 License:        MIT
 URL:            https://github.com/D3Ext/aesthetic-wallpapers
 Source0:        %{url}/archive/%{commit}/%{name}-%{commit}.tar.gz
 
-BuildArch:      noarch
-
 %description
-Almost 400 aesthetic wallpapers (anime, landscapes, abstract) curated by D3Ext,
-installed in the layout desktop environments expect:
-- %%{_datadir}/backgrounds/aesthetic-wallpapers/ (raw path usable by every DE
-  and picker wrappers like azote or nitrogen)
+D3Ext collection of aesthetic wallpapers, installed in the layout desktop environments expect:
+- %%{_datadir}/backgrounds/%{name}/ (raw path usable by every DE and picker
+  wrappers like azote or nitrogen)
 - a gnome-background-properties XML, so GNOME, Cinnamon and MATE list every
   image in their built-in wallpaper chooser
-- a KDE kpackage under %%{_datadir}/wallpapers, so Plasma's chooser lists the
-  collection too
+- one Plasma kpackage per image under %%{_datadir}/wallpapers, as
+  plasma-workspace-wallpapers does, so every card shows a working preview
+Portrait (phone-sized) images are skipped.
 
 %prep
 %setup -q -n %{name}-%{commit}
@@ -30,68 +30,166 @@ rm -f images/.gitkeep
 %build
 
 %install
-# Raw footprint: the images land once and every DE entry points at them
-mkdir -p %{buildroot}%{_datadir}/backgrounds/%{name}
-install -m644 images/* %{buildroot}%{_datadir}/backgrounds/%{name}/
+# Every desktop entry is driven by one python listing of the landscape
+# (published) wallpapers: raw footprint, GNOME XML and KDE kpackages
 
 # GNOME, Cinnamon and MATE discover wallpapers through
-# gnome-background-properties XML listings only
+# gnome-background-properties XML listings only; the file is opened here and
+# closed by the </wallpapers> line appended after the listing loop
 mkdir -p %{buildroot}%{_datadir}/gnome-background-properties
 {
   echo '<?xml version="1.0" encoding="UTF-8"?>'
   echo '<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">'
   echo '<wallpapers>'
-  for img in images/*; do
-    base="$(basename "$img")"
-    label="$(echo "$base" | sed 's/\.[^.]*$//; s/[-_]/ /g')"
-    printf '    <wallpaper deleted="false">\n        <name>%s</name>\n        <filename>%s/backgrounds/%s/%s</filename>\n        <options>zoom</options>\n        <shade_type>solid</shade_type>\n    </wallpaper>\n' \
-      "$label" '%{_datadir}' '%{name}' "$base"
-  done
-  echo '</wallpapers>'
 } > %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml
 
-# Plasma discovers wallpaper collections only under wallpapers/ as kpackages:
-# per-file links inside contents/images avoid duplicating 650 MB of payload;
-# no metadata screenshot file needed.
-kpkg=%{buildroot}%{_datadir}/wallpapers/AestheticWallpapers/contents/images
-mkdir -p "$kpkg"
-for img in images/*; do
-  ln -s "../../../../backgrounds/%{name}/$(basename "$img")" "$kpkg/$(basename "$img")"
+# Raw footprint: the images land once and every DE entry points at them
+mkdir -p %{buildroot}%{_datadir}/backgrounds/%{name}
+
+# Plasma discovers wallpaper collections only under wallpapers/ as kpackages,
+# one per image (plasma-workspace-wallpapers ships Altai, Autumn, ... that
+# way). It picks the card preview and the applied image by a WxH-encoded
+# filename, so every link is named with the image's real resolution, sniffed
+# from file headers (upstreams sometimes mislabel extensions).
+python3 - <<'PY' | while IFS='|' read -r stem ext wh; do
+import re, struct, sys
+from pathlib import Path
+
+
+def dims_png(h):
+    if h[12:16] != b'IHDR':
+        return None
+    return struct.unpack('>II', h[16:24])
+
+
+def dims_gif(h):
+    if not h.startswith(b'GIF8'):
+        return None
+    return struct.unpack('<HH', h[6:10])
+
+
+def dims_webp(h):
+    if h[8:12] != b'WEBP':
+        return None
+    if h[12:16] == b'VP8 ':
+        w, hh = struct.unpack('<HH', h[26:30])
+        return (w & 0x3FFF, hh & 0x3FFF)
+    if h[12:16] == b'VP8L':
+        if h[20] != 0x2F:
+            return None
+        bits = struct.unpack('<I', h[21:25])[0]
+        return (1 + (bits & 0x3FFF), 1 + ((bits >> 14) & 0x3FFF))
+    if h[12:16] == b'VP8X':
+        return (int.from_bytes(h[24:27], 'little') + 1,
+                int.from_bytes(h[27:30], 'little') + 1)
+    return None
+
+
+def dims_jpeg(b):
+    # EXIF payloads break segment walking and embedded thumbnails add a
+    # second small SOF: keep the largest sane match
+    best = None
+    for m in re.finditer(b'\xff[\xc0-\xc3\xc5-\xc7\xc9-\xcb\xcd-\xcf]', b):
+        if m.end() + 7 > len(b):
+            break
+        hh, w = struct.unpack('>HH', b[m.end() + 3:m.end() + 7])
+        if 64 < w < 16384 and 64 < hh < 16384:
+            if best is None or w * hh > best[0] * best[1]:
+                best = (w, hh)
+    return best
+
+
+def fmt(h):
+    if h.startswith(b'\x89PNG'):
+        return 'png'
+    if h.startswith(b'\xff\xd8'):
+        return 'jpeg'
+    if h.startswith(b'GIF8'):
+        return 'gif'
+    if h[8:12] == b'WEBP':
+        return 'webp'
+    return None
+
+
+PARSERS = {'png': dims_png, 'jpeg': dims_jpeg, 'gif': dims_gif, 'webp': dims_webp}
+
+for p in sorted(Path('images').iterdir()):
+    if p.is_dir() or p.name.startswith('.'):
+        continue
+    ext = p.suffix[1:].lower()
+    h = p.open('rb').read(2 * 1024 * 1024)
+    fn = PARSERS.get(fmt(h))
+    try:
+        wh = fn(h) if fn else None
+    except Exception:
+        wh = None
+    if not wh or not (0 < wh[0] < 16384 and 0 < wh[1] < 16384):
+        wh = (1920, 1080)
+    # portrait images are phone-sized (1080x2340, ...): skip them so every
+    # consumer (raw footprint, GNOME XML, KDE kpackages) filters in one place
+    if wh[1] > wh[0]:
+        continue
+    print(f'{p.stem}|{ext}|{wh[0]}x{wh[1]}')
+PY
+  install -m644 "images/${stem}.${ext}" \
+    %{buildroot}%{_datadir}/backgrounds/%{name}/
+  printf '    <wallpaper deleted="false">\n        <name>%s</name>\n        <filename>%s/backgrounds/%s/%s</filename>\n        <options>zoom</options>\n        <shade_type>solid</shade_type>\n    </wallpaper>\n' \
+    "$(echo "$stem" | sed 's/[-_]/ /g')" '%{_datadir}' '%{name}' "${stem}.${ext}" \
+    >> %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml
+  # images -> contents -> <stem> -> <name> -> wallpapers -> share, then backgrounds
+  kpkg=%{buildroot}%{_datadir}/wallpapers/%{name}/${stem}/contents/images
+  mkdir -p "$kpkg"
+  ln -s "../../../../../backgrounds/%{name}/${stem}.${ext}" "$kpkg/${wh}.${ext}"
+  {
+    echo '{'
+    echo '    "KPlugin": {'
+    echo '        "Authors": ['
+    echo '            {'
+    echo '                "Name": "D3Ext"'
+    echo '            }'
+    echo '        ],'
+    echo "        \"Id\": \"${stem}\","
+    echo '        "License": "MIT",'
+    echo "        \"Name\": \"$(echo "$stem" | sed 's/[-_]/ /g')\""
+    echo '    }'
+    echo '}'
+  } > "$kpkg/../../metadata.json"
 done
-# One level above contents/, as the Fedora wallpaper kpackages ship it
-cat > "$kpkg/../../metadata.json" <<'EOF'
-{
-    "KPlugin": {
-        "Authors": [
-            {
-                "Name": "D3Ext"
-            }
-        ],
-        "Id": "AestheticWallpapers",
-        "Name": "Aesthetic Wallpapers"
-    }
-}
-EOF
+echo '</wallpapers>' >> %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml
 
 %check
-# the generated discovery data must cover exactly what got installed
-imgs=$(find images -type f | wc -l)
+# the generated discovery data must cover exactly what got published
+# (scriptlets do not share variables: paths must be recomputed here; the
+# portrait skip makes the published count differ from the raw images/)
+bgc=$(find %{buildroot}%{_datadir}/backgrounds/%{name} -type f | wc -l)
 xmlc=$(grep -c '<wallpaper ' \
   %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml)
-links=$(find "$kpkg" -type l | wc -l)
-dangling=0
-for sym in "$kpkg"/*; do
-  test -e "$sym" || dangling=$((dangling + 1))
-done
-test "$imgs" -eq "$xmlc" -a "$imgs" -eq "$links" -a "$dangling" -eq 0
+kroot=%{buildroot}%{_datadir}/wallpapers/%{name}
+pkgs=$(find "$kroot" -name metadata.json | wc -l)
+links=$(find "$kroot" -type l | wc -l)
+# link filenames must encode a resolution (KDE picks the preview by it)
+badres=$(find "$kroot" -type l | awk -F/ '$NF !~ /[0-9]+x[0-9]+\./' | wc -l)
+dangling=$(find "$kroot" -type l ! -exec test -e {} \; -print | wc -l)
+if [ "$bgc" -eq "$xmlc" ] && [ "$bgc" -eq "$pkgs" ] && \
+   [ "$bgc" -eq "$links" ] && [ "$dangling" -eq 0 ] && [ "$badres" -eq 0 ]; then
+  :
+else
+  echo "inconsistent discovery data: bg=$bgc xml=$xmlc pkgs=$pkgs links=$links dangling=$dangling badres=$badres" >&2
+  exit 1
+fi
 
 %files
 %license LICENSE
 %doc README.md
 %{_datadir}/backgrounds/%{name}/
 %{_datadir}/gnome-background-properties/%{name}.xml
-%{_datadir}/wallpapers/AestheticWallpapers/
+%{_datadir}/wallpapers/%{name}/
 
 %changelog
+* Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2025.06.17-2.20261024git
+- KDE side: one kpackage per wallpaper with its real resolution in the link
+  name, as plasma-workspace-wallpapers does, so the chooser card shows a
+  preview (Plasma picks it from a WxH-encoded filename); portrait phone
+  wallpapers are skipped in one place
 * Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2025.06.17-1.20261024git
 - Initial package (commit e34f059, 388 wallpapers)

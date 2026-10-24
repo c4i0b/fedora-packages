@@ -62,6 +62,7 @@ __TAG__ 1970-01-01
 __COMMIT__ 0123456789abcdef0123456789abcdef0123456789ab
 __SNAPSHOT__ 19700101
 __LICENSEFILE__ LICENSE
+__AUTHOR__ Upstream authors
 __THEMEPREFIX__ Payload
 __APPID__ org.example.$name
 __GOIPATH__ github.com/example/$name
@@ -197,8 +198,19 @@ check_package() {
       || { echo "FAIL: $name: wallpaper without a backgrounds/ raw footprint"; fail=1; }
     grep -q 'gnome-background-properties' "$spec" \
       || { echo "FAIL: $name: wallpaper without a gnome-background-properties XML (invisible in GNOME/Cinnamon/MATE)"; fail=1; }
-    grep -qE 'metadata\.(json|desktop)' "$spec" \
-      || { echo "FAIL: $name: Plasma kpackage without metadata.json/metadata.desktop (invisible in Plasma)"; fail=1; }
+    # Plasma needs one kpackage per image with WxH-named links inside
+    # contents/images: it picks the card preview and the applied image from a
+    # resolution-encoded filename (resSize in playlist), so a single
+    # collection-level kpackage ships a preview-less broken card
+    if grep -q '%{_datadir}/wallpapers/%{name}/contents/images' "$spec" \
+      && grep -q '%{_datadir}/wallpapers/%{name}/metadata.json' "$spec"; then
+      echo "FAIL: $name: collection-level Plasma kpackage (needs one kpackage per wallpaper)"
+      fail=1
+    fi
+    if ! grep -qE '[0-9]+x[0-9]+' "$spec"; then
+      echo "FAIL: $name: KDE kpackage links without WxH resolution names (broken previews)"
+      fail=1
+    fi
   fi
 
   # fish plugin installs: vendor dirs are vendor_conf.d/vendor_functions.d/
