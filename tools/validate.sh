@@ -17,13 +17,16 @@ else
 fi
 
 # one dnf pass up front: parallel vendor phases must not race the dnf lock
-# (vendor-sources.sh reinstalls only when the tool is absent)
+# (vendor-sources.sh reinstalls only when the tool is absent); timed for the
+# [phase-summary] telemetry (CI decides on a prebuilt image with this number)
+t0=$(date +%s)
 dnf -y install --nodocs --setopt=install_weak_deps=0 \
   git make rpmdevtools go-vendor-tools python3-specfile golang git-core \
   cargo rust-packaging >/dev/null 2>&1 \
   || sudo dnf -y install --nodocs --setopt=install_weak_deps=0 \
     git make rpmdevtools go-vendor-tools python3-specfile golang git-core \
     cargo rust-packaging
+echo "dnf_toolchain=$(( $(date +%s) - t0 ))" >> "${GITHUB_ENV:-/dev/null}"
 
 tools/lint.sh "$@" & lintpid=$!
 
