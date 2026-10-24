@@ -2,6 +2,8 @@
 # find-debuginfo emits for prebuilts, so always disable debuginfo.
 # Only Bun/Electron payloads also need "%global __strip /bin/true" (stripping
 # corrupts their embedded app data); Go/Rust prebuilts strip normally.
+# Vendor repacks that carry upstream dev-machine rpaths need an export of
+# the QA_RPATHS mask in install (check-rpaths would abort otherwise).
 %define debug_package %{nil}
 
 # Per-arch upstream assets: Source URLs must stay arch-agnostic (the COPR
