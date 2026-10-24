@@ -1,5 +1,6 @@
-# Upstream has no tags/releases (checked 2026-10): pinned commit snapshot,
-# autoupdate tracker intentionally absent (same reasoning as unimatrix).
+# Images install once into backgrounds/, every desktop entry points there.
+# Upstream usually has no tagged releases: pin a commit snapshot (switch
+# Source0 to tag form and keep Version in sync when upstream tags).
 %global commit e34f05935c5b768f4c016b0893924d18ec1dba61
 
 Name:           aesthetic-wallpapers
@@ -19,8 +20,9 @@ D3Ext collection of aesthetic wallpapers, installed in the layout desktop enviro
   wrappers like azote or nitrogen)
 - chooser XMLs in gnome-, cinnamon- and mate-background-properties, so GNOME,
   Budgie, Cinnamon and MATE list every image in their built-in choosers
-- one Plasma kpackage per image under %%{_datadir}/wallpapers, as
-  plasma-workspace-wallpapers does, so every card shows a working preview
+- one Plasma kpackage per image directly under %%{_datadir}/wallpapers
+  (%%{name}-<image>/ as plasma-workspace-wallpapers does), so every card
+  shows a working preview
 - per-image symlinks under %%{_datadir}/xfce4/backdrops for xfdesktop
 Portrait (phone-sized) images are skipped.
 
@@ -31,15 +33,10 @@ rm -f images/.gitkeep
 %build
 
 %install
-# Every desktop entry is driven by one python listing of the landscape
-# (published) wallpapers: raw footprint, the three chooser XMLs, xfce4
-# backdrops and KDE kpackages
-
-# Desktop choosers discover wallpapers through XML listings only, one dir per
-# DE family: GNOME and Budgie read gnome-background-properties, Cinnamon
-# reads cinnamon-background-properties (cs_backgrounds.py scans only that
-# dir) and MATE reads mate-background-properties. The files are opened here
-# and closed after the listing loop below.
+# Choosers only list entries in their own dirs: GNOME/Budgie read
+# gnome-background-properties, Cinnamon cinnamon-background-properties
+# (cs_backgrounds.py scans that dir alone) and MATE
+# mate-background-properties — never the raw backgrounds/ footprint
 mkdir -p %{buildroot}%{_datadir}/gnome-background-properties \
   %{buildroot}%{_datadir}/cinnamon-background-properties \
   %{buildroot}%{_datadir}/mate-background-properties \
@@ -57,14 +54,12 @@ for dest in gnome-background-properties cinnamon-background-properties \
   } > %{buildroot}%{_datadir}/$dest/%{name}.xml
 done
 
-# Raw footprint: the images land once and every DE entry points at them
 mkdir -p %{buildroot}%{_datadir}/backgrounds/%{name}
 
-# Plasma discovers wallpaper collections only under wallpapers/ as kpackages,
-# one per image (plasma-workspace-wallpapers ships Altai, Autumn, ... that
-# way). It picks the card preview and the applied image by a WxH-encoded
-# filename, so every link is named with the image's real resolution, sniffed
-# from file headers (upstreams sometimes mislabel extensions).
+# Plasma only lists kpackages sitting directly under wallpapers/ (nested ones
+# are skipped by packagefinder). Links are WxH-named because the chooser
+# picks the preview by resolution; dims are sniffed from headers (upstreams
+# mislabel extensions)
 python3 - <<'PY' | while IFS='|' read -r stem ext wh; do
 import re, struct, sys
 from pathlib import Path
@@ -139,8 +134,7 @@ for p in sorted(Path('images').iterdir()):
         wh = None
     if not wh or not (0 < wh[0] < 16384 and 0 < wh[1] < 16384):
         wh = (1920, 1080)
-    # portrait images are phone-sized (1080x2340, ...): skip them so every
-    # consumer (raw footprint, GNOME XML, KDE kpackages) filters in one place
+    # portrait = phone-sized: skipped once, for every consumer
     if wh[1] > wh[0]:
         continue
     print(f'{p.stem}|{ext}|{wh[0]}x{wh[1]}')
@@ -153,14 +147,13 @@ PY
       "$(echo "$stem" | sed 's/[-_]/ /g')" '%{_datadir}' '%{name}' "${stem}.${ext}" \
       >> %{buildroot}%{_datadir}/$dest/%{name}.xml
   done
-  # xfdesktop lists anything found under xfce4/backdrops; a symlink keeps the
-  # payload single-copy (upstream's own generator links the same way)
+  # xfdesktop lists whatever is in xfce4/backdrops; the symlink keeps the
+  # payload single-copy
   ln -s "../../backgrounds/%{name}/${stem}.${ext}" \
     %{buildroot}%{_datadir}/xfce4/backdrops/%{name}-${stem}.${ext}
-  # images -> contents -> <stem> -> <name> -> wallpapers -> share, then backgrounds
-  kpkg=%{buildroot}%{_datadir}/wallpapers/%{name}/${stem}/contents/images
+  kpkg=%{buildroot}%{_datadir}/wallpapers/%{name}-${stem}/contents/images
   mkdir -p "$kpkg"
-  ln -s "../../../../../backgrounds/%{name}/${stem}.${ext}" "$kpkg/${wh}.${ext}"
+  ln -s "../../../../backgrounds/%{name}/${stem}.${ext}" "$kpkg/${wh}.${ext}"
   {
     echo '{'
     echo '    "KPlugin": {'
@@ -182,9 +175,8 @@ for dest in gnome-background-properties cinnamon-background-properties \
 done
 
 %check
-# the generated discovery data must cover exactly what got published
-# (scriptlets do not share variables: paths must be recomputed here; the
-# portrait skip makes the published count differ from the raw images/)
+# scriptlets do not share variables and the portrait skip shrinks the count
+# below images/: recount everything here
 bgc=$(find %{buildroot}%{_datadir}/backgrounds/%{name} -type f | wc -l)
 gnomec=$(grep -c '<wallpaper ' \
   %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml)
@@ -192,13 +184,12 @@ cinnc=$(grep -c '<wallpaper ' \
   %{buildroot}%{_datadir}/cinnamon-background-properties/%{name}.xml)
 matec=$(grep -c '<wallpaper ' \
   %{buildroot}%{_datadir}/mate-background-properties/%{name}.xml)
-kroot=%{buildroot}%{_datadir}/wallpapers/%{name}
-pkgs=$(find "$kroot" -name metadata.json | wc -l)
-links=$(find "$kroot" -type l | wc -l)
-# link filenames must encode a resolution (KDE picks the preview by it)
-badres=$(find "$kroot" -type l | awk -F/ '$NF !~ /[0-9]+x[0-9]+\./' | wc -l)
+kroot=%{buildroot}%{_datadir}/wallpapers/%{name}-
+pkgs=$(find "$kroot"* -name metadata.json | wc -l)
+links=$(find "$kroot"* -type l | wc -l)
+badres=$(find "$kroot"* -type l | awk -F/ '$NF !~ /[0-9]+x[0-9]+\./' | wc -l)
 xfcel=$(find %{buildroot}%{_datadir}/xfce4/backdrops/%{name}-* -type l | wc -l)
-dangling=$(find "$kroot" %{buildroot}%{_datadir}/xfce4/backdrops \
+dangling=$(find "$kroot"* %{buildroot}%{_datadir}/xfce4/backdrops \
   -type l ! -exec test -e {} \; -print | wc -l)
 if [ "$bgc" -eq "$gnomec" ] && [ "$bgc" -eq "$cinnc" ] && \
    [ "$bgc" -eq "$matec" ] && [ "$bgc" -eq "$pkgs" ] && \
@@ -218,8 +209,8 @@ fi
 %{_datadir}/cinnamon-background-properties/%{name}.xml
 %{_datadir}/mate-background-properties/%{name}.xml
 %{_datadir}/xfce4/backdrops/%{name}-*
-%{_datadir}/wallpapers/%{name}/
+%{_datadir}/wallpapers/%{name}-*/
 
 %changelog
 * Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2025.06.17-1.20261024git
-- Initial package (commit e34f059, 388 wallpapers)
+- Initial package (commit snapshot)

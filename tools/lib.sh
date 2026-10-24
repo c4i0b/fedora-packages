@@ -203,15 +203,18 @@ check_package() {
       grep -q "%{_datadir}/$consumer" "$spec" \
         || { echo "FAIL: $name: wallpaper without %{_datadir}/$consumer entries (invisible in that DE)"; fail=1; }
     done
-    # Plasma needs one kpackage per image with WxH-named links inside
-    # contents/images: it picks the card preview and the applied image from a
-    # resolution-encoded filename (resSize in playlist), so a single
-    # collection-level kpackage ships a preview-less broken card
-    if grep -q '%{_datadir}/wallpapers/%{name}/contents/images' "$spec" \
-      && grep -q '%{_datadir}/wallpapers/%{name}/metadata.json' "$spec"; then
-      echo "FAIL: $name: collection-level Plasma kpackage (needs one kpackage per wallpaper)"
+    # Plasma's chooser only lists kpackages sitting directly under wallpapers/
+    # (proven against real packagefinder.cpp findAll: a metadata-less parent
+    # dir enqueues its children but marks them in `folders` during the root
+    # enumeration, so addPackage() skips them — kpackages nested under a
+    # collection dir never appear). One kpackage per image, prefix-named
+    # %{name}-<image>/, as plasma-workspace-wallpapers does
+    if grep -qE '%\{_datadir\}/wallpapers/%\{name\}/(contents|metadata)' "$spec"; then
+      echo "FAIL: $name: nested Plasma kpackage (chooser does not list them; use prefix-named wallpapers/%{name}-<image>/)"
       fail=1
     fi
+    grep -q '%{_datadir}/wallpapers/%{name}-' "$spec" \
+      || { echo "FAIL: $name: Plasma kpackages not as prefix-named wallpapers/%{name}-<image>/"; fail=1; }
     if ! grep -qE '[0-9]+x[0-9]+' "$spec"; then
       echo "FAIL: $name: KDE kpackage links without WxH resolution names (broken previews)"
       fail=1
