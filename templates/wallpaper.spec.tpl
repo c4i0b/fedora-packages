@@ -22,10 +22,11 @@ Source0:        %{url}/archive/%{commit}/%{name}-%{commit}.tar.gz
 __SUMMARY__, installed in the layout desktop environments expect:
 - %%{_datadir}/backgrounds/%{name}/ (raw path usable by every DE and picker
   wrappers like azote or nitrogen)
-- a gnome-background-properties XML, so GNOME, Cinnamon and MATE list every
-  image in their built-in wallpaper chooser
+- chooser XMLs in gnome-, cinnamon- and mate-background-properties, so GNOME,
+  Budgie, Cinnamon and MATE list every image in their built-in choosers
 - one Plasma kpackage per image under %%{_datadir}/wallpapers, as
   plasma-workspace-wallpapers does, so every card shows a working preview
+- per-image symlinks under %%{_datadir}/xfce4/backdrops for xfdesktop
 Portrait (phone-sized) images are skipped.
 
 %prep
@@ -36,17 +37,30 @@ rm -f images/.gitkeep
 
 %install
 # Every desktop entry is driven by one python listing of the landscape
-# (published) wallpapers: raw footprint, GNOME XML and KDE kpackages
+# (published) wallpapers: raw footprint, the three chooser XMLs, xfce4
+# backdrops and KDE kpackages
 
-# GNOME, Cinnamon and MATE discover wallpapers through
-# gnome-background-properties XML listings only; the file is opened here and
-# closed by the </wallpapers> line appended after the listing loop
-mkdir -p %{buildroot}%{_datadir}/gnome-background-properties
-{
-  echo '<?xml version="1.0" encoding="UTF-8"?>'
-  echo '<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">'
-  echo '<wallpapers>'
-} > %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml
+# Desktop choosers discover wallpapers through XML listings only, one dir per
+# DE family: GNOME and Budgie read gnome-background-properties, Cinnamon
+# reads cinnamon-background-properties (cs_backgrounds.py scans only that
+# dir) and MATE reads mate-background-properties. The files are opened here
+# and closed after the listing loop below.
+mkdir -p %{buildroot}%{_datadir}/gnome-background-properties \
+  %{buildroot}%{_datadir}/cinnamon-background-properties \
+  %{buildroot}%{_datadir}/mate-background-properties \
+  %{buildroot}%{_datadir}/xfce4/backdrops
+for dest in gnome-background-properties cinnamon-background-properties \
+  mate-background-properties; do
+  dtd=gnome-wp-list.dtd
+  if [ "$dest" = mate-background-properties ]; then
+    dtd=mate-wp-list.dtd
+  fi
+  {
+    echo '<?xml version="1.0" encoding="UTF-8"?>'
+    echo "<!DOCTYPE wallpapers SYSTEM \"$dtd\">"
+    echo '<wallpapers>'
+  } > %{buildroot}%{_datadir}/$dest/%{name}.xml
+done
 
 # Raw footprint: the images land once and every DE entry points at them
 mkdir -p %{buildroot}%{_datadir}/backgrounds/%{name}
@@ -138,9 +152,16 @@ for p in sorted(Path('images').iterdir()):
 PY
   install -m644 "images/${stem}.${ext}" \
     %{buildroot}%{_datadir}/backgrounds/%{name}/
-  printf '    <wallpaper deleted="false">\n        <name>%s</name>\n        <filename>%s/backgrounds/%s/%s</filename>\n        <options>zoom</options>\n        <shade_type>solid</shade_type>\n    </wallpaper>\n' \
-    "$(echo "$stem" | sed 's/[-_]/ /g')" '%{_datadir}' '%{name}' "${stem}.${ext}" \
-    >> %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml
+  for dest in gnome-background-properties cinnamon-background-properties \
+    mate-background-properties; do
+    printf '    <wallpaper deleted="false">\n        <name>%s</name>\n        <filename>%s/backgrounds/%s/%s</filename>\n        <options>zoom</options>\n        <shade_type>solid</shade_type>\n    </wallpaper>\n' \
+      "$(echo "$stem" | sed 's/[-_]/ /g')" '%{_datadir}' '%{name}' "${stem}.${ext}" \
+      >> %{buildroot}%{_datadir}/$dest/%{name}.xml
+  done
+  # xfdesktop lists anything found under xfce4/backdrops; a symlink keeps the
+  # payload single-copy (upstream's own generator links the same way)
+  ln -s "../../backgrounds/%{name}/${stem}.${ext}" \
+    %{buildroot}%{_datadir}/xfce4/backdrops/%{name}-${stem}.${ext}
   # images -> contents -> <stem> -> <name> -> wallpapers -> share, then backgrounds
   kpkg=%{buildroot}%{_datadir}/wallpapers/%{name}/${stem}/contents/images
   mkdir -p "$kpkg"
@@ -160,26 +181,37 @@ PY
     echo '}'
   } > "$kpkg/../../metadata.json"
 done
-echo '</wallpapers>' >> %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml
+for dest in gnome-background-properties cinnamon-background-properties \
+  mate-background-properties; do
+  echo '</wallpapers>' >> %{buildroot}%{_datadir}/$dest/%{name}.xml
+done
 
 %check
 # the generated discovery data must cover exactly what got published
 # (scriptlets do not share variables: paths must be recomputed here; the
 # portrait skip makes the published count differ from the raw images/)
 bgc=$(find %{buildroot}%{_datadir}/backgrounds/%{name} -type f | wc -l)
-xmlc=$(grep -c '<wallpaper ' \
+gnomec=$(grep -c '<wallpaper ' \
   %{buildroot}%{_datadir}/gnome-background-properties/%{name}.xml)
+cinnc=$(grep -c '<wallpaper ' \
+  %{buildroot}%{_datadir}/cinnamon-background-properties/%{name}.xml)
+matec=$(grep -c '<wallpaper ' \
+  %{buildroot}%{_datadir}/mate-background-properties/%{name}.xml)
 kroot=%{buildroot}%{_datadir}/wallpapers/%{name}
 pkgs=$(find "$kroot" -name metadata.json | wc -l)
 links=$(find "$kroot" -type l | wc -l)
 # link filenames must encode a resolution (KDE picks the preview by it)
 badres=$(find "$kroot" -type l | awk -F/ '$NF !~ /[0-9]+x[0-9]+\./' | wc -l)
-dangling=$(find "$kroot" -type l ! -exec test -e {} \; -print | wc -l)
-if [ "$bgc" -eq "$xmlc" ] && [ "$bgc" -eq "$pkgs" ] && \
-   [ "$bgc" -eq "$links" ] && [ "$dangling" -eq 0 ] && [ "$badres" -eq 0 ]; then
+xfcel=$(find %{buildroot}%{_datadir}/xfce4/backdrops/%{name}-* -type l | wc -l)
+dangling=$(find "$kroot" %{buildroot}%{_datadir}/xfce4/backdrops \
+  -type l ! -exec test -e {} \; -print | wc -l)
+if [ "$bgc" -eq "$gnomec" ] && [ "$bgc" -eq "$cinnc" ] && \
+   [ "$bgc" -eq "$matec" ] && [ "$bgc" -eq "$pkgs" ] && \
+   [ "$bgc" -eq "$links" ] && [ "$bgc" -eq "$xfcel" ] && \
+   [ "$dangling" -eq 0 ] && [ "$badres" -eq 0 ]; then
   :
 else
-  echo "inconsistent discovery data: bg=$bgc xml=$xmlc pkgs=$pkgs links=$links dangling=$dangling badres=$badres" >&2
+  echo "inconsistent discovery data: bg=$bgc gnome=$gnomec cinnamon=$cinnc mate=$matec pkgs=$pkgs links=$links xfce=$xfcel dangling=$dangling badres=$badres" >&2
   exit 1
 fi
 
@@ -187,6 +219,9 @@ fi
 %license __LICENSEFILE__
 %{_datadir}/backgrounds/%{name}/
 %{_datadir}/gnome-background-properties/%{name}.xml
+%{_datadir}/cinnamon-background-properties/%{name}.xml
+%{_datadir}/mate-background-properties/%{name}.xml
+%{_datadir}/xfce4/backdrops/%{name}-*
 %{_datadir}/wallpapers/%{name}/
 
 %changelog

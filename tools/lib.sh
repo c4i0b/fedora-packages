@@ -188,16 +188,21 @@ check_package() {
   fi
 
   # Wallpaper collections are blind in a desktop unless its picker finds the
-  # payload: GNOME/Cinnamon/MATE list gnome-background-properties XML only,
+  # payload: GNOME/Budgie list gnome-background-properties XML only, Cinnamon
+  # lists cinnamon-background-properties only, MATE lists
+  # mate-background-properties only, xfdesktop lists xfce4/backdrops only,
   # Plasma lists kpackages under wallpapers/ only, everything else reads the
-  # raw backgrounds/ footprint. The trio must ship together.
+  # raw backgrounds/ footprint. All five consumers must ship together.
   if grep -q 'backgrounds/' "$spec" \
     || grep -q 'gnome-background-properties' "$spec" \
     || grep -q '%{_datadir}/wallpapers/' "$spec"; then
     grep -q '%{_datadir}/backgrounds/' "$spec" \
       || { echo "FAIL: $name: wallpaper without a backgrounds/ raw footprint"; fail=1; }
-    grep -q 'gnome-background-properties' "$spec" \
-      || { echo "FAIL: $name: wallpaper without a gnome-background-properties XML (invisible in GNOME/Cinnamon/MATE)"; fail=1; }
+    for consumer in gnome-background-properties cinnamon-background-properties \
+      mate-background-properties 'xfce4/backdrops'; do
+      grep -q "%{_datadir}/$consumer" "$spec" \
+        || { echo "FAIL: $name: wallpaper without %{_datadir}/$consumer entries (invisible in that DE)"; fail=1; }
+    done
     # Plasma needs one kpackage per image with WxH-named links inside
     # contents/images: it picks the card preview and the applied image from a
     # resolution-encoded filename (resSize in playlist), so a single
