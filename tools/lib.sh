@@ -73,6 +73,7 @@ __BIN__ $name
 __EXTRAREQ__
 __EXTRAINSTALL__
 __EXTRAFILES__
+__SKIP__
 __DATE__ $(date '+%a %b %d %Y')
 __PACKAGER__ Template Check <check@localhost>
 EOF

@@ -125,6 +125,9 @@ PARSERS = {'png': dims_png, 'jpeg': dims_jpeg, 'gif': dims_gif, 'webp': dims_web
 for p in sorted(Path('images').iterdir()):
     if p.is_dir() or p.name.startswith('.'):
         continue
+    # visually-identical upstream variants (one logo swapped): drop stems
+    if p.stem in set('__SKIP__'.split()):
+        continue
     ext = p.suffix[1:].lower()
     h = p.open('rb').read(2 * 1024 * 1024)
     fn = PARSERS.get(fmt(h))
