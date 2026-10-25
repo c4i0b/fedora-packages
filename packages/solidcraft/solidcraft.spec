@@ -68,9 +68,11 @@ done
 
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.%{name}.desktop
+# headless CLI smoke test (usage text exits 0)
+target/release/%{name}-cli --help >/dev/null
 
 %files
-%license LICENSE-APACHE LICENSE-MIT
+%license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/solidcraft
 %{_bindir}/solidcraft-cli
