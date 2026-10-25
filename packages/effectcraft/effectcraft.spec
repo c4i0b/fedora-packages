@@ -70,7 +70,7 @@ done
 desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.effectcraft.desktop
 
 %files
-%license LICENSE-APACHE LICENSE-MIT
+%license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/effectcraft
 %{_datadir}/applications/ai.storyteller.effectcraft.desktop

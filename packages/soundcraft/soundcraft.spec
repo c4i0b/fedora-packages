@@ -72,7 +72,7 @@ done
 desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.soundcraft.desktop
 
 %files
-%license LICENSE-APACHE LICENSE-MIT
+%license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/soundcraft
 %{_datadir}/applications/ai.storyteller.soundcraft.desktop

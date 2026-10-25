@@ -71,7 +71,7 @@ done
 desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.figcraft.desktop
 
 %files
-%license LICENSE-APACHE LICENSE-MIT
+%license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/figcraft
 %{_datadir}/applications/ai.storyteller.figcraft.desktop

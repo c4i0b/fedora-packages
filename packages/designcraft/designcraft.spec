@@ -68,7 +68,7 @@ done
 desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.designcraft.desktop
 
 %files
-%license LICENSE-APACHE LICENSE-MIT
+%license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/designcraft
 %{_datadir}/applications/ai.storyteller.designcraft.desktop

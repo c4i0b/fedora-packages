@@ -210,6 +210,9 @@ npm:
   generate, not what upstream ships broken.
 - Ship shell completions whenever the binary can generate them (see the
   templates); skip when upstream has none — never hand-write them.
+- Ship upstream's `NOTICE` (or equivalent notices file) as `%license` when
+  the source tree has one; smoke-run any headless CLI the package installs
+  in `%check`.
 - Squash/amend + force-push to `main` is acceptable; keep a small clean history.
 - Never commit archives (`*.tgz`, `*.tar.gz` gitignored) — sources are
   downloaded at build time.
