@@ -1,5 +1,5 @@
 Name:           solidcraft
-Version:        0.22.0
+Version:        0.22.1
 Release:        1%{?dist}
 Summary:        Parametric 3D CAD application with sketches, features and assemblies
 
@@ -86,5 +86,8 @@ target/release/%{name}-cli --help >/dev/null
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.solidcraft.*
 
 %changelog
+* Sun Oct 25 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.22.1-1
+- Update to 0.22.1
+
 * Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 0.22.0-1
 - Initial package
