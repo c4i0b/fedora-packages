@@ -5,7 +5,7 @@
 %global _missing_build_ids_terminate_build 0
 
 Name:           rea-agents
-Version:        6.7.0
+Version:        6.8.0
 Release:        1%{?dist}
 Summary:        Reverse-engineering CLI and MCP server for AI agents
 
@@ -72,5 +72,8 @@ HOME=%{_builddir} %{_bindir}/node-24 scripts/rea.mjs --help >/dev/null
 %{_prefix}/lib/node_modules/%{name}/
 
 %changelog
+* Sun Oct 25 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 6.8.0-1
+- Update to 6.8.0
+
 * Wed Oct 21 2026 Caio Bruno <cbrunofb@gmail.com> - 6.7.0-1
 - Initial package
