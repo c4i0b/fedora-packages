@@ -1,5 +1,5 @@
 Name:           effectcraft
-Version:        0.16.0
+Version:        0.17.0
 Release:        1%{?dist}
 Summary:        Motion graphics and compositing tool
 
@@ -77,6 +77,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.effect
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.effectcraft.*
 
 %changelog
+* Sun Oct 25 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.17.0-1
+- Update to 0.17.0
+
 * Fri Oct 23 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.16.0-1
 - Update to 0.16.0
 
