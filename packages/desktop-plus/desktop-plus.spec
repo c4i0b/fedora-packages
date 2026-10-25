@@ -1,6 +1,6 @@
 # Electron payload: stripping corrupts the embedded snapshot; rpm 6 also
 # fails on the empty debugsource list — see AGENTS.md
-%define debug_package %{nil}
+%global debug_package %{nil}
 %global __strip /bin/true
 
 # Bundled Electron must not leak into rpm provides/requires
@@ -20,7 +20,6 @@ Source0:        https://github.com/desktop-plus/desktop-plus/releases/download/v
 Source1:        https://github.com/desktop-plus/desktop-plus/releases/download/v%{version}/DesktopPlus-v%{version}-linux-arm64.rpm
 Source2:        org.desktop-plus.DesktopPlus.metainfo.xml
 
-BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
 
 Requires:       git
@@ -36,12 +35,15 @@ commit graph, multiple stashes per branch, and more.
 
 %prep
 %setup -T -q -c
+# rpm2archive: libarchive cannot parse rpm 6-built RPM containers and old
+# (EL10) cpio/libarchive misread their payload sizes; both rpm2cpio paths
+# break, rpm2archive streams a tarball to stdout on every rpm version
 %ifarch x86_64
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
 %else
-bsdtar -xf %{SOURCE1}
+rpm2archive %{SOURCE1} > payload.tgz
 %endif
-
+tar -xzf payload.tgz
 %build
 
 %install
