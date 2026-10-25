@@ -5,7 +5,7 @@ Summary:        WPS brute-force attack tool
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/aanarchyy/bully
-Source0:        https://codeload.github.com/aanarchyy/bully/tar.gz/refs/tags/%{version}
+Source0:        https://codeload.github.com/aanarchyy/bully/tar.gz/refs/tags/%{version}#/bully-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make

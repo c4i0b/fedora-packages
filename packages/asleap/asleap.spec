@@ -5,7 +5,7 @@ Summary:        Actively recover LEAP passwords
 
 License:        GPL-2.0-only
 URL:            https://github.com/joswr1ght/asleap
-Source0:        https://codeload.github.com/joswr1ght/asleap/tar.gz/refs/heads/master
+Source0:        https://codeload.github.com/joswr1ght/asleap/tar.gz/refs/heads/master#/asleap-master.tar.gz
 # rawhide glibc dropped setkey()/encrypt(): DES via OpenSSL instead, and
 # pcap-bpf.h no longer exists
 Patch0:         des-openssl.patch

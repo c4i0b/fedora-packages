@@ -5,7 +5,7 @@ Summary:        Wordlist generator where you can specify standard character sets
 
 License:        GPL-2.0-only
 URL:            https://github.com/crunchsec/crunch
-Source0:        https://codeload.github.com/crunchsec/crunch/tar.gz/refs/heads/master
+Source0:        https://codeload.github.com/crunchsec/crunch/tar.gz/refs/heads/master#/crunch-master.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make

@@ -6,7 +6,7 @@ Summary:        hostapd fork facilitating AP impersonation attacks
 License:        BSD-3-Clause
 URL:            https://patches.aircrack-ng.org/wpe/hostapd-wpe/
 Source0:        https://w1.fi/releases/hostapd-%{version}.tar.gz
-Patch0:         https://patches.aircrack-ng.org/wpe/hostapd-wpe/hostapd-wpe.patch
+Patch0:         https://patches.aircrack-ng.org/wpe/hostapd-wpe/hostapd-wpe.patch#/hostapd-wpe-%{version}.patch
 
 BuildRequires:  gcc
 BuildRequires:  libnl3-devel
