@@ -5,12 +5,12 @@
 [![badges](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml)
 
 <!-- chroot-badges begin -->
-[![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3D17c797b1%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
-[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D85b2c430%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D6071d01f%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3D7b876848%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3Dbaa9c41f%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3Dfc25a538%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3Dfc9af98a%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
+[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D1191b53c%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3Df95563e2%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3Dc3a5e322%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3Dd49ca501%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3Dc5e014ab%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 <!-- chroot-badges end -->
 
 <!-- package-badges begin -->
@@ -37,6 +37,7 @@
 [![dnspyre](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnspyre.json%3Fv%3D3.12.0%2Er2)](https://github.com/Tantalor93/dnspyre/)
 [![effectcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Feffectcraft.json%3Fv%3D0.16.0%2Er2)](https://github.com/storytold/effectcraft/)
 [![faugus-launcher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffaugus-launcher.json%3Fv%3D2.5.1%2Er2)](https://github.com/Faugus/faugus-launcher/)
+[![fetch](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffetch.json%3Fv%3D2.3.0%2Er2)](https://github.com/areofyl/fetch/)
 [![figcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffigcraft.json%3Fv%3D0.10.0%2Er2)](https://github.com/storytold/figcraft/)
 [![filmcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffilmcraft.json%3Fv%3D0.12.0%2Er2)](https://github.com/storytold/filmcraft/)
 [![fira-code-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffira-code-nerd-fonts.json%3Fv%3D3.5.1%2Er2)](https://github.com/ryanoasis/nerd-fonts/)
@@ -89,7 +90,8 @@
 [![rio](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Frio.json%3Fv%3D0.5.28%2Er2)](https://github.com/raphamorim/rio/)
 [![scientifica-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fscientifica-fonts.json%3Fv%3D2.3%2Er2)](https://github.com/oppiliappan/scientifica/)
 [![selawik-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fselawik-fonts.json%3Fv%3D1.01%2Er2)](https://github.com/microsoft/Selawik/)
-[![slimbrave](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fslimbrave.json%3Fv%3D2.3.2%2Er2)](https://github.com/ChaoticSi1ence/SlimBrave-Neo/)
+[![slimbrave](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fslimbrave.json%3Fv%3D2.3.3%2Er2)](https://github.com/ChaoticSi1ence/SlimBrave-Neo/)
+[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3D0.22.0%2Er2)](https://github.com/tangency-labs/solidcraft/)
 [![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3D0.12.1%2Er2)](https://github.com/storytold/soundcraft/)
 [![superfile](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsuperfile.json%3Fv%3D1.6.0%2Er2)](https://github.com/yorukot/superfile/)
 [![tela-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftela-icon-theme.json%3Fv%3D2026.07.07%2Er2)](https://github.com/vinceliuice/Tela-icon-theme/)
@@ -103,14 +105,14 @@
 [![wezterm](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwezterm.json%3Fv%3D0.r20240203_110809_5046fc22%2Er2)](https://wezfurlong.org/wezterm//)
 [![whitesur-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwhitesur-icon-theme.json%3Fv%3D2026.09.10%2Er2)](https://github.com/vinceliuice/WhiteSur-icon-theme/)
 [![whosthere](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwhosthere.json%3Fv%3D0.9.0%2Er2)](https://github.com/ramonvermeulen/whosthere/)
-[![wifit3](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwifit3.json%3Fv%3D0.5.3%2Er2)](https://github.com/derv82/wifit3/)
+[![wifit3](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwifit3.json%3Fv%3D0.6.0%2Er2)](https://github.com/derv82/wifit3/)
 [![wifite](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwifite.json%3Fv%3D2.2.5%2Er2)](https://github.com/derv82/wifite2/)
 [![wordcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwordcraft.json%3Fv%3D0.10.0%2Er2)](https://github.com/storytold/wordcraft/)
 [![zapzap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fzapzap.json%3Fv%3D7.5.1%2Er2)](https://github.com/rafatosta/zapzap/)
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-10-25 00:31 UTC automatically by GitHub Actions.**
+**Updated 2026-10-25 07:48 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 
 ---
