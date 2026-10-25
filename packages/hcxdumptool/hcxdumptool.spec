@@ -1,5 +1,5 @@
 Name:           hcxdumptool
-Version:        7.1.2
+Version:        8.0.0
 Release:        1%{?dist}
 Summary:        Small tool to capture packets from wireless interfaces
 
@@ -40,5 +40,8 @@ install -Dpm644 man/hcxdumptool.1 %{buildroot}%{_mandir}/man1/hcxdumptool.1
 %{_mandir}/man1/hcxdumptool.1*
 
 %changelog
+* Sun Oct 25 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 8.0.0-1
+- Update to 8.0.0
+
 * Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 7.1.2-1
 - Initial package
