@@ -1,5 +1,5 @@
 Name:           filmcraft
-Version:        0.12.0
+Version:        0.13.0
 Release:        1%{?dist}
 Summary:        Nonlinear video editor with timeline, color and audio tools
 
@@ -79,6 +79,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.filmcr
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.filmcraft.*
 
 %changelog
+* Sun Oct 25 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.13.0-1
+- Update to 0.13.0
+
 * Fri Oct 23 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.12.0-1
 - Update to 0.12.0
 
