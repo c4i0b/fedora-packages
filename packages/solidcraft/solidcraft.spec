@@ -15,6 +15,12 @@ BuildRequires:  desktop-file-utils
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
 
+# truck (the geometry kernel) makes the workspace outgrow COPR's 5 h build
+# timeout at single-unit codegen with full debug info: parallelize codegen
+# and skip DWARF (no debug package is shipped anyway)
+%global rustflags_codegen_units 16
+%global rustflags_debuginfo 0
+
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
 
