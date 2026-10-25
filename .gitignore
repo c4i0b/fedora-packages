@@ -21,3 +21,5 @@ packages/*/*.rpm
 packages/*/cd_on_quit.*
 packages/*/*/
 *.AppImage
+packages/hostapd-wpe/hostapd-wpe-*.patch
+packages/solidcraft/vendor-cargo-config.toml
