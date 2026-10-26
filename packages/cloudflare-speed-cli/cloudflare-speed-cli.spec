@@ -1,5 +1,5 @@
 Name:           cloudflare-speed-cli
-Version:        1.0.10
+Version:        1.0.11
 Release:        1%{?dist}
 Summary:        Cloudflare-based internet speed test with optional TUI
 
@@ -45,5 +45,8 @@ with headless --text/--json modes for scripting.
 %{_bindir}/cloudflare-speed-cli
 
 %changelog
+* Mon Oct 26 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.0.11-1
+- Update to 1.0.11
+
 * Mon Oct 19 2026 Caio Bruno <cbrunofb@gmail.com> - 1.0.10-1
 - Initial package
