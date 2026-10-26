@@ -118,7 +118,7 @@
 |---|---|---|---|---|
 | cloudflare-speed-cli | 1.0.10 | 1.0.11-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11210335](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11210335/) |
 
-*Updated 2026-10-26 16:59 UTC automatically by GitHub Actions.*
+*Updated 2026-10-26 22:52 UTC automatically by GitHub Actions.*
 <!-- build-status end -->
 
 ---
