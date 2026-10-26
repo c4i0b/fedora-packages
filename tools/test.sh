@@ -36,6 +36,13 @@ done < <(git -C "$root" ls-files 'packages/*' | grep -vE '\.(spec|patch|txt|md|t
     head -c2 "$root/$f" 2>/dev/null | grep -q '#!' && echo "$f"
   done)
 
+# vendor-sources.sh tars the vendored crates as vendor-deps/ (plus a
+# git-sources.conf); specs must consume that layout, not a bare "vendor" dir
+while IFS= read -r spec; do
+  echo "FAIL: $spec uses '%cargo_prep -v vendor' but vendor.tar.zst ships vendor-deps/" >&2
+  fail=1
+done < <(grep -lE '^%cargo_prep -v vendor([[:space:]]|$)' "$root"/packages/*/*.spec)
+
 # host.sh must parse every remote syntax the repo may use (a past regression
 # silently dropped the owner and every host-dependent tool died on "/repo")
 # shellcheck source=host.sh

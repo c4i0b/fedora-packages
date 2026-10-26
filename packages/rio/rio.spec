@@ -30,7 +30,8 @@ ligatures, and configuration via TOML.
 
 %prep
 %autosetup -n %{name}-%{version} -p1 -a 1
-%cargo_prep -v vendor
+%cargo_prep -v vendor-deps
+cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
 # default features only: wayland + x11 backends; no --all-features (pulls

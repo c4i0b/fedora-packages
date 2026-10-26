@@ -20,7 +20,8 @@ shortcuts.
 
 %prep
 %autosetup -n %{name}-%{version} -p1 -a 1
-%cargo_prep -v vendor
+%cargo_prep -v vendor-deps
+cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
 %cargo_build
