@@ -8,14 +8,17 @@ URL:            https://ghostty.org
 Source0:        https://github.com/ghostty-org/ghostty/archive/refs/tags/v%{version}.tar.gz
 # Upstream ships no GitHub Release for stable tags (only the "tip" prerelease),
 # so Source0 is the codeload archive; the autoupdate bot falls back to tags.
-# zig is not in Fedora; ghostty pins 0.15.x and builds it with the official
+# zig is not in Fedora; ghostty pins 0.17.x and builds it with the official
 # prebuilt toolchain (one Source per arch, SRPM builder arch is arbitrary).
-Source1:        https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz
-Source2:        https://ziglang.org/download/0.15.2/zig-aarch64-linux-0.15.2.tar.xz
+Source1:        https://ziglang.org/download/0.17.0/zig-x86_64-linux-0.17.0.tar.xz
+Source2:        https://ziglang.org/download/0.17.0/zig-aarch64-linux-0.17.0.tar.xz
 ExclusiveArch:  x86_64 aarch64
 
 # zig produces no GNU build-id note; find-debuginfo fails on its binaries
 %global debug_package %{nil}
+# zig's staged install leaves hardlinked cache .o files under /usr/lib/<hash>
+# that vanish mid brp-strip; zig binaries are shipped unstripped anyway
+%global __strip /bin/true
 %if 0%{?rhel}
 # ...and rpm 4.19 aborts on the missing note without this
 %global _missing_build_ids_terminate_build 0
@@ -30,6 +33,7 @@ BuildRequires:  gtk4-devel
 BuildRequires:  harfbuzz-devel
 BuildRequires:  libadwaita-devel
 BuildRequires:  libpng-devel
+BuildRequires:  mesa-libEGL-devel
 BuildRequires:  oniguruma-devel
 BuildRequires:  pixman-devel
 BuildRequires:  pkg-config
@@ -64,6 +68,13 @@ for libghostty-vt, Ghostty's standalone terminal emulation library.
 # EPEL's harfbuzz (8.4) predates HB_BUFFER_CLUSTER_LEVEL_GRAPHEMES; it equals
 # CHARACTERS+1 in the newer harfbuzz the vendored binding links against
 sed -i 's/c\.HB_BUFFER_CLUSTER_LEVEL_GRAPHEMES/c.HB_BUFFER_CLUSTER_LEVEL_CHARACTERS + 1/' pkg/harfbuzz/buffer.zig
+# EL10 libadwaita is 1.6; the 1.7 floor is upstream's support policy, the
+# blueprints (max declared 1.5) and code compile fine against 1.6. Same for
+# blueprint-compiler 0.19 (floor says 0.20): all blueprints compile with it.
+sed -i 's/\.minor = 7,/.minor = 6,/' src/apprt/gtk/build/gresource.zig
+sed -i 's/\.minor = 20,/.minor = 19,/' src/apprt/gtk/build/blueprint.zig
+sed -i 's/\.minor = 7,/.minor = 6,/' src/apprt/gtk/adw_version.zig
+sed -i 's/\.minor = 18,/.minor = 16,/' src/apprt/gtk/gtk_version.zig
 %endif
 %ifarch x86_64
 tar -xJf %{SOURCE1}
@@ -73,9 +84,9 @@ tar -xJf %{SOURCE2}
 
 %install
 %ifarch x86_64
-export PATH="$PWD/zig-x86_64-linux-0.15.2:$PATH"
+export PATH="$PWD/zig-x86_64-linux-0.17.0:$PATH"
 %else
-export PATH="$PWD/zig-aarch64-linux-0.15.2:$PATH"
+export PATH="$PWD/zig-aarch64-linux-0.17.0:$PATH"
 %endif
 # Link the system fontconfig/freetype/harfbuzz rather than letting zig vendor
 # them: without -fsys= the executable would interpose its own copies over the
@@ -101,6 +112,13 @@ DESTDIR=%{buildroot} zig build \
     %if 0%{?fedora}
     -Demit-docs \
     %endif
+
+# zig bakes DESTDIR into the pc files' prefix; check-buildroot aborts
+sed -i 's@^prefix=.*@prefix=%{_prefix}@' \
+    %{buildroot}%{_datadir}/pkgconfig/libghostty-vt*.pc
+# static artifacts shipped nowhere: drop them
+rm -f %{buildroot}%{_prefix}/lib/libghostty-vt.a \
+      %{buildroot}%{_datadir}/pkgconfig/libghostty-vt-static.pc
 
 # rpm's own terminfo owns this entry on fedora >= 42
 %if 0%{?fedora} >= 42

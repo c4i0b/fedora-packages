@@ -236,6 +236,8 @@ npm:
   (python3-setuptools/python3-wheel) — Fedora builds without isolation.
 - Never add Epoch; if a release must be skipped or downgraded, push a commit
   message `autoupdate: override <version>` on the package (the bot respects it).
+  When fixing a failed build, do not bump Release/changelog if that build never
+  completed (a failed build never delivered the version).
 - English only, concise README. In any code (specs, scripts, tools): comments
   only for non-obvious workarounds — never the obvious; full context lives here.
 - When `fedora-review` is enabled on the project, builds run slower than
