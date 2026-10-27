@@ -1,5 +1,5 @@
 Name:           ghostty
-Version:        1.3.1
+Version:        1.4.0
 Release:        1%{?dist}
 Summary:        A fast, feature-rich terminal emulator
 
@@ -179,5 +179,8 @@ LD_LIBRARY_PATH=%{buildroot}%{_prefix}/lib \
 %endif
 
 %changelog
+* Tue Oct 27 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.4.0-1
+- Update to 1.4.0
+
 * Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 1.3.1-1
 - Initial package
