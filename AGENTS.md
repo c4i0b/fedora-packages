@@ -111,7 +111,10 @@ General:
   (`Source: zig-pkg.tar.*` via tools/vendor-sources.sh) and build with
   `zig build --system zig-pkg` — zig's own http client fails on COPR
   builders, and only a dependency's *root* zon belongs to the graph
-  (scanning fetched sub-zons pulls gigabytes of junk).
+  (scanning fetched sub-zons pulls gigabytes of junk). Note `--system`
+  implies zig's system package mode: install paths and defaults change
+  (ghostty moves systemd units to `%{_prefix}/lib/systemd/user` and flips
+  `emit-docs` on) — audit `%files` and build flags accordingly.
 - Never hardcode upstream desktop-file/app-id names in %install/%files:
   upstreams rename them between releases (solidcraft's
   ai.storyteller → io.tangencylabs) — glob the desktop file and icons.
