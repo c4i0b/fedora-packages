@@ -72,6 +72,7 @@ HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --get-yargs-completions dev
 %license LICENSE.txt ThirdPartyNotices.txt
 %doc README.md CHANGELOG.md
 %{_bindir}/devcontainer
+%{_datadir}/bash-completion/completions/devcontainer
 %{_prefix}/lib/node_modules/%{name}/
 
 %changelog
