@@ -73,11 +73,12 @@ for libghostty-vt, Ghostty's standalone terminal emulation library.
 # EPEL's harfbuzz (8.4) predates HB_BUFFER_CLUSTER_LEVEL_GRAPHEMES; it equals
 # CHARACTERS+1 in the newer harfbuzz the vendored binding links against
 sed -i 's/c\.HB_BUFFER_CLUSTER_LEVEL_GRAPHEMES/c.HB_BUFFER_CLUSTER_LEVEL_CHARACTERS + 1/' pkg/harfbuzz/buffer.zig
-# EL10 libadwaita is 1.6; the 1.7 floor is upstream's support policy, the
-# blueprints (max declared 1.5) and code compile fine against 1.6. Same for
-# blueprint-compiler 0.19 (floor says 0.20): all blueprints compile with it.
+%endif
+%if 0%{?rhel} || 0%{?fedora} < 44
+# Upstream's version floors are its support policy, not compile requirements;
+# EL10 has adw 1.6/blueprint 0.19/gtk 4.16, f43 blueprint 0.18 — all compile
 sed -i 's/\.minor = 7,/.minor = 6,/' src/apprt/gtk/build/gresource.zig
-sed -i 's/\.minor = 20,/.minor = 19,/' src/apprt/gtk/build/blueprint.zig
+sed -i 's/\.minor = 20,/.minor = 18,/' src/apprt/gtk/build/blueprint.zig
 sed -i 's/\.minor = 7,/.minor = 6,/' src/apprt/gtk/adw_version.zig
 sed -i 's/\.minor = 18,/.minor = 16,/' src/apprt/gtk/gtk_version.zig
 %endif
@@ -118,6 +119,9 @@ DESTDIR=%{buildroot} zig build \
     %endif
     %if 0%{?fedora}
     -Demit-docs \
+    %else
+    # system package mode defaults emit-docs on; EPEL has no pandoc
+    -Demit-docs=false \
     %endif
 
 # zig bakes DESTDIR into the pc files' prefix; check-buildroot aborts
@@ -180,7 +184,8 @@ LD_LIBRARY_PATH=%{buildroot}%{_prefix}/lib \
 %{_datadir}/dbus-1/services/com.mitchellh.ghostty.service
 %{_datadir}/locale/*/LC_MESSAGES/com.mitchellh.ghostty.mo
 %{_datadir}/metainfo/com.mitchellh.ghostty.metainfo.xml
-%{_datadir}/systemd/user/app-com.mitchellh.ghostty.service
+# --system (system package mode) installs the unit to /usr/lib/systemd/user
+%{_prefix}/lib/systemd/user/app-com.mitchellh.ghostty.service
 # zig installs libraries into /usr/lib regardless of the arch-specific libdir
 %{_prefix}/lib/libghostty-vt.so.0
 %{_prefix}/lib/libghostty-vt.so.0.1.0
