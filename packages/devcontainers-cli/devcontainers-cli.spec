@@ -64,7 +64,8 @@ EOF
 HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --version
 HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --help >/dev/null
 # completion engine must answer both subcommands and per-command flags
-test "$(HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --get-yargs-completions devcontainer '')" = "up set-up build run-user-commands read-configuration outdated upgrade features templates exec"
+# (tr: $(...) keeps the newlines, the comparison is space-separated)
+test "$(HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --get-yargs-completions devcontainer '' | tr '\n' ' ')" = "up set-up build run-user-commands read-configuration outdated upgrade features templates exec "
 HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --get-yargs-completions devcontainer up -- | grep -q -- --workspace-folder
 
 %files
