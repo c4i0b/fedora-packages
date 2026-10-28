@@ -45,6 +45,12 @@ line or by an AI agent.
 # git-sourced crates (craft-libs) need the source replacements cargo vendor
 # printed; the prep macro only rewrites crates-io
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
+# cargo eagerly validates every [patch.crates-io] entry against the vendored
+# directory source: patched crates nothing depends on (egui_demo_lib) are
+# never vendored by cargo vendor and abort the build -- drop those entries
+sed -n '/^\[patch\.crates-io\]/,/^\[/p' Cargo.toml | grep -oE '^[a-zA-Z0-9_-]+ = \{ git' | cut -d' ' -f1 | while read -r crate; do
+    [ -d "vendor-deps/$crate" ] || sed -i "/^$crate = { git/d" Cargo.toml
+done
 
 %build
 # %%cargo_build cannot select a workspace member: its -n flag is
