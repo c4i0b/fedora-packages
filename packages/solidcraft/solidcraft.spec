@@ -64,8 +64,11 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 install -Dm755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
 install -Dm755 target/release/%{name}-cli %{buildroot}%{_bindir}/%{name}-cli
 
-install -Dm644 assets/platforms/linux/ai.storyteller.%{name}.desktop \
-    %{buildroot}%{_datadir}/applications/ai.storyteller.%{name}.desktop
+# upstream renames its app id between releases (ai.storyteller.* →
+# io.tangencylabs.*): ship whatever desktop file linux/platforms carries
+desktop_file=$(basename assets/platforms/linux/*.desktop)
+install -Dm644 "assets/platforms/linux/$desktop_file" \
+    %{buildroot}%{_datadir}/applications/$desktop_file
 
 # ship whatever sizes upstream provides (they change between releases)
 for icon in assets/icons/app/linux/exports/hicolor/*/apps/*; do
@@ -73,7 +76,7 @@ for icon in assets/icons/app/linux/exports/hicolor/*/apps/*; do
 done
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.%{name}.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 # headless CLI smoke test (usage text exits 0)
 target/release/%{name}-cli --help >/dev/null
 
@@ -82,8 +85,8 @@ target/release/%{name}-cli --help >/dev/null
 %doc README.md
 %{_bindir}/solidcraft
 %{_bindir}/solidcraft-cli
-%{_datadir}/applications/ai.storyteller.solidcraft.desktop
-%{_datadir}/icons/hicolor/*/apps/ai.storyteller.solidcraft.*
+%{_datadir}/applications/*.desktop
+%{_datadir}/icons/hicolor/*/apps/*
 
 %changelog
 * Wed Oct 28 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.25.1-1
