@@ -99,6 +99,9 @@ export PATH="$PWD/zig-aarch64-linux-0.17.0:$PATH"
 # them: without -fsys= the executable would interpose its own copies over the
 # ones GTK4 uses, mixing symbol/state across library boundaries.
 # Runs in the install section (rpmbuild's buildroot is only usable there).
+# emit-docs is pinned both ways: system package mode defaults it on, and EPEL
+# has no pandoc. No comments inside the conditional — a hash ends the
+# backslash-continued zig build command.
 DESTDIR=%{buildroot} zig build \
     --summary all \
     --system zig-pkg \
@@ -120,7 +123,6 @@ DESTDIR=%{buildroot} zig build \
     %if 0%{?fedora}
     -Demit-docs \
     %else
-    # system package mode defaults emit-docs on; EPEL has no pandoc
     -Demit-docs=false \
     %endif
 
