@@ -1,5 +1,5 @@
 Name:           cadcraft
-Version:        0.13.0
+Version:        0.14.0
 Release:        1%{?dist}
 Summary:        2D/3D CAD and drafting application with DXF and DWG support
 
@@ -76,6 +76,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.cadcra
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.cadcraft.*
 
 %changelog
+* Wed Oct 28 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.14.0-1
+- Update to 0.14.0
+
 * Sun Oct 25 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.13.0-1
 - Update to 0.13.0
 
