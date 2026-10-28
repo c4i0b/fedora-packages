@@ -107,6 +107,14 @@ General:
   archive) — strip `-f*lto*` from CFLAGS in those specs. The same manual
   `ar` is often parallel-unsafe too: two sub-makes rebuild the same objects
   and the final archive lands truncated (mdk4 osdep) — build with `-j1`.
+- zig packages vendor their `build.zig.zon` closure at SRPM time
+  (`Source: zig-pkg.tar.*` via tools/vendor-sources.sh) and build with
+  `zig build --system zig-pkg` — zig's own http client fails on COPR
+  builders, and only a dependency's *root* zon belongs to the graph
+  (scanning fetched sub-zons pulls gigabytes of junk).
+- Never hardcode upstream desktop-file/app-id names in %install/%files:
+  upstreams rename them between releases (solidcraft's
+  ai.storyteller → io.tangencylabs) — glob the desktop file and icons.
 - The Fedora meson macro forces `--auto-features=enabled` and cannot be
   overridden (argument concatenation): for minimal builds, call
   `meson setup %{_vpath_builddir} --auto-features=disabled ...` directly

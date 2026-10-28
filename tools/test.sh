@@ -43,6 +43,16 @@ while IFS= read -r spec; do
   fail=1
 done < <(grep -lE '^%cargo_prep -v vendor([[:space:]]|$)' "$root"/packages/*/*.spec)
 
+# zig packages vendor their build.zig.zon closure as zig-pkg.tar.*; the build
+# must consume it hermetically (--system never fetches, unlike zig's flaky
+# http client on COPR builders)
+while IFS= read -r spec; do
+  grep -q -- '--system' "$spec" || {
+    echo "FAIL: $spec ships a zig-pkg store but 'zig build' lacks --system" >&2
+    fail=1
+  }
+done < <(grep -lE '^Source[0-9]*:.*zig-pkg\.tar' "$root"/packages/*/*.spec)
+
 # host.sh must parse every remote syntax the repo may use (a past regression
 # silently dropped the owner and every host-dependent tool died on "/repo")
 # shellcheck source=host.sh
