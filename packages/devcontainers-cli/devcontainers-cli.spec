@@ -44,11 +44,28 @@ cat > %{buildroot}%{_bindir}/devcontainer <<'EOF'
 exec /usr/bin/node-24 %{_prefix}/lib/node_modules/devcontainers-cli/devcontainer.js "$@"
 EOF
 
+# Yargs has completion() enabled but no `completion` command (no script to
+# print); ship the canonical yargs boilerplate — candidates are generated
+# dynamically by the binary via --get-yargs-completions, nothing hand-written
+install -Dpm644 /dev/null %{buildroot}%{_datadir}/bash-completion/completions/devcontainer
+cat > %{buildroot}%{_datadir}/bash-completion/completions/devcontainer <<'EOF'
+# canonical yargs completion shim
+_devcontainer_completion() {
+  local cur_word
+  cur_word="${COMP_WORDS[COMP_CWORD]}"
+  COMPREPLY=( $(COMP_CWORD=$((COMP_CWORD+1)) devcontainer --get-yargs-completions "${COMP_WORDS[@]:1}" "${cur_word}") )
+}
+complete -F _devcontainer_completion devcontainer
+EOF
+
 %check
 # Scratch HOME per repo convention; call the interpreter directly since the
 # wrapper hardcodes installed paths
 HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --version
 HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --help >/dev/null
+# completion engine must answer both subcommands and per-command flags
+test "$(HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --get-yargs-completions devcontainer '')" = "up set-up build run-user-commands read-configuration outdated upgrade features templates exec"
+HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --get-yargs-completions devcontainer up -- | grep -q -- --workspace-folder
 
 %files
 %license LICENSE.txt ThirdPartyNotices.txt

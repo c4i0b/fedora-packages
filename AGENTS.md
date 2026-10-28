@@ -182,6 +182,11 @@ Rust:
   plain `export CFLAGS` gets overridden by the %cargo macros.
 
 npm:
+- Yargs CLIs without a `completion` command still answer
+  `--get-yargs-completions`: ship the canonical yargs bash shim (candidates
+  come from the binary; never hand-write them) and smoke it in `%check`
+  (see devcontainers-cli). Only yargs — openclaw/rea-agents style custom
+  arg parsers have nothing to generate.
 - Apps may ship no GitHub Releases: the `upstream` file supports
   `npm:<package>` tracking. A bundled-`node_modules` tarball is **not
   necessarily complete** (regular `dependencies` may be missing) and can
