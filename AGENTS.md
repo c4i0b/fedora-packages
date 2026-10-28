@@ -172,7 +172,8 @@ Rust:
   in %prep.
 - A `[patch.crates-io]` entry for a crate nothing in the graph depends on is
   never vendored, yet cargo eagerly validates every patch entry against the
-  directory source and aborts — drop unvendored patch lines in `%prep`.
+  directory source and aborts — vendor-sources.sh drops unvendored patch
+  entries (and re-packs the source tarball) automatically at SRPM time.
 - `cargo-rpm-macros` cannot build a single workspace member (`-n` is
   `--no-default-features`, other flags rejected): invoke
   `%{__cargo} build %{?_smp_mflags} -Z avoid-dev-deps --profile rpm -p <crate>`

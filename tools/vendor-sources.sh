@@ -42,6 +42,41 @@ elif grep -q '^%cargo_prep' "$spec"; then
   ws="$(cd "$ws" && pwd)"
   # vendor into a fresh dir name: some trees already carry a "vendor" dir
   (cd "$ws" && cargo vendor --locked vendor-deps 2>/dev/null || cargo vendor vendor-deps 2>/dev/null) > vendor-cargo-config.toml
+  # [patch.crates-io] entries for crates nothing in the graph depends on are
+  # never vendored, yet cargo validates every patch entry against its source
+  # and aborts offline — drop them from the tree the binary build will extract
+  # (the extracted copy dies with the SRPM chroot, so re-pack the tarball too)
+  dropped=0
+  while IFS= read -r -d '' cm; do
+    grep -q '^\[patch\.crates-io\]' "$cm" || continue
+    tmp="$cm.tmp"; : > "$tmp"; inpatch=0
+    while IFS= read -r line || [ -n "$line" ]; do
+      case "$line" in
+        '[patch.crates-io]'*) inpatch=1 ;;
+        '['*) inpatch=0 ;;
+      esac
+      if [ "$inpatch" = 1 ] && [[ "$line" =~ ^[A-Za-z0-9_-]+[[:space:]]*= ]]; then
+        crate="${line%%=*}"; crate="${crate//[[:space:]]/}"
+        if [ ! -d "$ws/vendor-deps/$crate" ] \
+           && ! ls "$ws/vendor-deps/$crate"-[0-9]* >/dev/null 2>&1; then
+          echo "vendor-sources: dropping unvendored patch entry: $crate ($cm)" >&2
+          dropped=1
+          continue
+        fi
+      fi
+      printf '%s\n' "$line" >> "$tmp"
+    done < "$cm"
+    mv "$tmp" "$cm"
+  done < <(find "$ws" -name Cargo.toml -not -path '*/vendor*' -print0)
+  if [ "$dropped" = 1 ]; then
+    case "$src_file" in
+      *.tar.gz|*.tgz|*.crate) zflag=-z ;;
+      *.tar.xz) zflag=-J ;;
+      *.tar.bz2) zflag=-j ;;
+      *) zflag="" ;;
+    esac
+    tar $zflag -cf "$src_file" "$dir"
+  fi
   # git-sourced crates (e.g. storytold craft-libs) need their own [source]
   # replacements appended to the config %cargo_prep generates
   awk 'BEGIN{RS=""; ORS="\n\n"} /\[source\."git\+/' vendor-cargo-config.toml > git-sources.conf
