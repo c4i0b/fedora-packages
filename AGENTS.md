@@ -112,12 +112,11 @@ General:
   `zig build --system zig-pkg` — zig's own http client fails on COPR
   builders, and only a dependency's *root* zon belongs to the graph
   (scanning fetched sub-zons pulls gigabytes of junk). Note `--system`
-  implies zig's system package mode: install paths and defaults change
-  (ghostty moves systemd units to `%{_prefix}/lib/systemd/user` and flips
-  `emit-docs` on) — audit `%files` and build flags accordingly.
+  implies zig's system package mode: install paths change (e.g. systemd
+  units to `%{_prefix}/lib/systemd/user`) and upstream build defaults may
+  flip (docs, vendored libs) — audit `%files` and build flags accordingly.
 - Never hardcode upstream desktop-file/app-id names in %install/%files:
-  upstreams rename them between releases (solidcraft's
-  ai.storyteller → io.tangencylabs) — glob the desktop file and icons.
+  upstreams rename them between releases — glob the desktop file and icons.
 - The Fedora meson macro forces `--auto-features=enabled` and cannot be
   overridden (argument concatenation): for minimal builds, call
   `meson setup %{_vpath_builddir} --auto-features=disabled ...` directly
@@ -171,6 +170,9 @@ Rust:
   config the cargo_prep macro writes; vendor-sources.sh ships them inside
   vendor.tar.zst as `git-sources.conf` — `cat` it onto `.cargo/config.toml`
   in %prep.
+- A `[patch.crates-io]` entry for a crate nothing in the graph depends on is
+  never vendored, yet cargo eagerly validates every patch entry against the
+  directory source and aborts — drop unvendored patch lines in `%prep`.
 - `cargo-rpm-macros` cannot build a single workspace member (`-n` is
   `--no-default-features`, other flags rejected): invoke
   `%{__cargo} build %{?_smp_mflags} -Z avoid-dev-deps --profile rpm -p <crate>`

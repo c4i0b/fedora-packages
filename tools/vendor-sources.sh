@@ -50,6 +50,9 @@ elif grep -q '^%cargo_prep' "$spec"; then
   # keep it for the patches: our vendored deps go to a SEPARATE dir — a merged
   # dir breaks (registry replacement demands checksums the patched copies
   # lack, and drops the vendored ones)
+  # a stale vendor-deps from a previous local run would nest as
+  # vendor-deps/vendor-deps inside the mv below
+  rm -rf vendor-deps
   mv "$ws/vendor-deps" vendor-deps
   mv git-sources.conf vendor-deps/
   tar --zstd -cf vendor.tar.zst vendor-deps
