@@ -1,5 +1,5 @@
 Name:           pdfcraft
-Version:        0.14.0
+Version:        0.15.0
 Release:        1%{?dist}
 Summary:        PDF reader and editor with annotations, forms and signing
 
@@ -100,6 +100,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.pdfcra
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.pdfcraft.*
 
 %changelog
+* Wed Oct 28 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.15.0-1
+- Update to 0.15.0
+
 * Sun Oct 25 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.14.0-1
 - Update to 0.14.0
 
