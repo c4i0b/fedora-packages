@@ -106,20 +106,37 @@ PY
       d="zig-pkg/$hash"
       [ -d "$d" ] && continue # same id reachable via several URLs
       mkdir -p "$d"
+      # COPR builder egress breaks HTTP/2 to several forges (curl exit 92) and
+      # flaps mid-transfer; force HTTP/1.1 and retry hard, verbosely.
       if [ "$commit" != "-" ]; then
         repo="${url%%#*}"; repo="${repo%%\?*}"
         git init -q "$d/tmpg"
-        (cd "$d/tmpg" &&
-         git remote add origin "$repo" &&
-         git fetch -q --depth 1 origin "$commit" &&
-         git checkout -q FETCH_HEAD && rm -rf .git)
+        ok=0
+        for attempt in 1 2 3 4 5; do
+          echo "vendor-sources: git fetch $repo ($commit), attempt $attempt" >&2
+          if (cd "$d/tmpg" &&
+              git -c http.version=HTTP/1.1 fetch -q --depth 1 "$repo" "$commit" &&
+              git checkout -q FETCH_HEAD && rm -rf .git); then ok=1; break; fi
+          rm -rf "$d/tmpg"; git init -q "$d/tmpg"
+          sleep $((attempt * 10))
+        done
+        [ "$ok" = 1 ] || { echo "vendor-sources: git fetch failed: $repo" >&2; exit 1; }
         shopt -s dotglob nullglob
         mv "$d/tmpg"/* "$d/"
         shopt -u dotglob nullglob
         rmdir "$d/tmpg"
       else
         f="zon-cache-$(basename "$url")"
-        curl -sfL --max-time 300 --retry 3 -o "$f" "$url"
+        ok=0
+        for attempt in 1 2 3 4 5; do
+          echo "vendor-sources: fetching $url, attempt $attempt" >&2
+          if curl --http1.1 -sfL --connect-timeout 30 --max-time 600 \
+               --retry 3 --retry-delay 10 --retry-all-errors -o "$f" "$url"; then
+            ok=1; break
+          fi
+          sleep $((attempt * 10))
+        done
+        [ "$ok" = 1 ] || { echo "vendor-sources: download failed: $url" >&2; exit 1; }
         ft=$(file -b "$f")
         if [[ "$ft" == *Zip* ]]; then
           unzip -q "$f" -d "$d"
