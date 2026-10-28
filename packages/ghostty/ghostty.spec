@@ -12,6 +12,10 @@ Source0:        https://github.com/ghostty-org/ghostty/archive/refs/tags/v%{vers
 # prebuilt toolchain (one Source per arch, SRPM builder arch is arbitrary).
 Source1:        https://ziglang.org/download/0.17.0/zig-x86_64-linux-0.17.0.tar.xz
 Source2:        https://ziglang.org/download/0.17.0/zig-aarch64-linux-0.17.0.tar.xz
+# build.zig.zon dependency closure, pre-fetched at SRPM time into a
+# zig build --system package store (vendor-sources.sh): zig's own downloader
+# fails on the COPR builders
+Source3:        zig-pkg.tar.zst
 ExclusiveArch:  x86_64 aarch64
 
 # zig produces no GNU build-id note; find-debuginfo fails on its binaries
@@ -38,6 +42,7 @@ BuildRequires:  oniguruma-devel
 BuildRequires:  pixman-devel
 BuildRequires:  pkg-config
 BuildRequires:  wayland-protocols-devel
+BuildRequires:  zstd
 BuildRequires:  zlib-ng-devel
 %if 0%{?rhel}
 BuildRequires:  patchelf
@@ -81,6 +86,7 @@ tar -xJf %{SOURCE1}
 %else
 tar -xJf %{SOURCE2}
 %endif
+tar --zstd -xf %{SOURCE3}
 
 %install
 %ifarch x86_64
@@ -94,6 +100,7 @@ export PATH="$PWD/zig-aarch64-linux-0.17.0:$PATH"
 # Runs in the install section (rpmbuild's buildroot is only usable there).
 DESTDIR=%{buildroot} zig build \
     --summary all \
+    --system zig-pkg \
     --prefix "%{_prefix}" \
     -fsys=fontconfig \
     -fsys=freetype \

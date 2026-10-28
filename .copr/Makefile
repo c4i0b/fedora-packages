@@ -14,6 +14,6 @@ srpm: vendor
 		$(specfile)
 
 vendor:
-	@if grep -qE '^%goprep|go-vendor-tools' $(specfile) || grep -q '^%cargo_prep' $(specfile); then \
+	@if grep -qE '^%goprep|go-vendor-tools' $(specfile) || grep -q '^%cargo_prep' $(specfile) || grep -q '^Source[0-9]*:.*zig-pkg.tar' $(specfile); then \
 		$(selfdir)../tools/vendor-sources.sh $(srcdir) $(specfile); \
 	fi
