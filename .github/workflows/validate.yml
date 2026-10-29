@@ -68,6 +68,10 @@ jobs:
       # cache saved with an incomplete set would re-download the difference
       # forever. The primary key never matches (saved keys have an epoch
       # suffix); the prefix picks the newest entry.
+      # vendor-sources.sh REWRITES source tarballs in place (cargo patch
+      # filtering re-packs them): its hash is part of the key so a recipe
+      # change can never be served a tarball repacked by an older one (a
+      # stale one poisoned soundcraft's vendor step with cargo exit 101)
       - uses: actions/cache/restore@v5
         id: sources_cache
         with:
@@ -77,8 +81,8 @@ jobs:
             packages/**/*.zip
             !packages/**/*-vendor.tar.bz2
             !packages/**/vendor.tar.zst
-          key: sources-v2-${{ hashFiles('packages/*/*.spec') }}
-          restore-keys: sources-v2-
+          key: sources-v3-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh') }}
+          restore-keys: sources-v3-
       # subset validation: only packages changed since the last green run
       # (cancelled runs leave their changes pending for the next one); every
       # ambiguity — dispatch, tools/templates changes, orphaned sha — is full
@@ -114,7 +118,7 @@ jobs:
       # restored (same set = the immutable entry already holds it); volatile
       # "releases/latest" payloads are pruned before this point and never saved
       - uses: actions/cache/save@v5
-        if: steps.sources_cache.outputs.cache-matched-key != format('sources-v2-{0}-{1}', hashFiles('packages/*/*.spec'), env.srcs_epoch)
+        if: steps.sources_cache.outputs.cache-matched-key != format('sources-v3-{0}-{1}', hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh'), env.srcs_epoch)
         with:
           path: |
             packages/**/*.tar.*
@@ -122,4 +126,4 @@ jobs:
             packages/**/*.zip
             !packages/**/*-vendor.tar.bz2
             !packages/**/vendor.tar.zst
-          key: sources-v2-${{ hashFiles('packages/*/*.spec') }}-${{ env.srcs_epoch }}
+          key: sources-v3-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh') }}-${{ env.srcs_epoch }}
