@@ -11,6 +11,7 @@ Source1:        vendor.tar.zst
 BuildRequires:  cargo-rpm-macros
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
+BuildRequires:  openssl-devel
 
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false

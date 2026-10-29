@@ -24,10 +24,11 @@ alongside. Supports multiple hosts, IPv4/IPv6 and adaptive graph scaling.
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
-%cargo_build
+# virtual workspace: cargo-rpm-macros cannot build a single member
+%{__cargo} build %{?_smp_mflags} -Z avoid-dev-deps --profile rpm -p gping
 
 %install
-%cargo_install
+install -Dm755 target/release/gping %{buildroot}%{_bindir}/gping
 
 %check
 %{buildroot}%{_bindir}/gping --version

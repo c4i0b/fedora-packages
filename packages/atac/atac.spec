@@ -12,6 +12,8 @@ BuildRequires:  cargo-rpm-macros
 
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
+# debugsource trips brp-mangle-shebangs on vendored crate inner attrs
+%global debug_package %{nil}
 
 %description
 ATAC (Argument-Tree API Client) is a feature-rich API client that lives in

@@ -15,6 +15,9 @@ Source0:        %{gosource}
 Source1:        %{archivename}-vendor.tar.bz2
 
 BuildRequires:  go-vendor-tools
+# containers/storage cgo drivers (btrfs, devmapper) need their headers
+BuildRequires:  btrfs-progs-devel
+BuildRequires:  device-mapper-devel
 
 %generate_buildrequires
 %go_vendor_license_buildrequires
