@@ -34,7 +34,6 @@ fields=(
   "downloads=${downloads:-na}"
   "vendor_runs=${vendor_runs:-na}"
   "vendor_skips=${vendor_skips:-na}"
-  "cache=${CACHE:-na}"
   "srcs_cache=${SRCS_CACHE:-na}"
   "srcs_files=$srcs_files"
   "srcs_mb=$srcs_mb"
