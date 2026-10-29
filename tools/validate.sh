@@ -38,10 +38,17 @@ tools/lint.sh "$@" & lintpid=$!
 srcs_before="$(srcs_find | wc -l)"
 t1=$(date +%s)
 jobs=$(nproc); [ "$jobs" -gt 8 ] && jobs=8
+# VENDOR_STATS collects one run/skip line per vendoring package from
+# vendor-sources.sh (exported, so it survives xargs/make)
+vendor_stats="$(mktemp)"
+export VENDOR_STATS="$vendor_stats"
 printf '%s\n' "${pkgs[@]}" \
   | xargs -P "$jobs" -I{} make -f .copr/Makefile srpm "pkg={}" outdir=/tmp/srpm
 echo "validate=$(( $(date +%s) - t1 ))" >> "${GITHUB_ENV:-/dev/null}"
 echo "downloads=$(( $(srcs_find | wc -l) - srcs_before ))" >> "${GITHUB_ENV:-/dev/null}"
+echo "vendor_runs=$(grep -c '^run$' "$vendor_stats" || true)" >> "${GITHUB_ENV:-/dev/null}"
+echo "vendor_skips=$(grep -c '^skip$' "$vendor_stats" || true)" >> "${GITHUB_ENV:-/dev/null}"
+rm -f "$vendor_stats"
 wait "$lintpid"
 
 # Remove downloaded/generated build artifacts (legit files are tracked).

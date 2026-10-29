@@ -9,6 +9,38 @@ spec="${2:?usage: vendor-sources.sh <source-dir> <spec>}"
 spec="$(cd "$(dirname "$spec")" && pwd)/$(basename "$spec")"
 cd "$srcdir"
 
+# Fingerprint of every input that determines the vendor archive: spec bytes,
+# this script, the (non-vendor) source archives, and toolchain packages. A
+# matching .vendor-ok stamp + present archive skips re-vendoring entirely —
+# CI restores both from the sources cache; COPR builders start clean and
+# never hit this path.
+vendor_fingerprint() {
+  {
+    sha256sum "$spec" "${BASH_SOURCE[0]}" 2>/dev/null
+    find . -maxdepth 2 \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) \
+      ! -name '*-vendor.tar.*' ! -name 'vendor.tar.zst' ! -name 'zig-pkg.tar.*' \
+      -printf '%p %s\n' | sort
+    rpm -q golang go-vendor-tools cargo rust-packaging 2>/dev/null || true
+  } | sha256sum | cut -c1-16
+}
+
+vendor_kind() {
+  if grep -qE '^%goprep|go-vendor-tools' "$spec"; then printf '*-vendor.tar.*'
+  elif grep -q '^%cargo_prep' "$spec"; then printf 'vendor.tar.zst'
+  elif grep -q '^Source[0-9]*:.*zig-pkg.tar' "$spec"; then printf 'zig-pkg.tar.*'
+  else printf ''; fi
+}
+
+kind="$(vendor_kind)"
+if [ -n "$kind" ] && [ -f .vendor-ok ]; then
+  fp="$(vendor_fingerprint)"
+  if [ "$fp" = "$(cat .vendor-ok)" ] && ls $kind >/dev/null 2>&1; then
+    echo "vendor-sources: inputs unchanged, reusing $(ls $kind | head -1)"
+    if [ -n "${VENDOR_STATS:-}" ]; then echo skip >> "$VENDOR_STATS"; fi
+    exit 0
+  fi
+fi
+
 dnfinstall() { dnf -y install --nodocs --setopt=install_weak_deps=0 "$@" >/dev/null 2>&1; }
 [ "$(id -u)" = 0 ] || dnfinstall() { sudo dnf -y install --nodocs --setopt=install_weak_deps=0 "$@" >/dev/null 2>&1; }
 
@@ -216,4 +248,9 @@ fi
 if [ -n "$vendor_archive" ] && [ ! -f "$vendor_archive" ]; then
   echo "vendor-sources: expected $vendor_archive in $srcdir but it is missing" >&2
   exit 1
+fi
+
+if [ -n "$kind" ]; then
+  vendor_fingerprint > .vendor-ok
+  if [ -n "${VENDOR_STATS:-}" ]; then echo run >> "$VENDOR_STATS"; fi
 fi

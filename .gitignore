@@ -23,3 +23,4 @@ packages/*/*/
 *.AppImage
 packages/hostapd-wpe/hostapd-wpe-*.patch
 packages/solidcraft/vendor-cargo-config.toml
+packages/*/.vendor-ok
