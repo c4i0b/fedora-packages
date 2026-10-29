@@ -6,11 +6,14 @@ specfile := $(if $(wildcard $(spec)/*.spec),$(firstword $(wildcard $(spec)/*.spe
 srcdir := $(dir $(abspath $(specfile)))
 
 .PHONY: srpm vendor
+# source payloads are (already compressed) tarballs: rpm's default zstd-19
+# burns ~9x the CPU for zero size win — level 1 is size-identical
 srpm: vendor
 	rpmbuild -bs \
 		--define "_sourcedir $(srcdir)" \
 		--define "_srcrpmdir $(abspath $(outdir))" \
 		--define "_disable_source_fetch 0" \
+		--define "_source_payload w1T.zstdio" \
 		$(specfile)
 
 vendor:
