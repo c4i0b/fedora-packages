@@ -35,7 +35,7 @@ install -Dm755 target/release/gping %{buildroot}%{_bindir}/gping
 
 %files
 %license LICENSE
-%doc README.md
+%doc readme.md
 %{_bindir}/gping
 
 %changelog
