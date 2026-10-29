@@ -1,5 +1,5 @@
 Name:           hollywood
-Version:        1.25
+Version:        1.26
 Release:        1%{?dist}
 Summary:        Fill your console with Hollywood melodrama technobabble
 
@@ -90,5 +90,8 @@ install -Dpm644 share/man/man1/wallstreet.1 %{buildroot}%{_mandir}/man1/wallstre
 %{_mandir}/man1/wallstreet.1*
 
 %changelog
+* Thu Oct 29 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.26-1
+- Update to 1.26
+
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 1.25-1
 - Initial package
