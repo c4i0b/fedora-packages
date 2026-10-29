@@ -25,10 +25,11 @@ root on most platforms.
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
-%cargo_build
+# virtual workspace: cargo-rpm-macros cannot build a single member
+%{__cargo} build %{?_smp_mflags} -Z avoid-dev-deps --profile rpm -p trippy
 
 %install
-%cargo_install
+install -Dm755 target/release/trip %{buildroot}%{_bindir}/trip
 
 %check
 %{buildroot}%{_bindir}/trip --version

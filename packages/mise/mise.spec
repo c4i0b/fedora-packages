@@ -9,6 +9,8 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 Source1:        vendor.tar.zst
 
 BuildRequires:  cargo-rpm-macros
+BuildRequires:  gcc-c++
+BuildRequires:  cmake
 
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false

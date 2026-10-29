@@ -20,7 +20,7 @@ highlighted responses and curl import — a Postman/Insomnia experience
 without leaving the keyboard.
 
 %prep
-%autosetup -n atac-%{version} -p1 -a 1
+%autosetup -n ATAC-%{version} -p1 -a 1
 %cargo_prep -v vendor-deps
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
