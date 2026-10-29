@@ -31,7 +31,7 @@ tar -xf %{S:1}
 
 %build
 %global gomodulesmode GO111MODULE=on
-%gobuild -o %{gobuilddir}/bin/dockle %{goipath}
+%gobuild -o %{gobuilddir}/bin/dockle %{goipath}/cmd/dockle
 
 %install
 %go_vendor_license_install

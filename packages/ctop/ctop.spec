@@ -40,7 +40,7 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 %if %{with check}
 %check
 %gocheck2
-%{gobuilddir}/bin/ctop --version
+%{gobuilddir}/bin/ctop -v
 %endif
 
 %files -f %{go_vendor_license_filelist}

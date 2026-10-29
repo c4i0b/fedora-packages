@@ -19,7 +19,7 @@ the terminal, and can plot the execution time of arbitrary commands
 alongside. Supports multiple hosts, IPv4/IPv6 and adaptive graph scaling.
 
 %prep
-%autosetup -n %{name}-%{version} -p1 -a 1
+%autosetup -n gping-gping-v%{version} -p1 -a 1
 %cargo_prep -v vendor-deps
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
