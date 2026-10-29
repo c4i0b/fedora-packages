@@ -33,8 +33,9 @@ echo "dnf_toolchain=$(( $(date +%s) - t0 ))" >> "${GITHUB_ENV:-/dev/null}"
 tools/lint.sh "$@" & lintpid=$!
 
 # downloads = files rpmbuild had to fetch: on a healthy cache-hit run only
-# the 'releases/latest' volatiles (pruned before every cache save); anything
-# more without a spec change means a prune/cache bug
+# the 'releases/latest' volatiles (pruned before every cache save); more than
+# that without a spec change is usually the first full run after subset-run
+# bumps folded their new tarballs in (the save is full-only since 2026-10)
 srcs_before="$(srcs_find | wc -l)"
 t1=$(date +%s)
 jobs=$(nproc); [ "$jobs" -gt 8 ] && jobs=8

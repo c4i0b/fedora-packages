@@ -108,8 +108,12 @@ jobs:
       # save only when the post-prune content set differs from what was
       # restored (same set = the immutable entry already holds it); volatile
       # "releases/latest" payloads are pruned before this point and never saved
+      # subset runs never save: uploading 5.8GB to record one bumped tarball
+      # is pure overhead — the next full run folds it in (it re-downloads the
+      # few new tarballs, so a slightly-high downloads counter there is
+      # expected, not a prune/cache bug)
       - uses: actions/cache/save@v5
-        if: steps.sources_cache.outputs.cache-matched-key != format('sources-v4-{0}-{1}', hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh'), env.srcs_epoch)
+        if: steps.scope.outputs.scope == 'full' && steps.sources_cache.outputs.cache-matched-key != format('sources-v4-{0}-{1}', hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh'), env.srcs_epoch)
         with:
           # must stay IDENTICAL to the restore step's paths: the cache
           # archive version is derived from them, a mismatch reads as
