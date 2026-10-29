@@ -42,10 +42,13 @@ elif grep -q '^%cargo_prep' "$spec"; then
   ws="$(cd "$ws" && pwd)"
   # vendor into a fresh dir name: some trees already carry a "vendor" dir
   (cd "$ws" && cargo vendor --locked vendor-deps 2>/dev/null || cargo vendor vendor-deps 2>/dev/null) > vendor-cargo-config.toml
-  # [patch.crates-io] entries for crates nothing in the graph depends on are
-  # never vendored, yet cargo validates every patch entry against its source
-  # and aborts offline — drop them from the tree the binary build will extract
-  # (the extracted copy dies with the SRPM chroot, so re-pack the tarball too)
+  # [patch.crates-io] GIT entries for crates nothing in the graph depends on
+  # are never vendored, yet cargo validates every patch entry against its
+  # source and aborts offline — drop them from the tree the binary build will
+  # extract (the extracted copy dies with the SRPM chroot, so re-pack the
+  # tarball too). PATH entries must be kept: path-patched crates (pdfcraft's
+  # vendor/hayro) stay local and never appear in the vendor dir, yet the
+  # build resolves them from the tree itself.
   dropped=0
   while IFS= read -r -d '' cm; do
     grep -q '^\[patch\.crates-io\]' "$cm" || continue
@@ -55,11 +58,11 @@ elif grep -q '^%cargo_prep' "$spec"; then
         '[patch.crates-io]'*) inpatch=1 ;;
         '['*) inpatch=0 ;;
       esac
-      if [ "$inpatch" = 1 ] && [[ "$line" =~ ^[A-Za-z0-9_-]+[[:space:]]*= ]]; then
+      if [ "$inpatch" = 1 ] && [[ "$line" =~ ^[A-Za-z0-9_-]+[[:space:]]*=[[:space:]]*\{[[:space:]]*git ]]; then
         crate="${line%%=*}"; crate="${crate//[[:space:]]/}"
         if [ ! -d "$ws/vendor-deps/$crate" ] \
            && ! ls "$ws/vendor-deps/$crate"-[0-9]* >/dev/null 2>&1; then
-          echo "vendor-sources: dropping unvendored patch entry: $crate ($cm)" >&2
+          echo "vendor-sources: dropping unvendored git patch entry: $crate ($cm)" >&2
           dropped=1
           continue
         fi
