@@ -6,11 +6,11 @@
 
 <!-- chroot-badges begin -->
 [![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3D37648090%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
-[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D321fb041%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D2e69b22a%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3Dc9c9b247%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3Daf9b47a0%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3Da2860cea%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D54fed898%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D149512d3%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3Dc3a5e322%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3De792b8fa%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3D931f6d1f%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 <!-- chroot-badges end -->
 
 <!-- package-badges begin -->
@@ -78,7 +78,7 @@
 [![meslo-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmeslo-nerd-fonts.json%3Fv%3D3.5.1%2Er2)](https://github.com/ryanoasis/nerd-fonts/)
 [![netscanner](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fnetscanner.json%3Fv%3D0.6.43%2Er2)](https://github.com/Chleba/netscanner/)
 [![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3D2026.10.8%2Er2)](https://www.npmjs.com/package/openclaw/)
-[![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.2.0%2Er2)](https://www.npmjs.com/package/@opencode/cli-linux-x64/)
+[![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.2.1%2Er2)](https://www.npmjs.com/package/@opencode/cli-linux-x64/)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D1.19.5%2Er2)](https://github.com/anomalyco/opencode/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3D0.13.4%2Er2)](https://github.com/mrjackwills/oxker/)
 [![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D0.15.0%2Er2)](https://github.com/storytold/pdfcraft/)
@@ -92,7 +92,7 @@
 [![scientifica-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fscientifica-fonts.json%3Fv%3D2.3%2Er2)](https://github.com/oppiliappan/scientifica/)
 [![selawik-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fselawik-fonts.json%3Fv%3D1.01%2Er2)](https://github.com/microsoft/Selawik/)
 [![slimbrave](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fslimbrave.json%3Fv%3D2.3.3%2Er2)](https://github.com/ChaoticSi1ence/SlimBrave-Neo/)
-[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3D0.25.1%2Er2)](https://github.com/tangency-labs/solidcraft/)
+[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3D0.26.0%2Er2)](https://github.com/tangency-labs/solidcraft/)
 [![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3D0.14.0%2Er2)](https://github.com/storytold/soundcraft/)
 [![superfile](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fsuperfile.json%3Fv%3D1.6.0%2Er2)](https://github.com/yorukot/superfile/)
 [![tela-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftela-icon-theme.json%3Fv%3D2026.07.07%2Er2)](https://github.com/vinceliuice/Tela-icon-theme/)
@@ -113,24 +113,7 @@
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-### :x: build failures
-
-| package | published | attempted | failed in | build |
-|---|---|---|---|---|
-| cadcraft | 0.13.0 | 0.14.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220702](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220702/) |
-| deckcraft | 0.11.1 | 0.12.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220701](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220701/) |
-| designcraft | 0.13.0 | 0.14.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220696](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220696/) |
-| effectcraft | 0.17.0 | 0.18.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220698](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220698/) |
-| figcraft | 0.11.2 | 0.12.1-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220703](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220703/) |
-| filmcraft | 0.13.0 | 0.14.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220695](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220695/) |
-| gridcraft | 0.12.1 | 0.13.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220700](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220700/) |
-| lightcraft | 0.14.0 | 0.15.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220697](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220697/) |
-| pdfcraft | 0.14.0 | 0.15.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220694](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220694/) |
-| photocraft | 0.16.0 | 0.17.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220692](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220692/) |
-| vectorcraft | 0.17.0 | 0.18.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220693](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220693/) |
-| wordcraft | 0.11.0 | 0.12.0-1 | fedora 43<br>fedora 44<br>fedora 45<br>fedora rawhide<br>epel 10 | [#11220699](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11220699/) |
-
-*Updated 2026-10-28 22:50 UTC automatically by GitHub Actions.*
+**Updated 2026-10-29 08:54 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 
 ---
