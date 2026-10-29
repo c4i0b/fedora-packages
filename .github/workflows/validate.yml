@@ -45,21 +45,11 @@ jobs:
           # full history: the scope step diffs HEAD against the sha of the
           # last successful run, which force-pushes can orphan (then: full)
           fetch-depth: 0
-      - uses: actions/cache@v5
-        id: module_cache
-        with:
-          # the job container gets HOME=/github/home (not /root), so that is
-          # where go/cargo put their module caches
-          path: |
-            /github/home/go/pkg/mod
-            /github/home/.cargo/registry
-            /github/home/.cargo/git
-          key: vendor-caches-${{ hashFiles('packages/*/go.*', 'packages/*/Cargo.*', 'tools/vendor-sources.sh') }}
-          # module/registry caches are content-addressed by dependency version,
-          # NOT by toolchain, so a golang/cargo bump in the Fedora image must
-          # not invalidate them; bump the vendor-caches-v2- prefix manually
-          # only on real cache corruption
-          restore-keys: vendor-caches-
+      # NOTE: no go/cargo module cache anymore. The 4.5GB vendor-caches entry
+      # plus the 3GB sources cache breached the 10GB repo quota and LRU-evicted
+      # each other on every save (sources restored as pure miss). With the
+      # .vendor-ok skip, vendoring only runs on package bumps, and a cold
+      # module cache then costs one networked re-vendor for that package.
       # upstream tarballs rpmbuild downloads into the package dirs; the
       # restore-keys prefix makes invalidation per-package-lazy: after a bump
       # only the changed tarball is re-fetched, the prune bounds the size.
@@ -113,7 +103,6 @@ jobs:
           FEDORA_PACKAGES_DIRECT: "1"
           SCOPE: ${{ steps.scope.outputs.scope }}
           PKGS: ${{ steps.scope.outputs.pkgs }}
-          CACHE: ${{ steps.module_cache.outputs.cache-hit == 'true' && 'hit' || 'miss' }}
           SRCS_CACHE: ${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }}
           JOB_START: ${{ env.job_start }}
       # save only when the post-prune content set differs from what was
