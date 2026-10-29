@@ -1,5 +1,5 @@
 Name:           solidcraft
-Version:        0.26.0
+Version:        0.26.1
 Release:        1%{?dist}
 Summary:        Parametric 3D CAD application with sketches, features and assemblies
 
@@ -89,6 +89,9 @@ target/release/%{name}-cli --help >/dev/null
 %{_datadir}/icons/hicolor/*/apps/*
 
 %changelog
+* Thu Oct 29 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.26.1-1
+- Update to 0.26.1
+
 * Thu Oct 29 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.26.0-1
 - Update to 0.26.0
 
