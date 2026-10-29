@@ -15,6 +15,8 @@ BuildRequires:  openssl-devel
 
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
+# debugsource trips brp-mangle-shebangs on vendored crate inner attrs
+%global debug_package %{nil}
 
 %description
 Mise manages runtime and tool versions per project, directory or globally:
