@@ -111,10 +111,12 @@ jobs:
       - uses: actions/cache/save@v5
         if: steps.sources_cache.outputs.cache-matched-key != format('sources-v4-{0}-{1}', hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh'), env.srcs_epoch)
         with:
+          # must stay IDENTICAL to the restore step's paths: the cache
+          # archive version is derived from them, a mismatch reads as
+          # "Cache not found" on every run
           path: |
             packages/**/*.tar.*
             packages/**/*.tgz
             packages/**/*.zip
-            !packages/**/*-vendor.tar.bz2
-            !packages/**/vendor.tar.zst
+            packages/**/.vendor-ok
           key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh') }}-${{ env.srcs_epoch }}
