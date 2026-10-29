@@ -12,6 +12,8 @@ BuildRequires:  cargo-rpm-macros
 
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
+# debugsource trips brp-mangle-shebangs on vendored crate inner attrs
+%global debug_package %{nil}
 
 %description
 Trippy (trip) is a network diagnostic tool combining the functionality of

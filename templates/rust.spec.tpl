@@ -12,6 +12,8 @@ BuildRequires:  cargo-rpm-macros
 
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
+# debugsource trips brp-mangle-shebangs on vendored crate inner attrs (xh, atac)
+%global debug_package %{nil}
 
 # Uncomment if the dependency tree pulls aws-lc-sys (rustls/reqwest): its
 # bundled jitterentropy errors on RPM's -O2 (see AGENTS.md)
