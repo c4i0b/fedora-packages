@@ -1,6 +1,6 @@
 Name:           quiver-launcher
 Version:        3.5.1
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Launcher for downloading and playing static recompilation ports of classic games
 
 License:        MIT
@@ -113,9 +113,5 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_iconsdir}/hicolor/256x256/apps/*.png
 
 %changelog
-* Fri Oct 30 2026 Caio Bruno <cbrunofb@gmail.com> - 3.5.1-2
-- Prune non-build-arch NuGet native assets (musl/android/riscv64 sonames
-  made the package uninstallable)
-
 * Fri Oct 30 2026 Caio Bruno <cbrunofb@gmail.com> - 3.5.1-1
 - Initial package
