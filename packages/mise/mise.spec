@@ -13,6 +13,10 @@ BuildRequires:  gcc-c++
 BuildRequires:  cmake
 BuildRequires:  openssl-devel
 
+# debug_package is nil and the workspace is huge: debuginfo + single
+# codegen unit push the build past the COPR timeout on 2-vCPU builders
+%global build_rustflags %(echo "%{build_rustflags}" | sed -e 's/-Cdebuginfo=[0-9]//' -e 's/-Ccodegen-units=1//')
+
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
 # debugsource trips brp-mangle-shebangs on vendored crate inner attrs
