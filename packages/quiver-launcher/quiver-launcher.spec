@@ -1,6 +1,6 @@
 Name:           quiver-launcher
 Version:        3.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Launcher for downloading and playing static recompilation ports of classic games
 
 License:        MIT
@@ -77,7 +77,18 @@ dotnet publish QuiverLauncher.Desktop/QuiverLauncher.Desktop.csproj \
     -p:PublishTrimmed=false -p:PublishSingleFile=false \
     -o publish
 
+%ifarch x86_64
+%global rid linux-x64
+%else
+%global rid linux-arm64
+%endif
+
 %install
+# NuGet native assets (libSDL3, libSkiaSharp) ship one runtimes/<rid>/native
+# tree per architecture — including musl/riscv64/android builds whose sonames
+# become unresolvable rpm requires: keep only the build arch
+find publish/runtimes -mindepth 1 -maxdepth 1 -type d \
+    ! -name '%{rid}' -exec rm -rf {} +
 install -Dm755 %{SOURCE1} %{buildroot}%{_bindir}/quiver-launcher
 install -d %{buildroot}%{_libdir}/quiver-launcher
 cp -a publish/. %{buildroot}%{_libdir}/quiver-launcher/
@@ -102,5 +113,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_iconsdir}/hicolor/256x256/apps/*.png
 
 %changelog
+* Fri Oct 30 2026 Caio Bruno <cbrunofb@gmail.com> - 3.5.1-2
+- Prune non-build-arch NuGet native assets (musl/android/riscv64 sonames
+  made the package uninstallable)
+
 * Fri Oct 30 2026 Caio Bruno <cbrunofb@gmail.com> - 3.5.1-1
 - Initial package
