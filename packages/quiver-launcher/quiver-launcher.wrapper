@@ -1,0 +1,5 @@
+#!/bin/sh
+# Installed payload is not writable: keep the in-app self-updater from
+# trying to replace it (updates come from this repository's COPR builds)
+export QuiverLauncher_SKIP_UPDATES=1
+exec %{_libdir}/quiver-launcher/QuiverLauncher "$@"
