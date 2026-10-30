@@ -1,5 +1,7 @@
 #!/bin/sh
+# NOTE: rpm macros are NOT expanded in Source files — keep this path literal
+# (libdir is /usr/lib64 on both x86_64 and aarch64)
 # Installed payload is not writable: keep the in-app self-updater from
 # trying to replace it (updates come from this repository's COPR builds)
 export QuiverLauncher_SKIP_UPDATES=1
-exec %{_libdir}/quiver-launcher/QuiverLauncher "$@"
+exec /usr/lib64/quiver-launcher/QuiverLauncher "$@"
