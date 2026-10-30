@@ -1,5 +1,5 @@
 Name:           faugus-launcher
-Version:        2.5.4
+Version:        2.5.5
 Release:        1%{?dist}
 Summary:        A simple and lightweight app for running Windows games using UMU-Launcher
 
@@ -53,6 +53,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_metainfodir}/io.github.Faugus.faugus-launcher.metainfo.xml
 
 %changelog
+* Fri Oct 30 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.5.5-1
+- Update to 2.5.5
+
 * Tue Oct 27 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.5.4-1
 - Update to 2.5.4
 
