@@ -1,5 +1,5 @@
 Name:           broot
-Version:        1.61.0
+Version:        1.62.0
 Release:        1%{?dist}
 Summary:        Interactive tree file manager with fuzzy search and previews
 
@@ -39,5 +39,8 @@ install -Dpm644 br.fish %{buildroot}%{_datadir}/fish/vendor_functions.d/br.fish
 %{_datadir}/fish/vendor_functions.d/br.fish
 
 %changelog
+* Sun Nov 01 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.62.0-1
+- Update to 1.62.0
+
 * Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 1.61.0-1
 - Initial package
