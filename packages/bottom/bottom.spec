@@ -1,5 +1,5 @@
 Name:           bottom
-Version:        0.14.9
+Version:        0.15.0
 Release:        1%{?dist}
 Summary:        Graphical process/system monitor with TUI (btm)
 
@@ -38,5 +38,8 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 %{_bindir}/btm
 
 %changelog
+* Sun Nov 01 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.15.0-1
+- Update to 0.15.0
+
 * Thu Oct 29 2026 Caio Bruno <cbrunofb@gmail.com> - 0.14.9-1
 - Initial package
