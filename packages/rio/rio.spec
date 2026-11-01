@@ -1,5 +1,5 @@
 Name:           rio
-Version:        0.5.28
+Version:        0.5.29
 Release:        1%{?dist}
 Summary:        Hardware-accelerated terminal emulator built with Rust
 
@@ -62,5 +62,8 @@ target/rpm/rio --version
 %{_datadir}/terminfo/x/xterm-rio
 
 %changelog
+* Sun Nov 01 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.5.29-1
+- Update to 0.5.29
+
 * Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 0.5.28-1
 - Initial package
