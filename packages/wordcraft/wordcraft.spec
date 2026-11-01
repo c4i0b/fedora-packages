@@ -1,5 +1,5 @@
 Name:           wordcraft
-Version:        0.13.2
+Version:        0.14.0
 Release:        1%{?dist}
 Summary:        Word processor with docx support, track changes and mail merge
 
@@ -74,6 +74,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.wordcr
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.wordcraft.*
 
 %changelog
+* Sun Nov 01 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.14.0-1
+- Update to 0.14.0
+
 * Sat Oct 31 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.13.2-1
 - Update to 0.13.2
 
