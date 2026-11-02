@@ -1,5 +1,5 @@
 Name:           fish-tide
-Version:        6.2.0
+Version:        6.2.1
 Release:        1%{?dist}
 Summary:        The ultimate fish prompt (tide)
 BuildArch:      noarch
@@ -53,5 +53,8 @@ done
 %{_datadir}/fish/vendor_functions.d/tide/
 
 %changelog
+* Mon Nov 02 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 6.2.1-1
+- Update to 6.2.1
+
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 6.2.0-1
 - Initial package
