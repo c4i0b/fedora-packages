@@ -55,6 +55,10 @@ HERMES_NIX_BUILD=1 uv pip install \
 grep -rlZ '%{buildroot}' %{buildroot}%{_libdir}/%{name}/bin/ \
     | xargs -0 -r sed -i "s|%{buildroot}||g"
 sed -i "s|%{buildroot}||g" %{buildroot}%{_libdir}/%{name}/pyvenv.cfg
+# brp-mangle-shebangs aborts on ambiguous "env python" shebangs in vendored
+# test scripts (croniter)
+grep -rlZ '^#!/usr/bin/env python$' %{buildroot}%{_libdir}/%{name}/ \
+    | xargs -0 -r sed -i 's|^#!/usr/bin/env python$|#!/usr/bin/python3|'
 
 install -d -m755 %{buildroot}%{_bindir}
 for b in hermes hermes-agent hermes-acp; do
