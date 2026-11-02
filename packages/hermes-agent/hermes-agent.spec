@@ -16,7 +16,7 @@
 %endif
 
 Name:           hermes-agent
-Version:        0.22.5
+Version:        0.22.6
 Release:        1%{?dist}
 Summary:        The self-improving AI agent by Nous Research
 
@@ -85,6 +85,9 @@ HOME="%{_builddir}/home" %{buildroot}%{_libdir}/%{name}/bin/python \
 %{_datadir}/%{name}/
 
 %changelog
+* Mon Nov 02 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.22.6-1
+- Update to 0.22.6
+
 * Thu Oct 22 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.22.5-1
 * Fri Oct 23 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.22.5-1
 - Update to 0.22.5
