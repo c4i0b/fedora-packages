@@ -1,5 +1,5 @@
 Name:           cloudflare-speed-cli
-Version:        1.0.11
+Version:        1.0.12
 Release:        1%{?dist}
 Summary:        Cloudflare-based internet speed test with optional TUI
 
@@ -46,6 +46,9 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 %{_bindir}/cloudflare-speed-cli
 
 %changelog
+* Tue Nov 03 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.0.12-1
+- Update to 1.0.12
+
 * Mon Oct 26 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.0.11-1
 - Update to 1.0.11
 
