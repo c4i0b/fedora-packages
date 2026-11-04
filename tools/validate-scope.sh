@@ -26,7 +26,11 @@ last="$(curl -sf \
   "${GIT_API_BASE}/repos/${GIT_SLUG}/actions/workflows/validate.yml/runs?status=success&per_page=1" \
   "${auth[@]}" \
   | grep -oE '"head_sha": ?"[0-9a-f]{40}"' | head -1 | cut -d'"' -f4 || true)"
-[ -n "$last" ] || full no-green-history
+if [ -z "$last" ]; then
+  # loud, not silent: this path silently forced full for a week
+  echo "::warning::[scope] last-green lookup returned nothing; falling back to full"
+  full no-green-history
+fi
 git -C "$root" cat-file -e "$last^{commit}" 2>/dev/null || full orphaned-sha
 
 changed="$(git -C "$root" diff --name-only "$last"..HEAD)"
