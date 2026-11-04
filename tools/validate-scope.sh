@@ -39,7 +39,7 @@ if [ -z "$last" ]; then
   last="$(grep -oE '"head_sha": ?"[0-9a-f]{40}"' "$body" | head -1 | cut -d'"' -f4 || true)"
 fi
 if [ -z "$last" ]; then
-  echo >&2 "::warning::[scope] last-green lookup empty (http=$http): $(head -c 200 "$body" 2>/dev/null)"
+  echo >&2 "::warning::[scope] last-green lookup empty (http=$http url=$url msg=$(grep -oE '"message": ?"[^"]*"' "$body" | head -1))"
   rm -f "$body"
   full no-green-history
 fi
