@@ -19,7 +19,7 @@
 [![angryoxide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fangryoxide.json%3Fv%3D0.9.2%2Er2)](https://github.com/Ragnt/AngryOxide/)
 [![asleap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fasleap.json%3Fv%3D2.3%2Er2)](https://github.com/joswr1ght/asleap/)
 [![atac](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fatac.json%3Fv%3D0.24.0%2Er2)](https://github.com/julien-cpsn/ATAC/)
-[![beads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbeads.json%3Fv%3D1.3.3%2Er2)](https://github.com/gastownhall/beads/)
+[![beads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbeads.json%3Fv%3D1.3.4%2Er2)](https://github.com/gastownhall/beads/)
 [![beef](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbeef.json%3Fv%3D0.6.0.0%2Er2)](https://github.com/beefproject/beef/)
 [![bettercap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbettercap.json%3Fv%3D2.41.7%2Er2)](https://github.com/bettercap/bettercap/)
 [![bottom](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fbottom.json%3Fv%3D0.15.0%2Er2)](https://github.com/ClementTsang/bottom/)
@@ -91,7 +91,7 @@
 [![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.2.5%2Er2)](https://www.npmjs.com/package/@opencode/cli-linux-x64/)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D1.19.5%2Er2)](https://github.com/anomalyco/opencode/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3D0.13.4%2Er2)](https://github.com/mrjackwills/oxker/)
-[![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D0.18.0%2Er2)](https://github.com/storytold/pdfcraft/)
+[![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D0.18.1%2Er2)](https://github.com/storytold/pdfcraft/)
 [![pear-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpear-desktop.json%3Fv%3D3.12.0%2Er2)](https://github.com/pear-devs/pear-desktop/)
 [![photocraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fphotocraft.json%3Fv%3D0.20.1%2Er2)](https://github.com/storytold/photocraft/)
 [![press-start-2p-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpress-start-2p-fonts.json%3Fv%3D3.000%2Er2)](https://fonts.google.com/specimen/Press+Start+2P/)
@@ -123,13 +123,13 @@
 [![wifit3](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwifit3.json%3Fv%3D0.7.0%2Er2)](https://github.com/derv82/wifit3/)
 [![wifite](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwifite.json%3Fv%3D2.2.5%2Er2)](https://github.com/derv82/wifite2/)
 [![winboat](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwinboat.json%3Fv%3D0.9.2%2Er2)](https://github.com/winboat-org/winboat/)
-[![wordcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwordcraft.json%3Fv%3D0.15.0%2Er2)](https://github.com/storytold/wordcraft/)
+[![wordcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fwordcraft.json%3Fv%3D0.15.1%2Er2)](https://github.com/storytold/wordcraft/)
 [![xh](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fxh.json%3Fv%3D0.26.3%2Er2)](https://github.com/ducaale/xh/)
 [![zapzap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fzapzap.json%3Fv%3D7.5.1%2Er2)](https://github.com/rafatosta/zapzap/)
 <!-- package-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-11-04 02:41 UTC automatically by GitHub Actions.**
+**Updated 2026-11-04 14:52 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 
 ---
