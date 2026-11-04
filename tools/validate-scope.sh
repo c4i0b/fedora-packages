@@ -50,7 +50,11 @@ if [ -z "$last" ]; then
   full no-green-history
 fi
 rm -f "$body"
-git -C "$root" cat-file -e "$last^{commit}" 2>/dev/null || full orphaned-sha
+# checkout's own git calls configure safe.directory; ours may still be
+# blocked by dubious-ownership (it silently emptied GIT_SLUG before)
+git config --global --add safe.directory "$root" 2>/dev/null || true
+git -C "$root" cat-file -e "$last^{commit}" 2>/dev/null \
+  || full "orphaned($last origin=$(git -C "$root" remote get-url origin 2>&1 | head -c 60))"
 
 changed="$(git -C "$root" diff --name-only "$last"..HEAD)"
 force="$(grep -vE '^packages/' <<<"$changed" \
