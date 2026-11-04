@@ -3,19 +3,21 @@ set -euo pipefail
 
 # Decide what validate should build: only packages changed since the last
 # SUCCESSFUL validate run, so a cancelled run's changes stay "pending" and are
-# picked up by the next one (per-push diffs would bypass them). Any change
-# outside packages/** affects every package; so do dispatch runs, a missing
-# green history and unreachable shas after force-pushes. Every edge fails
-# towards "full" — never towards validating less than needed.
-# usage: validate-scope.sh [event_name]  ->  "full" | "subset <pkg>..."
+# picked up by the next one (per-push diffs would bypass them). Files outside
+# packages/ are mostly CI artifacts (README, badges/) and are ignored; only
+# build-affecting paths force a full run. Every edge fails towards "full" —
+# never towards validating less than needed — with the reason reported so the
+# weekly telemetry can show what forced it.
+# usage: validate-scope.sh [event_name]
+#   ->  "full <reason>"  |  "subset <pkg>..."
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=host.sh
 source "$root/tools/host.sh"
 
 event="${1:-push}"
-full() { echo "full"; exit 0; }
+full() { echo "full $1"; exit 0; }
 
-[ "$event" = workflow_dispatch ] && full
+[ "$event" = workflow_dispatch ] && full dispatch
 
 auth=()
 [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
@@ -24,15 +26,17 @@ last="$(curl -sf \
   "${GIT_API_BASE}/repos/${GIT_SLUG}/actions/workflows/validate.yml/runs?status=success&per_page=1" \
   "${auth[@]}" \
   | grep -oE '"head_sha": ?"[0-9a-f]{40}"' | head -1 | cut -d'"' -f4 || true)"
-[ -n "$last" ] || full
-git -C "$root" cat-file -e "$last^{commit}" 2>/dev/null || full
+[ -n "$last" ] || full no-green-history
+git -C "$root" cat-file -e "$last^{commit}" 2>/dev/null || full orphaned-sha
 
 changed="$(git -C "$root" diff --name-only "$last"..HEAD)"
-grep -qvE '^packages/' <<<"$changed" && full
+force="$(grep -vE '^packages/' <<<"$changed" \
+  | grep -E '^(tools/|templates/|\.copr/|justfile$|\.github/workflows/validate\.yml$)' || true)"
+[ -z "$force" ] || full "${force%%/*}"
 
 pkgs=""
 while IFS= read -r p; do
-  [ -d "$root/packages/$p" ] && pkgs+=" $p"
+  [ -n "$p" ] && [ -d "$root/packages/$p" ] && pkgs+=" $p"
 done < <(cut -d/ -f2 <<<"$changed" | sort -u)
-[ -n "$pkgs" ] || full
+[ -n "${pkgs// /}" ] || full nothing-changed
 echo "subset$pkgs"

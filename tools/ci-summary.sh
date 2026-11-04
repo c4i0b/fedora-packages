@@ -26,6 +26,7 @@ srcs_mb="$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}')"
 
 fields=(
   "scope=${SCOPE:-?}"
+  "reason=${REASON:-changed}"
   "pkgs=${PKGS:-all}"
   "dnf=${dnf:-na}"
   "dnf_toolchain=${dnf_toolchain:-na}"

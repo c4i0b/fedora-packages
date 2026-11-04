@@ -80,10 +80,11 @@ jobs:
       # ambiguity — dispatch, tools/templates changes, orphaned sha — is full
       - id: scope
         run: |
-          read -r scope pkgs <<< "$(bash tools/validate-scope.sh "$GITHUB_EVENT_NAME")"
+          read -r scope reason pkgs <<< "$(bash tools/validate-scope.sh "$GITHUB_EVENT_NAME")"
           echo "scope=$scope" >> "$GITHUB_OUTPUT"
+          echo "reason=${reason:-}" >> "$GITHUB_OUTPUT"
           echo "pkgs=${pkgs:-}" >> "$GITHUB_OUTPUT"
-          echo "validate scope: $scope${pkgs:+ ($pkgs)}"
+          echo "validate scope: $scope${reason:+ ($reason)}${pkgs:+ [$pkgs]}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
@@ -102,6 +103,7 @@ jobs:
         env:
           FEDORA_PACKAGES_DIRECT: "1"
           SCOPE: ${{ steps.scope.outputs.scope }}
+          REASON: ${{ steps.scope.outputs.reason }}
           PKGS: ${{ steps.scope.outputs.pkgs }}
           SRCS_CACHE: ${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }}
           JOB_START: ${{ env.job_start }}
