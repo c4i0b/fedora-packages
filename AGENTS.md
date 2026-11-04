@@ -7,17 +7,25 @@ webhook on every push. There is no CI-side building.
 
 ## Environment (mandatory)
 
-- All development happens inside the `fedora-packages` distrobox (Fedora
-  Rawhide). `just` runs on the **host** and is the only entrypoint: every
-  recipe transparently prefixes `distrobox enter fedora-packages --`.
-  `FEDORA_PACKAGES_DIRECT=1` runs commands directly instead (used by CI).
-  Do not run `just` from inside the box (it would nest distrobox).
-- Run `just box` once to create the box (from `.distrobox/fedora-packages.ini`,
-  falling back to explicit flags on distrobox versions without `--config`);
-  it also enables the versioned pre-commit hooks (`core.hooksPath`).
+- All development happens inside the `fedora-packages` podman container
+  (Fedora Rawhide), defined by the repo's `Containerfile`. `just` runs on the
+  **host** and is the only entrypoint: every recipe transparently prefixes
+  `tools/box.sh exec --`. `FEDORA_PACKAGES_DIRECT=1` runs commands directly
+  instead (used by CI). Do not run `just` from inside the container.
+- Run `just box` to build/start/enter it (rootless podman with
+  `--privileged --userns=keep-id --security-opt label=disable`: the
+  upstream-documented way to run mock inside a container); it also enables
+  the versioned pre-commit hooks (`core.hooksPath`). Editing the
+  `Containerfile` takes effect on the next `just box` (podman layer cache
+  keeps no-op rebuilds fast; `podman rm fedora-packages` forces a fresh one).
+- The container home is a bind of host `/tmp/devhome-fedora-packages`
+  (tmpfs: wiped on reboot by design — do not keep anything there). The only
+  host paths mounted are the repo, `~/.config/copr` (read-only) and a named
+  volume for the mock cache.
 - The host has no copr-cli/ssh — never run rpmbuild or copr-cli on it.
-- COPR token lives in `~/.config/copr` (home is bind-mounted into the box).
-  Clear `~/.cache/copr` when switching COPR accounts (stale sessions 401).
+- COPR token lives in `~/.config/copr` (bind-mounted read-only into the
+  container). Clear `~/.cache/copr` when switching COPR accounts (stale
+  sessions 401).
 - Git remote is HTTPS + gh credential helper (no ssh available).
 
 ## Identity split (a costly past mistake)

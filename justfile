@@ -5,13 +5,13 @@ owner := env_var_or_default("COPR_OWNER", "caiobruno")
 github_owner := env_var_or_default("GITHUB_OWNER", "c4i0b")
 project := owner + "/" + repo
 
-# Recipes run inside the fedora-packages distrobox; CI sets FEDORA_PACKAGES_DIRECT=1
-runner := `[ "${FEDORA_PACKAGES_DIRECT:-}" = 1 ] || printf 'distrobox enter fedora-packages --'`
+# Recipes run inside the fedora-packages podman container; CI sets FEDORA_PACKAGES_DIRECT=1
+runner := `[ "${FEDORA_PACKAGES_DIRECT:-}" = 1 ] || printf 'tools/box.sh exec --'`
 
 @default:
     just --list
 
-# Create and enter the development distrobox (mandatory environment)
+# Build/start and enter the development container (mandatory environment)
 box:
     tools/box.sh
 

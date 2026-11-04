@@ -158,7 +158,7 @@ sudo dnf install <package>
 ## Development
 
 ```sh
-just box          # create/enter the distrobox (Fedora Rawhide)
+just box          # build/start and enter the dev container (Fedora Rawhide, podman)
 just test         # package invariants + template rendering check
 just lint         # rpmlint all specs
 just srpm <name>  # build one SRPM
