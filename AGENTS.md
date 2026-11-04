@@ -12,9 +12,11 @@ webhook on every push. There is no CI-side building.
   recipe transparently prefixes `distrobox enter fedora-packages --`.
   `FEDORA_PACKAGES_DIRECT=1` runs commands directly instead (used by CI).
   Do not run `just` from inside the box (it would nest distrobox).
-- Run `just box` once to create the box (from `.distrobox/fedora-packages.ini`,
-  falling back to explicit flags on distrobox versions without `--config`);
-  it also enables the versioned pre-commit hooks (`core.hooksPath`).
+- Run `just box` once to create the box (explicit `distrobox create`
+  flags in `tools/box.sh`); the container home is `.distrobox/home/`
+  (gitignored — dotfiles land there, not in the host home; the host home
+  stays mounted and reachable, only `$HOME` moves). It also enables the
+  versioned pre-commit hooks (`core.hooksPath`).
 - The host has no copr-cli/ssh — never run rpmbuild or copr-cli on it.
 - COPR token lives in `~/.config/copr` (home is bind-mounted into the box).
   Clear `~/.cache/copr` when switching COPR accounts (stale sessions 401).
