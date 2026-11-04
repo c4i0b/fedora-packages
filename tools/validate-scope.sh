@@ -24,7 +24,13 @@ auth=()
 # compact JSON: grep, never per-line awk (AGENTS.md). Diagnostics MUST go to
 # stderr: stdout is command-substituted by the caller, and a ::warning:: that
 # lands there poisons the scope parse
-url="${GIT_API_BASE}/repos/${GIT_SLUG}/actions/workflows/validate.yml/runs?status=success&per_page=1"
+# In Actions, GITHUB_REPOSITORY/GITHUB_API_URL are authoritative: parsing
+# the origin remote can fail inside the job container (git safe.directory),
+# which silently empties GIT_SLUG
+api="${GITHUB_API_URL:-${GIT_API_BASE:-https://api.github.com}}"
+slug="${GITHUB_REPOSITORY:-${GIT_SLUG:-}}"
+[ -n "$slug" ] || full no-repo-slug
+url="${api}/repos/${slug}/actions/workflows/validate.yml/runs?status=success&per_page=1"
 body="$(mktemp)"
 fetch_last() {
   curl -s -o "$body" -w '%{http_code}' "$@" "$url" || true
