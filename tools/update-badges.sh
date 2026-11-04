@@ -139,10 +139,15 @@ def badge(fname, lbl, message, color):
                    "message": message, "color": color}, f)
         f.write("\n")
 
+# non-terminal monitor states; anything else (canceled, unknown) is idle, NOT
+# in flight — a subtraction would paint canceled builds yellow forever
+INFLIGHT_STATES = frozenset(
+    ("waiting", "pending", "starting", "importing", "running"))
+
 for chroot, cell_list in sorted(chroots.items(), key=lambda kv: sort_key(kv[0])):
     ok = sum(c["state"] == "succeeded" for c in cell_list)
     bad = sum(c["state"] == "failed" for c in cell_list)
-    inflight = len(cell_list) - ok - bad
+    inflight = sum(c["state"] in INFLIGHT_STATES for c in cell_list)
     # ok alone: the packages badge already carries the total; only the color
     # flags failures/in-flight
     msg = str(ok)
@@ -162,6 +167,7 @@ for f in os.listdir(d):
 # ---- per-package version badges (any succeeded chroot wins) ----------------
 # pkg_version is None for fresh/queued builds
 latest, attempted, known, has_fail, inflight = {}, {}, {}, set(), set()
+ok_count, cell_count = {}, {}
 
 def published_versions(chroot):
     """name -> version of packages actually in the chroot binary repo.
@@ -191,11 +197,14 @@ for chroot in chroots:
         published.setdefault(pkg_name, ver)
 for c in iter_cells():
     pkg, ver = c["name"], (c["pkg_version"] or "").rsplit("-", 1)[0]
+    cell_count[pkg] = cell_count.get(pkg, 0) + 1
+    if c["state"] == "succeeded":
+        ok_count[pkg] = ok_count.get(pkg, 0) + 1
     if c["state"] == "succeeded" and pkg not in latest:
         latest[pkg] = ver
     if c["state"] == "failed":
         has_fail.add(pkg)
-    if c["state"] in ("waiting", "pending", "starting", "importing", "running"):
+    if c["state"] in INFLIGHT_STATES:
         inflight.add(pkg)
     if c["state"] != "succeeded" and ver:
         # last attempted (failed, canceled or in flight) for the right side
@@ -206,18 +215,19 @@ badge_lines = []
 url = (f"https://img.shields.io/endpoint?url="
        + raw.replace(":", "%3A").replace("/", "%2F"))
 for pkg in packages:
-    # blue = published; yellow = build live; red = failed; grey = idle
-    # (canceled, no failure). Message convention, same for every state: left
-    # side is what is installable, right side the last attempt (in flight,
-    # failed or canceled); color carries the outcome. Blue prefers the
-    # monitor's succeeded version: repodata can lag right after publishing
+    # red = any chroot failed; yellow = any build live; blue = every chroot
+    # succeeded; grey = idle (canceled, no failure). Message convention, same
+    # for every state: left side is what is installable, right side the last
+    # attempt (in flight, failed or canceled); color carries the outcome.
+    # Blue prefers the monitor's succeeded version: repodata can lag right
+    # after publishing
     pub = latest.get(pkg) or published.get(pkg, known.get(pkg))
     att = attempted.get(pkg)
     msg = (f"v{pub} → v{att}" if pub and att and pub != att
            else f"v{pub or att or '?'}")
-    color = ("blue" if pkg in latest
-             else "red" if pkg in has_fail
+    color = ("red" if pkg in has_fail
              else "yellow" if pkg in inflight
+             else "blue" if ok_count.get(pkg) == cell_count.get(pkg)
              else "lightgrey")
     badge(pkg, pkg, msg, color)
     ver = (latest.get(pkg) or attempted.get(pkg) or published.get(pkg)
