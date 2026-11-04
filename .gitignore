@@ -1,16 +1,18 @@
-*.src.rpm
-*.rpm
-*.log
-.build/
-.binaries/
-.distrobox/home/
-tmp/
+# never commit archives: sources are downloaded at build time (AGENTS.md)
 *.tgz
 *.tar.gz
 *.tar.xz
 *.tar.bz2
 *.tar.zst
 *.zip
+*.rpm
+*.log
+
+# local scratch
+tmp/
+.distrobox/home/
+
+# downloaded sources/payloads that are not archives (land next to the spec)
 packages/*/COPYING
 packages/*/LICENSE*
 packages/*/OFL*
@@ -18,10 +20,12 @@ packages/*/*.ttf
 packages/*/*.otf
 packages/*/*.ttc
 packages/*/*.woff2
-packages/*/*.rpm
 packages/*/cd_on_quit.*
-packages/*/*/
-*.AppImage
 packages/hostapd-wpe/hostapd-wpe-*.patch
-packages/solidcraft/vendor-cargo-config.toml
+
+# vendoring artifacts (tools/vendor-sources.sh)
+packages/*/vendor-cargo-config.toml
 packages/*/.vendor-ok
+
+# anything extracted or vendored inside a package dir (keep last)
+packages/*/*/
