@@ -3,6 +3,7 @@
 *.log
 .build/
 .binaries/
+.distrobox/home/
 tmp/
 *.tgz
 *.tar.gz
