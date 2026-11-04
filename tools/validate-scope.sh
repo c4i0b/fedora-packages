@@ -26,10 +26,20 @@ auth=()
 # lands there poisons the scope parse
 url="${GIT_API_BASE}/repos/${GIT_SLUG}/actions/workflows/validate.yml/runs?status=success&per_page=1"
 body="$(mktemp)"
-http="$(curl -s -o "$body" -w '%{http_code}' "${auth[@]}" "$url" || true)"
+fetch_last() {
+  curl -s -o "$body" -w '%{http_code}' "$@" "$url" || true
+}
+# the GITHUB_TOKEN 404s this endpoint from inside a job (integration
+# masking) while the same URL answers unauthenticated (public repo): try
+# with, then without; only both-failing falls back to full
+http="$(fetch_last "${auth[@]}")"
 last="$(grep -oE '"head_sha": ?"[0-9a-f]{40}"' "$body" | head -1 | cut -d'"' -f4 || true)"
 if [ -z "$last" ]; then
-  echo >&2 "::warning::[scope] last-green lookup empty (http=$http): $(head -c 120 "$body" 2>/dev/null)"
+  http="$(fetch_last)"
+  last="$(grep -oE '"head_sha": ?"[0-9a-f]{40}"' "$body" | head -1 | cut -d'"' -f4 || true)"
+fi
+if [ -z "$last" ]; then
+  echo >&2 "::warning::[scope] last-green lookup empty (http=$http): $(head -c 200 "$body" 2>/dev/null)"
   rm -f "$body"
   full no-green-history
 fi
