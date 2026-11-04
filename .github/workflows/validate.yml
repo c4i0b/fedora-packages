@@ -44,11 +44,15 @@ jobs:
           t0=$(date +%s)
           dnf -y install git make rpmdevtools rpmlint just curl
           echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
+          echo "t_dnf=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@v5
         with:
           # full history: the scope step diffs HEAD against the sha of the
           # last successful run, which force-pushes can orphan (then: full)
           fetch-depth: 0
+      # infra timings (checkout, sources-cache restore) for the phase-summary:
+      # the ~80s of uninstrumented per-run overhead decides GHCR-vs-slim-cache
+      - run: echo "t_checkout=$(date +%s)" >> "$GITHUB_ENV"
       # NOTE: no go/cargo module cache anymore. The 4.5GB vendor-caches entry
       # plus the 3GB sources cache breached the 10GB repo quota and LRU-evicted
       # each other on every save (sources restored as pure miss). With the
@@ -79,6 +83,7 @@ jobs:
             packages/**/.vendor-ok
           key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh') }}
           restore-keys: sources-v4-
+      - run: echo "t_cache=$(date +%s)" >> "$GITHUB_ENV"
       # subset validation: only packages changed since the last green run
       # (cancelled runs leave their changes pending for the next one); every
       # ambiguity — dispatch, tools/templates changes, orphaned sha — is full
