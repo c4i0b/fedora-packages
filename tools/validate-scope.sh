@@ -21,16 +21,19 @@ full() { echo "full $1"; exit 0; }
 
 auth=()
 [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
-# compact JSON: grep, never per-line awk (AGENTS.md)
-last="$(curl -sf \
-  "${GIT_API_BASE}/repos/${GIT_SLUG}/actions/workflows/validate.yml/runs?status=success&per_page=1" \
-  "${auth[@]}" \
-  | grep -oE '"head_sha": ?"[0-9a-f]{40}"' | head -1 | cut -d'"' -f4 || true)"
+# compact JSON: grep, never per-line awk (AGENTS.md). Diagnostics MUST go to
+# stderr: stdout is command-substituted by the caller, and a ::warning:: that
+# lands there poisons the scope parse
+url="${GIT_API_BASE}/repos/${GIT_SLUG}/actions/workflows/validate.yml/runs?status=success&per_page=1"
+body="$(mktemp)"
+http="$(curl -s -o "$body" -w '%{http_code}' "${auth[@]}" "$url" || true)"
+last="$(grep -oE '"head_sha": ?"[0-9a-f]{40}"' "$body" | head -1 | cut -d'"' -f4 || true)"
 if [ -z "$last" ]; then
-  # loud, not silent: this path silently forced full for a week
-  echo "::warning::[scope] last-green lookup returned nothing; falling back to full"
+  echo >&2 "::warning::[scope] last-green lookup empty (http=$http): $(head -c 120 "$body" 2>/dev/null)"
+  rm -f "$body"
   full no-green-history
 fi
+rm -f "$body"
 git -C "$root" cat-file -e "$last^{commit}" 2>/dev/null || full orphaned-sha
 
 changed="$(git -C "$root" diff --name-only "$last"..HEAD)"
