@@ -1,7 +1,11 @@
 name: validate
 
 permissions:
+  # actions:read lets the scope step query the last green run; with
+  # contents:read alone GitHub 403s the runs API instead of falling back to
+  # public access
   contents: read
+  actions: read
 
 on:
   workflow_dispatch:
