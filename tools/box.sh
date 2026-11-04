@@ -7,12 +7,11 @@ enter=1
 [ "${1:-}" = "--no-enter" ] && enter=0
 
 if ! distrobox list 2>/dev/null | grep -qw fedora-packages; then
-  # keep the container home inside the repo (gitignored), not the host's
+  # container home inside the repo (gitignored), not the host's; the ini
+  # stays path-free, DBX_CONTAINER_CUSTOM_HOME carries the absolute path
   mkdir -p "$root/.distrobox/home"
-  distrobox create --yes --name fedora-packages \
-    --home "$root/.distrobox/home" \
-    --image registry.fedoraproject.org/fedora:rawhide \
-    --additional-packages "copr-cli rpkg rpmdevtools rpmlint make git curl pyproject-rpm-macros cargo-rpm-macros go-vendor-tools"
+  DBX_CONTAINER_CUSTOM_HOME="$root/.distrobox/home" \
+    distrobox assemble create --yes --file "$root/.distrobox/fedora-packages.ini"
 fi
 
 git -C "$root" config core.hooksPath .githooks
