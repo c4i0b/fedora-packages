@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:rawhide
+FROM quay.io/fedora/fedora:rawhide
 
 RUN dnf install -y --setopt=install_weak_deps=False \
       copr-cli rpkg rpmdevtools rpmlint make git curl sudo mock \
