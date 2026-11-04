@@ -1,5 +1,5 @@
 %global goipath         github.com/steveyegge/beads
-Version:        1.3.2
+Version:        1.3.3
 
 %gometa -L -f
 
@@ -62,6 +62,9 @@ install -Dpm644 bd.zsh  %{buildroot}%{zsh_completions_dir}/_bd
 %{zsh_completions_dir}/_bd
 
 %changelog
+* Wed Nov 04 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.3.3-1
+- Update to 1.3.3
+
 * Sat Oct 24 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.3.2-1
 - Update to 1.3.2
 
