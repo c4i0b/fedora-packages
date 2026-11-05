@@ -1,11 +1,11 @@
 name: validate
 
 permissions:
-  # actions:read lets the scope step query the last green run; with
-  # contents:read alone GitHub 403s the runs API instead of falling back to
-  # public access
+  # actions:write (which includes read) covers both the scope step's last
+  # green lookup and trim-caches deleting stale entries; with contents:read
+  # alone GitHub 403s/404s the runs API instead of falling back to public
   contents: read
-  actions: read
+  actions: write
 
 on:
   workflow_dispatch:
@@ -135,3 +135,9 @@ jobs:
             packages/**/*.zip
             packages/**/.vendor-ok
           key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh') }}-${{ env.srcs_epoch }}
+      # deterministic quota: drop stale sources-v* entries so the LRU never
+      # evicts the live one (two 6GB entries transiently exceed the 10GB cap)
+      - run: bash tools/trim-caches.sh
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
