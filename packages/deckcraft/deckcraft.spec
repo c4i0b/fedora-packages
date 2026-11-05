@@ -1,5 +1,5 @@
 Name:           deckcraft
-Version:        0.15.0
+Version:        0.15.1
 Release:        1%{?dist}
 Summary:        Presentation designer with themes, animations and pptx support
 
@@ -78,6 +78,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.deckcr
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.deckcraft.*
 
 %changelog
+* Thu Nov 05 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.15.1-1
+- Update to 0.15.1
+
 * Tue Nov 03 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.15.0-1
 - Update to 0.15.0
 
