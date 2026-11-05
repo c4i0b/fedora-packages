@@ -12,7 +12,7 @@
 ExclusiveArch:  x86_64
 
 Name:           hydra-launcher
-Version:        4.3.0
+Version:        4.4.0
 Release:        1%{?dist}
 Summary:        Game launcher with a self-hosted torrent library source
 
@@ -105,5 +105,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/hydralauncher.png
 
 %changelog
+* Thu Nov 05 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 4.4.0-1
+- Update to 4.4.0
+
 * Fri Oct 30 2026 Caio Bruno <cbrunofb@gmail.com> - 4.3.0-1
 - Initial package
