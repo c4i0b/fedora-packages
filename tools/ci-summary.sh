@@ -55,5 +55,14 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     echo "| field | value |"
     echo "|---|---|"
     for f in "${fields[@]}"; do echo "| ${f%%=*} | \`${f#*=}\` |"; done
+    # whales: the sources-cache payload is ~6GB and the restore dominates
+    # the infra cost; name the heaviest package dirs to target slimming
+    echo
+    echo "### heaviest package dirs (MB)"
+    echo
+    echo "| pkg | MB |"
+    echo "|---|---|"
+    du -sm packages/*/ 2>/dev/null | sort -rn | head -8 \
+      | while read -r mb dir; do echo "| ${dir#packages/} | $mb |"; done
   } >> "$GITHUB_STEP_SUMMARY"
 fi
