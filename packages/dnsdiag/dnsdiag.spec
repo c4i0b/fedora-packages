@@ -7,7 +7,7 @@
 %global __requires_exclude ^lib.+-[0-9a-f]{8}\\.so
 
 Name:           dnsdiag
-Version:        2.10.0
+Version:        2.10.1
 Release:        1%{?dist}
 Summary:        DNS measurement, troubleshooting and security auditing toolset
 
@@ -76,5 +76,8 @@ done
 %{_datadir}/%{name}/
 
 %changelog
+* Thu Nov 05 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.10.1-1
+- Update to 2.10.1
+
 * Mon Oct 19 2026 Caio Bruno <cbrunofb@gmail.com> - 2.10.0-1
 - Initial package
