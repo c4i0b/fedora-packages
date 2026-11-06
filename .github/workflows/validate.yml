@@ -67,9 +67,9 @@ jobs:
       # forever. The primary key never matches (saved keys have an epoch
       # suffix); the prefix picks the newest entry.
       # Vendor archives + .vendor-ok stamps ride along (keyed by the same
-      # spec hash): vendor-sources.sh reuses them to skip re-vendoring when
+      # spec hash): vendor-sources.py reuses them to skip re-vendoring when
       # the fingerprint (spec+sources+script+toolchain) is unchanged.
-      # vendor-sources.sh REWRITES source tarballs in place (cargo patch
+      # vendor-sources.py REWRITES source tarballs in place (cargo patch
       # filtering re-packs them): its hash is part of the key so a recipe
       # change can never be served a tarball repacked by an older one (a
       # stale one poisoned soundcraft's vendor step with cargo exit 101).
@@ -81,7 +81,7 @@ jobs:
             packages/**/*.tgz
             packages/**/*.zip
             packages/**/.vendor-ok
-          key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh') }}
+          key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.py') }}
           restore-keys: sources-v4-
       - run: echo "t_cache=$(date +%s)" >> "$GITHUB_ENV"
       # subset validation: only packages changed since the last green run
@@ -124,7 +124,7 @@ jobs:
       # few new tarballs, so a slightly-high downloads counter there is
       # expected, not a prune/cache bug)
       - uses: actions/cache/save@v5
-        if: steps.scope.outputs.scope == 'full' && steps.sources_cache.outputs.cache-matched-key != format('sources-v4-{0}-{1}', hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh'), env.srcs_epoch)
+        if: steps.scope.outputs.scope == 'full' && steps.sources_cache.outputs.cache-matched-key != format('sources-v4-{0}-{1}', hashFiles('packages/*/*.spec', 'tools/vendor-sources.py'), env.srcs_epoch)
         with:
           # must stay IDENTICAL to the restore step's paths: the cache
           # archive version is derived from them, a mismatch reads as
@@ -134,7 +134,7 @@ jobs:
             packages/**/*.tgz
             packages/**/*.zip
             packages/**/.vendor-ok
-          key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.sh') }}-${{ env.srcs_epoch }}
+          key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.py') }}-${{ env.srcs_epoch }}
       # deterministic quota: drop stale sources-v* entries so the LRU never
       # evicts the live one (two 6GB entries transiently exceed the 10GB cap)
       - run: bash tools/trim-caches.sh

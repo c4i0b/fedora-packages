@@ -19,7 +19,7 @@ else
 fi
 
 # one dnf pass up front: parallel vendor phases must not race the dnf lock
-# (vendor-sources.sh reinstalls only when the tool is absent); timed for the
+# (vendor-sources.py reinstalls only when the tool is absent); timed for the
 # [phase-summary] telemetry (CI decides on a prebuilt image with this number)
 t0=$(date +%s)
 dnf -y install --nodocs --setopt=install_weak_deps=0 \
@@ -40,7 +40,7 @@ srcs_before="$(srcs_find | wc -l)"
 t1=$(date +%s)
 jobs=$(nproc); [ "$jobs" -gt 8 ] && jobs=8
 # VENDOR_STATS collects one run/skip line per vendoring package from
-# vendor-sources.sh (exported, so it survives xargs/make)
+# vendor-sources.py (exported, so it survives xargs/make)
 vendor_stats="$(mktemp)"
 export VENDOR_STATS="$vendor_stats"
 printf '%s\n' "${pkgs[@]}" \
