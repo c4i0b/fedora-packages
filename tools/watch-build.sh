@@ -25,16 +25,20 @@ pkg = '''$pkg'''
 watched = set()
 items = json.load(sys.stdin).get('items', [])
 inflight = []
+# only the newest in-flight build per package: a still-running older build
+# (e.g. a superseded one being canceled) would otherwise pollute the signal
+newest = {}
 for b in items:
     name = (b.get('source_package') or {}).get('name', '')
     state = b['state']
     if pkg and name != pkg:
         continue
     if state in ('pending', 'starting', 'running'):
-        inflight.append((b['id'], name, state))
-        watched.add(b['id'])
-print('\n'.join(f'{i} {n} {s}' for i, n, s in inflight))
-print('IDS ' + ' '.join(str(i) for i in watched))
+        if name not in newest or b['id'] > newest[name]:
+            newest[name] = b['id']
+inflight = [(bid, name) for name, bid in newest.items()]
+print('\n'.join(f'{i} {n}' for i, n in inflight))
+print('IDS ' + ' '.join(str(i) for i in watched | {b for b in newest.values()}))
 "
 }
 
