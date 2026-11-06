@@ -47,6 +47,11 @@ fields=(
 )
 line="[phase-summary] ${fields[*]}"
 echo "::notice::$line"
+# whales as a notice too: run summaries are not scrapable from logs, and
+# the analyzer aggregates these for the slim decision
+whales="$(du -sm packages/*/ 2>/dev/null | sort -rn | head -5 \
+  | while read -r mb dir; do printf '%s=%sMB ' "${dir#packages/}" "$mb"; done)"
+echo "::notice::[whales] ${whales% }"
 
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   {

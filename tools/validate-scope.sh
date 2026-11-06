@@ -66,4 +66,5 @@ while IFS= read -r p; do
   [ -n "$p" ] && [ -d "$root/packages/$p" ] && pkgs+=" $p"
 done < <(cut -d/ -f2 <<<"$changed" | sort -u)
 [ -n "${pkgs// /}" ] || full nothing-changed
-echo "subset$pkgs"
+# same 3-field layout as "full <reason>": the caller reads scope/reason/pkgs
+echo "subset changed$pkgs"
