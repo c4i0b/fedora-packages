@@ -111,14 +111,14 @@ General:
   `ar` is often parallel-unsafe too: two sub-makes rebuild the same objects
   and the final archive lands truncated (mdk4 osdep) — build with `-j1`.
 - zig packages vendor their `build.zig.zon` closure at SRPM time
-  (`Source: zig-pkg.tar.*` via tools/vendor-sources.sh) and build with
+  (`Source: zig-pkg.tar.*` via tools/vendor-sources.py) and build with
   `zig build --system zig-pkg` — zig's own http client fails on COPR
   builders, and only a dependency's *root* zon belongs to the graph
   (scanning fetched sub-zons pulls gigabytes of junk). Note `--system`
   implies zig's system package mode: install paths change (e.g. systemd
   units to `%{_prefix}/lib/systemd/user`) and upstream build defaults may
   flip (docs, vendored libs) — audit `%files` and build flags accordingly.
-- GitHub tag archives omit git submodule contents. vendor-sources.sh
+- GitHub tag archives omit git submodule contents. vendor-sources.py
   resolves each `.gitmodules` entry via the superproject's GitHub API (tag
   ref → pinned sha), overlays the submodule into the extracted tree and
   repacks Source0 — a spec never needs a Source per submodule. Rust specs
@@ -177,12 +177,12 @@ Rust:
   in %build (see any craft spec).
 - `cargo vendor` trees with git deps (e.g. storytold craft-libs) need the
   `[source."git+https://…"]` blocks cargo vendor prints appended to the
-  config the cargo_prep macro writes; vendor-sources.sh ships them inside
+  config the cargo_prep macro writes; vendor-sources.py ships them inside
   vendor.tar.zst as `git-sources.conf` — `cat` it onto `.cargo/config.toml`
   in %prep.
 - A `[patch.crates-io]` entry for a crate nothing in the graph depends on is
   never vendored, yet cargo eagerly validates every patch entry against the
-  directory source and aborts — vendor-sources.sh drops unvendored **git**
+  directory source and aborts — vendor-sources.py drops unvendored **git**
   patch entries (and re-packs the source tarball) automatically at SRPM time;
   path patch entries are always kept (path-patched crates stay in-tree and
   are never vendored).

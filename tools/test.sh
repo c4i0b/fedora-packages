@@ -36,7 +36,7 @@ done < <(git -C "$root" ls-files 'packages/*' | grep -vE '\.(spec|patch|txt|md|t
     head -c2 "$root/$f" 2>/dev/null | grep -q '#!' && echo "$f"
   done)
 
-# vendor-sources.sh tars the vendored crates as vendor-deps/ (plus a
+# vendor-sources.py tars the vendored crates as vendor-deps/ (plus a
 # git-sources.conf); specs must consume that layout, not a bare "vendor" dir
 while IFS= read -r spec; do
   echo "FAIL: $spec uses '%cargo_prep -v vendor' but vendor.tar.zst ships vendor-deps/" >&2

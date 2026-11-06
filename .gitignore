@@ -23,9 +23,10 @@ packages/*/*.woff2
 packages/*/cd_on_quit.*
 packages/hostapd-wpe/hostapd-wpe-*.patch
 
-# vendoring artifacts (tools/vendor-sources.sh)
+# vendoring artifacts (tools/vendor-sources.py)
 packages/*/vendor-cargo-config.toml
 packages/*/.vendor-ok
 
 # anything extracted or vendored inside a package dir (keep last)
 packages/*/*/
+__pycache__/

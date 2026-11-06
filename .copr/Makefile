@@ -18,5 +18,5 @@ srpm: vendor
 
 vendor:
 	@if grep -qE '^%goprep|go-vendor-tools' $(specfile) || grep -q '^%cargo_prep' $(specfile) || grep -q '^Source[0-9]*:.*zig-pkg.tar' $(specfile); then \
-		$(selfdir)../tools/vendor-sources.sh $(srcdir) $(specfile); \
+		$(selfdir)../tools/vendor-sources.py $(srcdir) $(specfile); \
 	fi
