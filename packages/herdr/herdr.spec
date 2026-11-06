@@ -70,6 +70,7 @@ export ZIG="$PWD/_zig/zig"
 install -Dm755 target/release/herdr-app %{buildroot}%{_bindir}/herdr-app
 install -Dm644 assets/icons/herdr-ui-icon-clean.svg \
     %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/herdr-app.svg
+mkdir -p %{buildroot}%{_datadir}/applications
 cat > %{buildroot}%{_datadir}/applications/herdr-app.desktop <<'EOF'
 [Desktop Entry]
 Type=Application
