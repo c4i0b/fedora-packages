@@ -1,5 +1,6 @@
 # never commit archives: sources are downloaded at build time (AGENTS.md)
 *.tgz
+*.tar
 *.tar.gz
 *.tar.xz
 *.tar.bz2
