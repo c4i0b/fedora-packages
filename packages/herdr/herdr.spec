@@ -39,7 +39,7 @@ see which agents need you, and leave terminals running when you close the
 window. Built on GPUI with the Ghostty terminal emulation core.
 
 %prep
-%autosetup -n %{name}-%{version} -p1 -a 1
+%autosetup -n herdr-app-%{version} -p1 -a 1
 %cargo_prep -v vendor-deps
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
