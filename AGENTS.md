@@ -118,6 +118,13 @@ General:
   implies zig's system package mode: install paths change (e.g. systemd
   units to `%{_prefix}/lib/systemd/user`) and upstream build defaults may
   flip (docs, vendored libs) — audit `%files` and build flags accordingly.
+- GitHub tag archives omit git submodule contents. vendor-sources.sh
+  resolves each `.gitmodules` entry via the superproject's GitHub API (tag
+  ref → pinned sha), overlays the submodule into the extracted tree and
+  repacks Source0 — a spec never needs a Source per submodule. Rust specs
+  may combine `%cargo_prep` with a `zig-pkg.tar` Source when an embedded
+  build shells out to zig (herdr): serve the closure through a `ZIG` env
+  shim that appends `--system <abs-path>` to `build` invocations only.
 - Never hardcode upstream desktop-file/app-id names in %install/%files:
   upstreams rename them between releases — glob the desktop file and icons.
 - The Fedora meson macro forces `--auto-features=enabled` and cannot be

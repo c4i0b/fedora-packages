@@ -11,7 +11,7 @@ if ! distrobox list 2>/dev/null | grep -qw fedora-packages; then
   # stays path-free, DBX_CONTAINER_CUSTOM_HOME carries the absolute path
   mkdir -p "$root/.distrobox/home"
   DBX_CONTAINER_CUSTOM_HOME="$root/.distrobox/home" \
-    distrobox assemble create --yes --file "$root/.distrobox/fedora-packages.ini"
+    distrobox assemble create --file "$root/.distrobox/fedora-packages.ini"
 fi
 
 git -C "$root" config core.hooksPath .githooks
