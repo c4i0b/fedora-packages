@@ -65,7 +65,9 @@ export ZIG="$PWD/_zig/zig"
 %cargo_build
 
 %install
-%cargo_install
+# cargo install re-resolves and cannot use git deps against the vendor dir
+# offline (no lock); the binary is already built by the build section
+install -Dm755 target/release/herdr-app %{buildroot}%{_bindir}/herdr-app
 install -Dm644 assets/icons/herdr-ui-icon-clean.svg \
     %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/herdr-app.svg
 cat > %{buildroot}%{_datadir}/applications/herdr-app.desktop <<'EOF'
