@@ -16,6 +16,13 @@ fi
 
 git -C "$root" config core.hooksPath .githooks
 
+# The COPR token stays in the HOST home; the container home is a separate
+# dir, so link it in (host home is mounted at /run/host inside the box)
+if [ -f "$HOME/.config/copr" ] && [ ! -e "$root/.distrobox/home/.config/copr" ]; then
+  mkdir -p "$root/.distrobox/home/.config"
+  ln -s "/run/host$HOME/.config/copr" "$root/.distrobox/home/.config/copr"
+fi
+
 if [ "$enter" = 1 ]; then
   exec distrobox enter fedora-packages
 fi
