@@ -18,5 +18,6 @@ srpm: vendor
 
 vendor:
 	@if grep -qE '^%goprep|go-vendor-tools' $(specfile) || grep -q '^%cargo_prep' $(specfile) || grep -q '^Source[0-9]*:.*zig-pkg.tar' $(specfile); then \
-		$(selfdir)../tools/vendor-sources.py $(srcdir) $(specfile); \
+		command -v python3 >/dev/null 2>&1 || dnf -y --nodocs --setopt=install_weak_deps=0 install python3 >/dev/null 2>&1; \
+		python3 $(selfdir)../tools/vendor-sources.py $(srcdir) $(specfile); \
 	fi
