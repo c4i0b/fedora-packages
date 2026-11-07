@@ -163,8 +163,8 @@ sudo dnf install <package>
 ## Development
 
 The host needs only `just`, `podman` and `gh` (pushes and gh are host-side;
-the gh token lives in the host keyring). Everything else runs in the
-ephemeral tooling container.
+the gh token lives in the host keyring). Optionally `bd` (beads) for task
+tracking. Everything else runs in the ephemeral tooling container.
 
 ```sh
 just image         # build the tooling container image (Fedora Rawhide)
