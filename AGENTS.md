@@ -2,7 +2,8 @@
 
 RPM spec monorepo built server-side by COPR (Fedora stable + Rawhide +
 EPEL). The GitHub repo is the source of truth: a push to `main` rebuilds the
-touched packages via webhook — there is no CI-side building. Detailed
+touched packages via webhook — there is no CI-side building. Keep this file
+lean: behavioral rules an agent must follow every session. Detailed
 policies live in `docs/` ([index](docs/README.md)); when adding rules here,
 prefer extending a linked doc over growing this file.
 
