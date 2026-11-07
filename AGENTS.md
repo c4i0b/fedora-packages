@@ -9,7 +9,7 @@ prefer extending a linked doc over growing this file.
 ## Environment
 
 - The host provides only `just` + `podman`; every recipe runs in the
-  ephemeral `tooling` container. Run `just build` once (and after
+  ephemeral `tooling` container. Run `just image` once (and after
   `Containerfile` changes); `just shell` for interactive work.
   Full details: [docs/environment.md](docs/environment.md).
 - GitHub and COPR owners are **different** (GitHub `c4i0b`, COPR/FAS

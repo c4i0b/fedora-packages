@@ -167,7 +167,7 @@ the gh token lives in the host keyring). Everything else runs in the
 ephemeral tooling container.
 
 ```sh
-just build         # build the tooling container image (Fedora Rawhide)
+just image         # build the tooling container image (Fedora Rawhide)
 just shell         # interactive bash in the tooling container
 just test          # package invariants + template rendering check
 just lint          # rpmlint all specs

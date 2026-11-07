@@ -9,7 +9,7 @@ be in the image — if it is not in the `Containerfile`, it does not exist.
 
 ## Lifecycle
 
-- `just build` builds the image and enables the versioned pre-commit hooks
+- `just image` builds the image and enables the versioned pre-commit hooks
   (`core.hooksPath`) — re-run after `Containerfile` changes; layer cache makes
   rebuilds near-instant unless a layer changed.
 - `just shell` opens an interactive bash in the container with the repo
