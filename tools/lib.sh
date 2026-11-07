@@ -165,13 +165,11 @@ check_package() {
     fail=1
   fi
 
-  # rpm < 4.20 (EPEL) expands macros inside comments: a commented-out
-  # %install/%files/... breaks the whole spec parse ("Name field must be
-  # present") and parameterized macros (%meson et al) inject their entire
-  # body as spec text — spell names out in prose instead. %{braced} forms
-  # expand harmlessly and are allowed.
+  # rpm < 4.20 (EPEL) expands macros inside comments (including %(shell),
+  # which executes): parse may succeed but behavior is corrupted/unsafe.
+  # Spell macro names out in prose instead. %{braced} forms are allowed.
   if grep -qE '^\s*#.*[[:space:](>]%[a-zA-Z_][a-zA-Z0-9_]*([^a-zA-Z0-9_{]|$)' "$spec"; then
-    echo "FAIL: $name: comment mentions a bare macro token (breaks rpm < 4.20/EPEL parse)"
+    echo "FAIL: $name: comment mentions a bare macro token (expanded silently on rpm < 4.20/EPEL)"
     fail=1
   fi
 
