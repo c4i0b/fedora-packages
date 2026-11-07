@@ -24,3 +24,21 @@ services:
       # linked them in via /run/host). :Z gives them a private SELinux label
       # without relabeling the whole host home.
       - ${HOME}/.config/copr:/tmp/.config/copr:ro,Z
+
+  # Rare escape hatch for reproducing inconclusive COPR failures: mock needs
+  # CAP_SYS_ADMIN to mount tmpfs/proc in the buildroot, which an unprivileged
+  # container cannot grant (mock issues #1100/#1222). Under rootless podman
+  # --privileged never exceeds the unprivileged host user — this is the
+  # upstream-documented pattern (mock docs: "Mock inside Podman"). Dedicated
+  # service so everyday tooling runs stay unprivileged.
+  mock:
+    image: fedora-packages/tooling:dev
+    user: "0:0"
+    working_dir: /app
+    environment:
+      HOME: /tmp
+    privileged: true
+    volumes:
+      - .:/app:z
+      # build-local.sh lists project chroots via copr-cli
+      - ${HOME}/.config/copr:/tmp/.config/copr:ro,Z

@@ -6,9 +6,10 @@ selection="${2:-default}"
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 project="${COPR_OWNER:-caiobruno}/fedora-packages"
 
-# mock ships in the tooling image; the container runs as uid 0 (rootless),
-# so no sudo. simple isolation: chroot instead of systemd-nspawn, which
-# cannot nest inside a rootless podman container.
+# mock ships in the tooling image; the dedicated mock compose service runs
+# privileged (CAP_SYS_ADMIN: mock mounts tmpfs/proc in the buildroot — under
+# rootless podman --privileged stays confined to the unprivileged host user).
+# simple isolation: mock's documented container mode (chroot, no nspawn).
 mock() { command mock --isolation=simple "$@"; }
 
 arch="${MOCK_ARCH:-x86_64}"

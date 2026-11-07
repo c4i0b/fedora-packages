@@ -46,9 +46,10 @@ prune-sources:
     {{runner}} tools/prune-sources.sh
 
 # Full mock build (rawhide + oldest stable, with network) — ONLY to reproduce
-# an inconclusive COPR failure; never preemptively, COPR is the validator
+# an inconclusive COPR failure; never preemptively, COPR is the validator.
+# Runs in the dedicated privileged mock service (see compose.yml).
 build-local name chroot="default":
-    {{runner}} tools/build-local.sh {{name}} {{chroot}}
+    podman compose run --rm mock tools/build-local.sh {{name}} {{chroot}}
 
 # Bump a package version (Version, Release and changelog)
 bump name version:
