@@ -14,7 +14,7 @@ runner := `[ "${FEDORA_PACKAGES_DIRECT:-}" = 1 ] || printf 'podman compose run -
 
 # Build (or rebuild) the tooling container image; also points git at the
 # versioned hooks (idempotent). Re-run after Containerfile changes.
-build:
+image:
     #!/usr/bin/env sh
     set -eu
     podman compose build tooling
