@@ -152,25 +152,35 @@ sudo dnf install <package>
 ## How it works
 
 - Each package lives in `packages/<name>/` with its spec file.
-- `.copr/Makefile` implements the COPR `make_srpm` contract: the SRPM is produced by COPR, downloading `Source` URLs at build time.
-- Pushes to `main` trigger the COPR webhook, which rebuilds the affected packages.
-- A scheduled workflow checks upstream releases (GitHub or npm, per package's `upstream` file) and bumps Version, Release and changelog automatically.
-- The project follows Fedora branching, so chroots for new releases are created automatically.
+- COPR produces the SRPMs server-side (`.copr/Makefile` contract) and pushes
+  to `main` rebuild the affected packages through a webhook.
+  Details: [docs/copr.md](docs/copr.md).
+- A scheduled workflow checks upstream releases (GitHub or npm, per package's
+  `upstream` file) and bumps Version, Release and changelog automatically.
+- The project follows Fedora branching, so chroots for new releases are
+  created automatically.
 
 ## Development
 
+The host needs only `just`, `podman` and `gh` (pushes and gh are host-side;
+the gh token lives in the host keyring). Everything else runs in the
+ephemeral tooling container.
+
 ```sh
 just build         # build the tooling container image (Fedora Rawhide)
-just shell        # interactive bash in the tooling container
-just test         # package invariants + template rendering check
-just lint         # rpmlint all specs
-just srpm <name>  # build one SRPM
-just status       # COPR build list
+just shell         # interactive bash in the tooling container
+just test          # package invariants + template rendering check
+just lint          # rpmlint all specs
+just srpm <name>   # build one SRPM
+just status        # COPR build list
 ```
+
+Environment details, COPR integration, conventions and packaging quirks:
+[docs/](docs/README.md).
 
 ## Adding a package
 
 1. Check it is not already in Fedora or RPM Fusion (query the oldest stable release too), then scaffold with `just new-package <name>` (kinds: `source`, `go`, `rust`, `python`, `bun`, `electron`, `bin`; `source` is the default) and fill the remaining `__PLACEHOLDER__` values in the spec.
 2. Run `just add-package <name>` (requires a configured `copr-cli` token).
 3. For automatic updates, add `packages/<name>/upstream` with the GitHub `owner/repo` slug or an `npm:<package>` reference.
-4. Run `just bump <name> <version>` to bump versions manually.
+4. Run `just bump <name> <version>` to bump versions manually (what the autoupdate workflow does on its own).
