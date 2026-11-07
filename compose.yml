@@ -1,0 +1,26 @@
+# fedora-packages tooling — Compose Spec (same model as finance: the host
+# provides only `just` + `podman`, every command runs in an ephemeral
+# container via `podman compose run --rm tooling`).
+name: fedora-packages
+
+services:
+  tooling:
+    build: .
+    image: fedora-packages/tooling:dev
+    # Container uid 0 — in rootless podman this maps to the unprivileged host
+    # user (no host privilege gained) and is the only uid that can WRITE the
+    # bind-mounted source. Ephemeral runs: no state survives a command.
+    user: "0:0"
+    working_dir: /app
+    environment:
+      # Ephemeral HOME: the copr-cli session cache (~/.cache/copr) dies with
+      # each run, so stale sessions never 401.
+      HOME: /tmp
+    volumes:
+      # :z (lowercase) — SHARED SELinux label, so concurrent runs (test +
+      # srpm + a `just shell`) all keep access to the bind mount.
+      - .:/app:z
+      # Credentials stay in the HOST home, mounted read-only (the old box
+      # linked them in via /run/host). :Z gives them a private SELinux label
+      # without relabeling the whole host home.
+      - ${HOME}/.config/copr:/tmp/.config/copr:ro,Z

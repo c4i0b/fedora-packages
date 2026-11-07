@@ -5,15 +5,24 @@ owner := env_var_or_default("COPR_OWNER", "caiobruno")
 github_owner := env_var_or_default("GITHUB_OWNER", "c4i0b")
 project := owner + "/" + repo
 
-# Recipes run inside the fedora-packages distrobox; CI sets FEDORA_PACKAGES_DIRECT=1
-runner := `[ "${FEDORA_PACKAGES_DIRECT:-}" = 1 ] || printf 'distrobox enter fedora-packages --'`
+# Recipes run inside the ephemeral tooling container (compose.yml); CI sets
+# FEDORA_PACKAGES_DIRECT=1
+runner := `[ "${FEDORA_PACKAGES_DIRECT:-}" = 1 ] || printf 'podman compose run --rm tooling'`
 
 @default:
     just --list
 
-# Create and enter the development distrobox (mandatory environment)
-box:
-    tools/box.sh
+# Build (or rebuild) the tooling container image; also points git at the
+# versioned hooks (idempotent). Re-run after Containerfile changes.
+build:
+    #!/usr/bin/env sh
+    set -eu
+    podman compose build tooling
+    git config core.hooksPath .githooks
+
+# Interactive bash in the tooling container (repo bind-mounted at /app)
+shell:
+    {{runner}} bash
 
 # Lint all spec files (one rpmlint process per spec: no macro cross-leak)
 lint:

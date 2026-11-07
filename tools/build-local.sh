@@ -6,7 +6,10 @@ selection="${2:-default}"
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 project="${COPR_OWNER:-caiobruno}/fedora-packages"
 
-command -v mock >/dev/null 2>&1 || sudo dnf -y install mock
+# mock ships in the tooling image; the container runs as uid 0 (rootless),
+# so no sudo. simple isolation: chroot instead of systemd-nspawn, which
+# cannot nest inside a rootless podman container.
+mock() { command mock --isolation=simple "$@"; }
 
 arch="${MOCK_ARCH:-x86_64}"
 project_chroots="$(copr-cli get "$project" 2>/dev/null \
@@ -34,6 +37,6 @@ make -C "$root" -f "$root/.copr/Makefile" srpm "pkg=$root/packages/$name/" "outd
 srpm=$(ls "$srpmdir"/*.src.rpm | head -1)
 for chroot in "${chroots[@]}"; do
   echo "rebuilding $srpm in mock ($chroot)"
-  sudo mock --rebuild --no-bootstrap-chroot --uniqueext="fp$$" --enable-network -r "$chroot" "$srpm"
+  mock --rebuild --no-bootstrap-chroot --uniqueext="fp$$" --enable-network -r "$chroot" "$srpm"
 done
 echo "OK: validated on ${chroots[*]}"

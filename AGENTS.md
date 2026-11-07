@@ -7,20 +7,21 @@ webhook on every push. There is no CI-side building.
 
 ## Environment (mandatory)
 
-- All development happens inside the `fedora-packages` distrobox (Fedora
-  Rawhide). `just` runs on the **host** and is the only entrypoint: every
-  recipe transparently prefixes `distrobox enter fedora-packages --`.
-  `FEDORA_PACKAGES_DIRECT=1` runs commands directly instead (used by CI).
-  Do not run `just` from inside the box (it would nest distrobox).
-- Run `just box` once to create the box (declaratively from
-  `.distrobox/fedora-packages.ini` via `distrobox assemble` in
-  `tools/box.sh`); the container home is `.distrobox/home/`
-  (gitignored — dotfiles land there, not in the host home; the host home
-  stays mounted and reachable, only `$HOME` moves). It also enables the
-  versioned pre-commit hooks (`core.hooksPath`).
+- The host provides only `just` + `podman` (same model as the finance repo):
+  every recipe transparently prefixes `podman compose run --rm tooling`, an
+  **ephemeral** container (Fedora Rawhide) defined by `Containerfile` +
+  `compose.yml`. No state survives a run; anything the environment needs
+  must be in the image. `FEDORA_PACKAGES_DIRECT=1` runs commands directly
+  instead (used by CI).
+- Run `just build` once to build the image and enable the versioned pre-commit
+  hooks (`core.hooksPath`); re-run after Containerfile changes. Interactive
+  work: `just shell` (bash in the container, repo bind-mounted).
+- Credentials: the COPR token (`~/.config/copr`) is mounted read-only into
+  the container. git push / gh are HOST-side only (gh token lives in the host
+  system keyring, unreachable from containers — do not require gh inside the
+  container). The container HOME is `/tmp` and dies with each run, so the
+  copr-cli session cache can never go stale.
 - The host has no copr-cli/ssh — never run rpmbuild or copr-cli on it.
-- COPR token lives in `~/.config/copr` (home is bind-mounted into the box).
-  Clear `~/.cache/copr` when switching COPR accounts (stale sessions 401).
 - Git remote is HTTPS + gh credential helper (no ssh available).
 
 ## Identity split (a costly past mistake)

@@ -160,7 +160,8 @@ sudo dnf install <package>
 ## Development
 
 ```sh
-just box          # create/enter the distrobox (Fedora Rawhide)
+just build         # build the tooling container image (Fedora Rawhide)
+just shell        # interactive bash in the tooling container
 just test         # package invariants + template rendering check
 just lint         # rpmlint all specs
 just srpm <name>  # build one SRPM
