@@ -6,6 +6,24 @@ proceed without it (no error, no setup attempt).
 
 bd runs on the HOST (like gh) — it is not part of the tooling container.
 
+## Initialization (per repo, host-side)
+
+Personal/local choice: `.beads/` is fully gitignored, so task state is never
+committed. On a fresh clone (or any checkout without `.beads/`), run:
+
+```bash
+bd init
+git config core.hooksPath .githooks
+bd hooks install
+```
+
+Order matters. `bd init` creates `.beads/` and claims `core.hooksPath` (points
+it at `.beads/hooks`); restore `core.hooksPath` to `.githooks` so the repo's
+versioned hooks remain active, then run `bd hooks install` to inject the bd
+integration sections (BEGIN/END markers) into the existing `.githooks/` hook
+files. `bd hooks install` may keep local `*.backup` files under `.githooks/`;
+these are gitignored and not committed.
+
 ## Tracking
 
 - `bd prime` for full workflow context before starting

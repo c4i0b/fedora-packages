@@ -31,3 +31,14 @@ packages/*/.vendor-ok
 # anything extracted or vendored inside a package dir (keep last)
 packages/*/*/
 __pycache__/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*
+
+# Hook backups created by bd hooks install
+.githooks/*.backup
+
