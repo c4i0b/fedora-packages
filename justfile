@@ -85,11 +85,13 @@ add-package name:
         --subdir packages/{{name}} \
         --webhook-rebuild on
 
-# Refresh COPR badges and the README build-status block (same as the badges workflow)
 # Aggregate key=value fields from GitHub Actions logs of recent runs
+# (host-side: gh reads the token from the host keyring, unreachable from
+# containers)
 analyze-logs workflow="autoupdate" days="7" pattern="rate-summary":
     tools/analyze-logs.sh {{workflow}} {{days}} {{pattern}}
 
+# Refresh COPR badges and the README build-status block (same as the badges workflow)
 badges:
     {{runner}} tools/update-badges.sh {{project}}
 
