@@ -10,6 +10,8 @@ session lives in [AGENTS.md](../AGENTS.md).
 - [autoupdate.md](autoupdate.md) — upstream trackers, cron, keepalive
 - [conventions.md](conventions.md) — adding packages, `-bin` policy, spec and
   repo conventions
+- [workflow.md](workflow.md) — optional beads task tracking and parallel
+  orchestration of the bd task graph
 - packaging quirks by ecosystem:
   [general](packaging/general.md) ·
   [python](packaging/python.md) ·

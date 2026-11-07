@@ -48,3 +48,6 @@ prefer extending a linked doc over growing this file.
   [python](docs/packaging/python.md) ·
   [rust](docs/packaging/rust.md) ·
   [npm](docs/packaging/npm.md)
+- Task tracking (optional): when the `bd` command is available on the host,
+  organize multi-step work with it; when it is not, carry on without it.
+  Details: [docs/workflow.md](docs/workflow.md)
