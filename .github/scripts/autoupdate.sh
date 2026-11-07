@@ -78,10 +78,15 @@ resolve() {
       forgejo:*) repo_url="${FORGEJO_HOME:-https://codeberg.org}/${repo_url#forgejo:}" ;;
       *) repo_url="https://github.com/$repo_url" ;;
     esac
-    # -v:refname sorts by version; skip annotated-tag deref (^{}) lines
+    # -v:refname sorts by version; skip annotated-tag deref (^{}) lines and
+    # non-version tags (component tags like ghostty's "vt-1.0.0" win the sort
+    # but are not releases): first tag whose normalization is digit-leading
     latest="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
-      | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2; exit}')"
-    latest="${latest#v}"
+      | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2}' \
+      | while IFS= read -r t; do
+          t="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$t")"
+          [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
+        done | head -1)"
   elif [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
     # repos without any GitHub Release (only prereleases) 404 here
     body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
@@ -153,8 +158,9 @@ while IFS=$'\t' read -r _ pkg latest; do
   fi
   # RPM forbids '-' in Version; bump.sh sanitizes, so compare sanitized
   latest_rpm="$(printf '%s' "$latest" | sed 's/[- ]/./g')"
-  # tags like jethrokuan/z's "<2.7.0" must never reach a spec
-  if ! [[ "$latest_rpm" =~ ^[A-Za-z0-9._+]+$ ]]; then
+  # tags like jethrokuan/z's "<2.7.0" must never reach a spec, and neither
+  # may a letter-leading one (a component tag resolved as "latest")
+  if ! [[ "$latest_rpm" =~ ^[0-9][A-Za-z0-9._+]+$ ]]; then
     echo "::warning::$pkg: latest tag '$latest' has non-version characters, skipping"
     continue
   fi
