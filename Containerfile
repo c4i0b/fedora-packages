@@ -3,9 +3,8 @@
 # top chroot.
 FROM registry.fedoraproject.org/fedora:rawhide
 
-# Full toolchain up front (the old distrobox ini + the SRPM/vendoring deps
-# validate.sh used to dnf-install per run): deterministic, no network at
-# recipe time beyond what the recipes themselves fetch.
+# Full toolchain baked up front: deterministic, no per-run dnf installs and
+# no network at recipe time beyond what the recipes themselves fetch.
 RUN dnf -y --nodocs --setopt=install_weak_deps=0 install \
       copr-cli rpkg rpmdevtools rpmlint mock \
       git make curl \
