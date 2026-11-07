@@ -4,8 +4,9 @@
   Makefiles (breaking upstream feature detection): `export CFLAGS=...`
   before `%make_build` instead.
 - EPEL chroots run one generation older toolchains than Fedora (rpm 4.19 on
-  EPEL 10): macros in comments break the spec parse (test.sh rejects them)
-  and ELF binaries without a GNU build-id note abort the build — non-GCC
+  EPEL 10): macros in comments are expanded and executed silently on rpm < 4.20
+  (test.sh rejects them) and ELF binaries without a GNU build-id note abort the
+  build — non-GCC
   toolchain specs carry `%global _missing_build_ids_terminate_build 0` next
   to `%global debug_package %{nil}`. When a package needs something beyond
   base toolchains, verify it exists in EPEL + CS AppStream/CRB (repoquery)
