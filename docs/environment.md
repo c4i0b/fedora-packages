@@ -19,7 +19,10 @@ be in the image — if it is not in the `Containerfile`, it does not exist.
 The container runs as uid 0 (maps to the unprivileged host user in rootless
 podman — no host privilege gained; it is the only uid that can write the
 bind mount). Repo mount uses `:z` (shared SELinux label) so concurrent runs
-keep access.
+keep access. A second, `privileged` service (`mock`) exists solely for
+`just build-local`: mock needs CAP_SYS_ADMIN to mount tmpfs/proc in the
+buildroot, and rootless `--privileged` stays confined to the host user
+(upstream-documented pattern).
 
 ## Credentials
 
