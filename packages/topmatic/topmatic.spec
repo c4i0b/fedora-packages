@@ -1,5 +1,5 @@
 Name:           topmatic
-Version:        1.1.0
+Version:        1.2.0
 Release:        1%{?dist}
 Summary:        User-level scheduled updates powered by topgrade
 
@@ -43,5 +43,8 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 %{_bindir}/topmatic
 
 %changelog
+* Sun Nov 08 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.2.0-1
+- Update to 1.2.0
+
 * Fri Oct 16 2026 Caio Bruno <cbrunofb@gmail.com> - 1.1.0-1
 - Initial package
