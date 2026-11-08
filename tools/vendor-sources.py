@@ -429,6 +429,35 @@ def extract_source0(src_file):
     return d if d.is_dir() else Path(".")
 
 
+def check_prep_topdir(spec, top):
+    # topdir-mismatch class bit three times (atac ATAC-*, gping
+    # gping-gping-v*, herdr herdr-app-*): %autosetup then dies mid-rpmbuild
+    # with a generic "cd: no such directory". The tarball is in hand here,
+    # so compare its top against the -n argument (default name-version)
+    # before the expensive vendoring even starts.
+    spec_text = spec.read_text()
+    top = str(top)
+    m = re.search(r"^%(?:auto)?setup\b(.*)$", spec_text, re.M)
+    if not m or top in (".", None) or "-c" in m.group(1).split():
+        return
+    # expand name/version and every %global (tag, commit, ...) the -n arg uses
+    macros = {"name": spec.stem}
+    for tag_name, tag_val in re.findall(r"^%global\s+(\w+)\s+(\S+)", spec_text, re.M):
+        macros.setdefault(tag_name, tag_val)
+    for tag_name in ("Version", "Name"):
+        hit = re.search(rf"^{tag_name}:\s+(\S+)", spec_text, re.M)
+        if hit:
+            macros.setdefault(tag_name.lower(), hit.group(1))
+    n = re.search(r"(?:^|\s)-n\s+(\S+)", m.group(1))
+    want = n.group(1) if n else "%{name}-%{version}"
+    want = re.sub(r"%\{(\w+)\}", lambda mm: macros.get(mm.group(1), mm.group(0)), want)
+    if "%{" in want:  # unknown macro: cannot expand, do not guess
+        return
+    if want != top:
+        die(f"Source0 topdir is '{top}' but %setup cds into '{want}' "
+            f"— fix the -n argument (e.g. -n {top})")
+
+
 def vendor_go(spec):
     if shutil.which("go_vendor_archive") is None:
         dnf_install(["go-vendor-tools", "python3-specfile", "golang",
@@ -437,6 +466,8 @@ def vendor_go(spec):
     lf = subprocess.run(["spectool", "--lf", spec.name],
                         capture_output=True, text=True, check=True).stdout
     ensure_archive(Path(lf.splitlines()[0].split()[1].split("#")[0]).name)
+    check_prep_topdir(spec, tar_first_top(
+        Path(lf.splitlines()[0].split()[1].split("#")[0]).name))
     cmd = ["go_vendor_archive", "create"]
     if Path("go-vendor-tools.toml").is_file():
         cmd += ["--config", "go-vendor-tools.toml"]
@@ -453,6 +484,7 @@ def vendor_cargo(spec, spec_text):
         dnf_install(["rpmdevtools"])
     url, src_file = spectool_get(spec)
     d = extract_source0(src_file)
+    check_prep_topdir(spec, d if d != Path(".") else None)
     # submodules (gitlinked vendor trees) must be in place before vendoring
     # and before the zig closure scan
     changed = fetch_submodules(d, url)
@@ -502,6 +534,7 @@ def vendor_zig(spec):
         dnf_install(["rpmdevtools"])
     url, src_file = spectool_get(spec)
     d = extract_source0(src_file)
+    check_prep_topdir(spec, d if d != Path(".") else None)
     fetch_submodules(d, url)
     fetch_zig_closure(d)
     if d != Path("."):
