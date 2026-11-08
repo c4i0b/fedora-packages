@@ -71,9 +71,11 @@ ssh://git@codeberg.org:2222/o/r.git|codeberg.org|o|r
 https://github.com/o/r|github.com|o|r
 EOF
 
-for dir in "$root"/packages/*/; do
+# tracked dirs only: the CI sources-cache restore can leave phantom dirs
+# from renamed packages (archives, no spec) next to the checkout
+while IFS= read -r dir; do
   check_package "$dir" || fail=1
-done
+done < <(package_dirs)
 
 # Templates must render into conforming packages: fill every placeholder with
 # dummy values and run the same invariants over the rendered spec.

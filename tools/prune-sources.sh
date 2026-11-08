@@ -14,7 +14,15 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 pruned=0
 for dir in "$root"/packages/*/; do
   specs=("$dir"*.spec)
-  [ -f "${specs[0]}" ] || continue
+  if [ ! -f "${specs[0]}" ]; then
+    # phantom dir restored by the CI sources cache (package renamed/removed):
+    # nothing can reference these archives, and keeping them would resurrect
+    # the dir on every cache save
+    find "$dir" -maxdepth 2 -type f \
+      \( -name '*.tar.*' -o -name '*.tgz' -o -name '*.zip' \) -delete || true
+    rmdir "${dir%/}" "${dir%/}"/* 2>/dev/null || true
+    continue
+  fi
   refs=""
   volatile=""
   for spec in "${specs[@]}"; do

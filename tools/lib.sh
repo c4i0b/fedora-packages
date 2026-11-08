@@ -20,6 +20,17 @@ upstream_home() {
   esac
 }
 
+# Package dirs are the ones with a git-tracked spec: the CI sources cache
+# restores tarballs of renamed/removed packages into phantom dirs (no spec),
+# which must never enter validation, builds or cache saves.
+package_dirs() {
+  local root spec
+  root="$(git rev-parse --show-toplevel)"
+  while IFS= read -r -d '' spec; do
+    printf '%s\n' "$root/$(dirname "$spec")"
+  done < <(git -C "$root" ls-files -z 'packages/*/*.spec') | sort -u
+}
+
 # The "downloaded sources set": what rpmbuild fetches into the package dirs,
 # minus the vendor archives that are regenerated (not fetched) each run.
 # Single definition shared by the CI counters, the content epoch and the
