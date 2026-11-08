@@ -1,5 +1,5 @@
 Name:           herdr-app
-Version:        0.1.13
+Version:        0.1.14
 Release:        1%{?dist}
 Summary:        Desktop app for terminals and coding agents
 
@@ -94,5 +94,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/herdr-app.desktop
 %{_datadir}/icons/hicolor/scalable/apps/herdr-app.svg
 
 %changelog
+* Sun Nov 08 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.1.14-1
+- Update to 0.1.14
+
 * Fri Nov 06 2026 Caio Bruno <cbrunofb@gmail.com> - 0.1.13-1
 - Initial package
