@@ -22,7 +22,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 <!-- chroot-badges end -->
 
 <!-- build-status begin -->
-*Updated 2026-11-08 16:30 UTC*
+*Updated 2026-11-08 16:46 UTC*
 <!-- build-status end -->
 
 ## Per-package build
