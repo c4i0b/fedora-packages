@@ -10,8 +10,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![autoupdate](https://github.com/c4i0b/fedora-packages/actions/workflows/autoupdate.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/autoupdate.yml)
 [![badges](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml/badge.svg)](https://github.com/c4i0b/fedora-packages/actions/workflows/badges.yml)
 
-<details>
-<summary>COPR chroot status (generated)</summary>
+## COPR chroot status
 
 <!-- chroot-badges begin -->
 [![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3Dc4200f0d%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
@@ -23,55 +22,10 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 <!-- chroot-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-11-08 09:27 UTC automatically by GitHub Actions.**
+*Updated 2026-11-08 16:27 UTC*
 <!-- build-status end -->
-</details>
 
-## Install
-
-```sh
-sudo dnf copr enable caiobruno/fedora-packages
-sudo dnf install <package>
-```
-
-## How it works
-
-- Each package lives in `packages/<name>/` with its spec file.
-- COPR produces the SRPMs server-side (`.copr/Makefile` contract) and pushes
-  to `main` rebuild the affected packages through a webhook.
-  Details: [docs/copr.md](docs/copr.md).
-- A scheduled workflow checks upstream releases (GitHub or npm, per package's
-  `upstream` file) and bumps Version, Release and changelog automatically.
-- The project follows Fedora branching, so chroots for new releases are
-  created automatically.
-
-## Development
-
-The host needs only `just`, `podman` and `gh` (pushes and gh are host-side;
-the gh token lives in the host keyring). Optionally `bd` (beads) for task
-tracking. Everything else runs in the ephemeral tooling container.
-
-```sh
-just image         # build the tooling container image (Fedora Rawhide)
-just shell         # interactive bash in the tooling container
-just test          # package invariants + template rendering check
-just lint          # rpmlint all specs
-just srpm <name>   # build one SRPM
-just status        # COPR build list
-```
-
-Environment details, COPR integration, conventions and packaging quirks:
-[docs/](docs/README.md).
-
-## Adding a package
-
-1. Check it is not already in Fedora or RPM Fusion (query the oldest stable release too), then scaffold with `just new-package <name>` (kinds: `source`, `go`, `rust`, `python`, `bun`, `electron`, `bin`; `source` is the default) and fill the remaining `__PLACEHOLDER__` values in the spec.
-2. Run `just add-package <name>` (requires a configured `copr-cli` token).
-3. For automatic updates, add `packages/<name>/upstream` with the GitHub `owner/repo` slug or an `npm:<package>` reference.
-4. Run `just bump <name> <version>` to bump versions manually (what the autoupdate workflow does on its own).
-
-<details>
-<summary>Per-package build badges (generated)</summary>
+## Per-package build
 
 <!-- package-badges begin -->
 [![aesthetic-wallpapers](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Faesthetic-wallpapers.json%3Fv%3D2025.06.17%2Er2)](https://github.com/D3Ext/aesthetic-wallpapers/)
@@ -149,7 +103,7 @@ Environment details, COPR integration, conventions and packaging quirks:
 [![netscanner](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fnetscanner.json%3Fv%3D0.6.43%2Er2)](https://github.com/Chleba/netscanner/)
 [![oha](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Foha.json%3Fv%3D1.16.0%2Er2)](https://github.com/hatoo/oha/)
 [![omo](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fomo.json%3Fv%3D5.1.64%2Er2)](https://github.com/code-yeongyu/oh-my-openagent/)
-[![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3D2026.11.1%2Er2)](https://www.npmjs.com/package/openclaw/)
+[![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3D2026.11.2%2Er2)](https://www.npmjs.com/package/openclaw/)
 [![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.2.6%2Er2)](https://www.npmjs.com/package/@opencode/cli-linux-x64/)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D1.19.5%2Er2)](https://github.com/anomalyco/opencode/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3D0.13.4%2Er2)](https://github.com/mrjackwills/oxker/)
@@ -189,4 +143,47 @@ Environment details, COPR integration, conventions and packaging quirks:
 [![xh](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fxh.json%3Fv%3D0.26.3%2Er2)](https://github.com/ducaale/xh/)
 [![zapzap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fzapzap.json%3Fv%3D7.5.1%2Er2)](https://github.com/rafatosta/zapzap/)
 <!-- package-badges end -->
-</details>
+
+## Install
+
+```sh
+sudo dnf copr enable caiobruno/fedora-packages
+sudo dnf install <package>
+```
+
+## How it works
+
+- Each package lives in `packages/<name>/` with its spec file.
+- COPR produces the SRPMs server-side (`.copr/Makefile` contract) and pushes
+  to `main` rebuild the affected packages through a webhook.
+  Details: [docs/copr.md](docs/copr.md).
+- A scheduled workflow checks upstream releases (GitHub or npm, per package's
+  `upstream` file) and bumps Version, Release and changelog automatically.
+- The project follows Fedora branching, so chroots for new releases are
+  created automatically.
+
+## Development
+
+The host needs only `just`, `podman` and `gh` (pushes and gh are host-side;
+the gh token lives in the host keyring). Optionally `bd` (beads) for task
+tracking. Everything else runs in the ephemeral tooling container.
+
+```sh
+just image         # build the tooling container image (Fedora Rawhide)
+just shell         # interactive bash in the tooling container
+just test          # package invariants + template rendering check
+just lint          # rpmlint all specs
+just srpm <name>   # build one SRPM
+just status        # COPR build list
+```
+
+Environment details, COPR integration, conventions and packaging quirks:
+[docs/](docs/README.md).
+
+## Adding a package
+
+1. Check it is not already in Fedora or RPM Fusion (query the oldest stable release too), then scaffold with `just new-package <name>` (kinds: `source`, `go`, `rust`, `python`, `bun`, `electron`, `bin`; `source` is the default) and fill the remaining `__PLACEHOLDER__` values in the spec.
+2. Run `just add-package <name>` (requires a configured `copr-cli` token).
+3. For automatic updates, add `packages/<name>/upstream` with the GitHub `owner/repo` slug or an `npm:<package>` reference.
+4. Run `just bump <name> <version>` to bump versions manually (what the autoupdate workflow does on its own).
+
