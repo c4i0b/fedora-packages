@@ -238,8 +238,11 @@ for pkg in packages:
         f"%2F{pkg}.json%3Fv%3D{ver}%2Er{BADGE_REV})"
         f"]({links.get(pkg) or gh_pkg_url}/)")
 
-# ---- failures table (published comes from chroot repodata) ----------------
-DASH = "\u2014"
+# ---- failures table --------------------------------------------------------
+# One line per failing chroot, "label: from → to"; "from" is the version
+# still installable there (chroot repodata — a failed build never enters the
+# repo), omitted when the chroot has nothing published. Succeeded chroots do
+# not appear: the table is about failures.
 failed = {}
 for c in iter_cells():
     if c["state"] == "failed":
@@ -247,41 +250,34 @@ for c in iter_cells():
 
 lines = []
 for pkg in sorted(failed):
-    cell_list = failed[pkg]
-    ch_list = sorted((c["chroot"] for c in cell_list), key=sort_key)
-    attempted = cell_list[0]["pkg_version"] or "?"
-    build_id = max(c["build_id"] for c in cell_list)
-    pub_parts = []
-    for ch in ch_list:
-        if ch not in pub_cache:
-            pub_cache[ch] = published_versions(ch)
-        pub_parts.append("?" if pub_cache[ch] is None else pub_cache[ch].get(pkg))
-    if all(v == "?" for v in pub_parts):
-        # every lookup failed: publishing "—" would claim the package was
-        # never published; fail the run and keep the previous table instead
-        sys.exit(f"repodata unfetchable for every failing chroot of {pkg}; "
-                 "keeping the previous build-status block")
-    if any(v and v != "?" for v in pub_parts):
-        # per-chroot only when they diverge
-        pub = pub_parts[0] if len(set(pub_parts)) == 1 and pub_parts[0] \
-            else "<br>".join(f"{v or DASH} ({label(ch)})"
-                             for v, ch in zip(pub_parts, ch_list))
-    else:
-        pub = DASH
-    failed_in = "<br>".join(label(ch) for ch in ch_list)
-    lines.append(f"| {pkg} | {pub} | {attempted} | {failed_in} "
+    cells = sorted(failed[pkg], key=lambda c: sort_key(c["chroot"]))
+    for c in cells:
+        if c["chroot"] not in pub_cache:
+            pub_cache[c["chroot"]] = published_versions(c["chroot"])
+    if all(pub_cache[c["chroot"]] is None for c in cells):
+        # every lookup failed: bare target versions would claim those chroots
+        # never published anything; fail the run, keep the previous table
+        sys.exit(f"repodata unfetchable for every failing chroot of {pkg}")
+    parts = []
+    for c in cells:
+        ch = c["chroot"]
+        att = (c["pkg_version"] or "?").rsplit("-", 1)[0]
+        pub = pub_cache[ch].get(pkg)
+        parts.append(f"{label(ch)}: {f'{pub} → {att}' if pub else att}")
+    build_id = max(c["build_id"] for c in cells)
+    lines.append(f"| {pkg} | {'<br>'.join(parts)} "
                  f"| [#{build_id}]({copr}/build/{build_id}/) |")
 
 from datetime import datetime, timezone
 ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
 if lines:
     body = ("### :x: build failures\n\n"
-            "| package | published | attempted | failed in | build |\n"
-            "|---|---|---|---|---|\n" + "\n".join(lines) + "\n")
-    block = body + f"\n*Updated {ts} UTC automatically by GitHub Actions.*\n"
+            "| package | chroots | build |\n"
+            "|---|---|---|\n" + "\n".join(lines) + "\n")
+    block = body + f"\n*Updated {ts} UTC*\n"
 else:
-    body = "**\u2705 all green**\n"
-    block = f"**Updated {ts} UTC automatically by GitHub Actions.**\n"
+    body = ""
+    block = f"*Updated {ts} UTC*\n"
 
 rp = f"{root}/README.md"
 readme = open(rp).read()
@@ -325,7 +321,7 @@ _, tail = rest.split(end, 1)
 # when the status itself changed, so refreshes with no change do not commit
 current = rest.split(end, 1)[0]
 def essence(t):
-    t = re.sub(r"Updated [0-9-]+ [0-9:]+ UTC automatically by GitHub Actions", "", t)
+    t = re.sub(r"Updated [0-9-]+ [0-9:]+ UTC( automatically by GitHub Actions)?", "", t)
     return "\n".join(l for l in t.split("\n") if l.strip()).strip()
 # unchanged status keeps its existing timestamp; the chroot/package blocks are
 # still rebuilt, so a plain file diff decides whether anything gets written
