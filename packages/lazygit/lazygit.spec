@@ -1,5 +1,5 @@
 %global goipath         github.com/jesseduffield/lazygit
-Version:        0.66.2
+Version:        0.66.3
 
 %gometa -L -f
 
@@ -64,5 +64,8 @@ install -Dpm644 lazygit.fish %{buildroot}%{fish_completions_dir}/lazygit.fish
 %{fish_completions_dir}/lazygit.fish
 
 %changelog
+* Sun Nov 08 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.66.3-1
+- Update to 0.66.3
+
 * Fri Oct 16 2026 Caio Bruno <cbrunofb@gmail.com> - 0.66.2-1
 - Initial package
