@@ -15,7 +15,11 @@ if [ "$#" -gt 0 ]; then
     pkgs+=("packages/$name/")
   done
 else
-  for dir in packages/*/; do pkgs+=("$dir"); done
+  # tracked dirs only: the CI sources-cache restore can leave phantom dirs
+  # from renamed packages (archives, no spec), which have nothing to build
+  while IFS= read -r dir; do
+    pkgs+=("${dir#"$root"/}/")
+  done < <(package_dirs)
 fi
 
 # one dnf pass up front: parallel vendor phases must not race the dnf lock
