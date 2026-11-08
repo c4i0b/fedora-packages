@@ -23,7 +23,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 <!-- chroot-badges end -->
 
 <!-- build-status begin -->
-**Updated 2026-11-07 22:17 UTC automatically by GitHub Actions.**
+**Updated 2026-11-08 01:48 UTC automatically by GitHub Actions.**
 <!-- build-status end -->
 </details>
 
@@ -138,7 +138,7 @@ Environment details, COPR integration, conventions and packaging quirks:
 [![jp2a](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fjp2a.json%3Fv%3D1.3.3%2Er2)](https://github.com/Talinx/jp2a/)
 [![kora-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fkora-icon-theme.json%3Fv%3D2.0.6%2Er2)](https://github.com/bikass/kora/)
 [![lazydocker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flazydocker.json%3Fv%3D0.25.2%2Er2)](https://github.com/jesseduffield/lazydocker/)
-[![lazygit](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flazygit.json%3Fv%3D0.66.2%2Er2)](https://github.com/jesseduffield/lazygit/)
+[![lazygit](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flazygit.json%3Fv%3D0.66.3%2Er2)](https://github.com/jesseduffield/lazygit/)
 [![librespeed-cli](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flibrespeed-cli.json%3Fv%3D1.0.14%2Er2)](https://github.com/librespeed/speedtest-cli/)
 [![lightcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flightcraft.json%3Fv%3D0.19.0%2Er2)](https://github.com/storytold/lightcraft/)
 [![ludusavi](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fludusavi.json%3Fv%3D0.31.0%2Er2)](https://github.com/mtkennerly/ludusavi/)
@@ -173,7 +173,7 @@ Environment details, COPR integration, conventions and packaging quirks:
 [![tela-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftela-icon-theme.json%3Fv%3D2026.07.07%2Er2)](https://github.com/vinceliuice/Tela-icon-theme/)
 [![television](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftelevision.json%3Fv%3D0.15.9%2Er2)](https://github.com/alexpasmantier/television/)
 [![topgrade](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftopgrade.json%3Fv%3D17.15.0%2Er2)](https://github.com/topgrade-rs/topgrade/)
-[![topmatic](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftopmatic.json%3Fv%3D1.1.0%2Er2)](https://github.com/c4i0b/topmatic/)
+[![topmatic](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftopmatic.json%3Fv%3D1.2.0%2Er2)](https://github.com/c4i0b/topmatic/)
 [![trippy](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ftrippy.json%3Fv%3D0.13.0%2Er2)](https://github.com/fujiapple852/trippy/)
 [![unimatrix](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Funimatrix.json%3Fv%3D0.1.0%2Er2)](https://github.com/will8211/unimatrix/)
 [![vectorcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fvectorcraft.json%3Fv%3D0.22.0%2Er2)](https://github.com/storytold/vectorcraft/)
