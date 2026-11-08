@@ -11,7 +11,9 @@ Summary:        Simple terminal UI for git commands
 
 License:        MIT
 URL:            https://github.com/jesseduffield/lazygit
-Source0:        %{gosource}
+# refs/tags disambiguates: upstream keeps a release BRANCH alongside each
+# tag, and plain archive/v<ver>.tar.gz 300s with an error page
+Source0:        https://github.com/jesseduffield/lazygit/archive/refs/tags/v%{version}/%{archivename}.tar.gz
 Source1:        %{archivename}-vendor.tar.bz2
 
 Recommends:     bash-completion

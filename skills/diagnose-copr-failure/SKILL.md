@@ -39,6 +39,10 @@ spec/SRPM name in the output matches the package you are diagnosing.
   hundreds of succeeding package lines (e.g. an `exec: "g++" not found` at
   line ~2500 of a log whose tail looks like a silent OOM). Grep the whole log
   for `exec:|fatal error:|error:` before concluding a silent kill/OOM.
+- `tarfile.ReadError: not a gzip file` from spectool/go_vendor_archive means
+  Source0 fetched a forge **error page**, not a tarball. On GitHub the usual
+  cause is a tag/branch name collision (lazygit keeps release branches) —
+  pin Source0 to `archive/refs/tags/v<ver>/…`, which is unambiguous.
 - A noarch package failing every chroot with `Arch dependent binaries in
   noarch package` means ELFs/wasm/platform dirs in the payload — strip them in
   `%install` (see openclaw).

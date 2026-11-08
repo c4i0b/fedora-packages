@@ -399,12 +399,26 @@ def git_source_blocks(config_text):
 
 # ---- vendor branches -----------------------------------------------------------
 
+def ensure_archive(src_file):
+    # spectool saves whatever a forge returns (a 300/404 HTML or text error
+    # page) under the tarball name; fail fast with the real cause instead of
+    # a cryptic tarfile.ReadError from the vendoring tool
+    magic = Path(src_file).read_bytes()[:5]
+    if magic[:2] == b"\x1f\x8b" or magic[:3] == b"BZh" \
+            or magic[:5] == b"\xfd7zXZ" or magic[:4] in (b"PK\x03\x04", b"ustar") \
+            or magic[:4] == b"\x28\xb5\x2f\xfd":
+        return
+    head = Path(src_file).read_bytes()[:120].decode("utf-8", "replace").strip()
+    die(f"{src_file} is not an archive (spectool saved an error page?): {head!r}")
+
+
 def spectool_get(spec):
     subprocess.run(["spectool", "-g", spec.name], check=True)
     lf = subprocess.run(["spectool", "--lf", spec.name],
                         capture_output=True, text=True, check=True).stdout
     url = lf.splitlines()[0].split()[1]
     src_file = Path(url.split("#")[0]).name
+    ensure_archive(src_file)
     return url, src_file
 
 
@@ -420,6 +434,9 @@ def vendor_go(spec):
         dnf_install(["go-vendor-tools", "python3-specfile", "golang",
                      "git-core", "rpmdevtools"])
     subprocess.run(["spectool", "-g", spec.name], check=True)
+    lf = subprocess.run(["spectool", "--lf", spec.name],
+                        capture_output=True, text=True, check=True).stdout
+    ensure_archive(Path(lf.splitlines()[0].split()[1].split("#")[0]).name)
     cmd = ["go_vendor_archive", "create"]
     if Path("go-vendor-tools.toml").is_file():
         cmd += ["--config", "go-vendor-tools.toml"]
