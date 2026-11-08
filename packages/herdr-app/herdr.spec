@@ -1,4 +1,4 @@
-Name:           herdr
+Name:           herdr-app
 Version:        0.1.13
 Release:        1%{?dist}
 Summary:        Desktop app for terminals and coding agents
