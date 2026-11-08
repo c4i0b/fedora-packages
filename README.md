@@ -22,7 +22,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 <!-- chroot-badges end -->
 
 <!-- build-status begin -->
-*Updated 2026-11-08 16:46 UTC*
+*Updated 2026-11-08 22:28 UTC*
 <!-- build-status end -->
 
 ## Per-package build
@@ -49,7 +49,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![ctop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fctop.json%3Fv%3D0.7.7%2Er2)](https://github.com/bcicen/ctop/)
 [![deckcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdeckcraft.json%3Fv%3D0.16.0%2Er2)](https://github.com/storytold/deckcraft/)
 [![designcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdesigncraft.json%3Fv%3D0.18.0%2Er2)](https://github.com/storytold/designcraft/)
-[![desktop-plus](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdesktop-plus.json%3Fv%3D3.6.10.0%2Er2)](https://github.com/desktop-plus/desktop-plus/)
+[![desktop-plus](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdesktop-plus.json%3Fv%3D3.6.11.0%2Er2)](https://github.com/desktop-plus/desktop-plus/)
 [![devcontainers-cli](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdevcontainers-cli.json%3Fv%3D0.90.0%2Er2)](https://www.npmjs.com/package/@devcontainers/cli/)
 [![dive](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdive.json%3Fv%3D0.13.1%2Er2)](https://github.com/wagoodman/dive/)
 [![dnsdiag](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnsdiag.json%3Fv%3D2.10.1%2Er2)](https://github.com/farrokhi/dnsdiag/)
@@ -82,7 +82,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![gping](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fgping.json%3Fv%3D1.21.0%2Er2)](https://github.com/orf/gping/)
 [![gridcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fgridcraft.json%3Fv%3D0.17.0%2Er2)](https://github.com/storytold/gridcraft/)
 [![hcxdumptool](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fhcxdumptool.json%3Fv%3D8.0.0%2Er2)](https://github.com/ZerBea/hcxdumptool/)
-[![herdr-app](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fherdr-app.json%3Fv%3D0.1.13%2Er2)](https://github.com/herdrdev/herdr-app/)
+[![herdr-app](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fherdr-app.json%3Fv%3D0.1.14%2Er2)](https://github.com/herdrdev/herdr-app/)
 [![hermes-agent](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fhermes-agent.json%3Fv%3D0.23.0%2Er2)](https://github.com/NousResearch/hermes-agent/)
 [![heroic](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fheroic.json%3Fv%3D2.22.4%2Er2)](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher/)
 [![hollywood](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fhollywood.json%3Fv%3D1.26%2Er2)](https://github.com/dustinkirkland/hollywood/)
