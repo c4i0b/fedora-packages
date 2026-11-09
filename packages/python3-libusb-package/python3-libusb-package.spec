@@ -1,5 +1,5 @@
 Name:           python3-libusb-package
-Version:        1.0.30.0
+Version:        1.0.30.1
 Release:        1%{?dist}
 Summary:        Python package locating a libusb library for pyusb
 
@@ -38,7 +38,7 @@ mkdir -p "$distinfo"
 cat > "$distinfo/METADATA" <<EOF
 Metadata-Version: 2.1
 Name: libusb-package
-Version: %{version}
+Version:        1.0.30.1
 Summary: Package containing libusb so it can be installed via Python package managers
 License-Expression: Apache-2.0
 EOF
@@ -64,5 +64,8 @@ EOF
 %{python3_sitelib}/libusb_package-%{version}.dist-info/
 
 %changelog
+* Mon Nov 09 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.0.30.1-1
+- Update to 1.0.30.1
+
 * Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 1.0.30.0-1
 - Initial package
