@@ -1,5 +1,5 @@
 Name:           photocraft
-Version:        0.21.0
+Version:        0.22.0
 Release:        1%{?dist}
 Summary:        Photo editor with layers, masks and PSD support
 
@@ -82,6 +82,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.photoc
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.photocraft.*
 
 %changelog
+* Mon Nov 09 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.22.0-1
+- Update to 0.22.0
+
 * Sat Nov 07 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.21.0-1
 - Update to 0.21.0
 
