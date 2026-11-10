@@ -5,7 +5,7 @@
 ExclusiveArch:  x86_64 aarch64
 
 Name:           omo
-Version:        5.1.66
+Version:        5.1.68
 Release:        1%{?dist}
 Summary:        AI agent harness with multi-model orchestration and memory
 
@@ -42,6 +42,9 @@ HOME=%{_builddir}/omo-home %{buildroot}%{_bindir}/omo --version
 %{_bindir}/omo
 
 %changelog
+* Tue Nov 10 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 5.1.68-1
+- Update to 5.1.68
+
 * Tue Nov 10 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 5.1.66-1
 - Update to 5.1.66
 
