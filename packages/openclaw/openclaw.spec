@@ -1,7 +1,7 @@
 # Same packaging as Fedora rawhide's openclaw (npm tarball, /usr/lib layout):
 # this COPR copy only exists to be newer and to cover stable/EPEL chroots
 Name:           openclaw
-Version:        2026.11.2
+Version:        2026.11.3
 Release:        1%{?dist}
 Summary:        OpenClaw CLI, a personal AI assistant (npm bundle)
 
@@ -75,6 +75,9 @@ HOME=%{_builddir} OPENCLAW_FS_SAFE_NATIVE_MODE=off \
 %{_prefix}/lib/node_modules/openclaw/
 
 %changelog
+* Tue Nov 10 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2026.11.3-1
+- Update to 2026.11.3
+
 * Sun Nov 08 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2026.11.2-1
 - Update to 2026.11.2
 
