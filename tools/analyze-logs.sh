@@ -25,16 +25,24 @@ mapfile -t runs < <(gh run list -R "$repo" -w "$workflow" --created ">$since" \
 
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 matches="$tmp/matches"; : > "$matches"
+errors=0
 
 for run in "${runs[@]}"; do
   id="${run%% *}"; ts="${run#* }"
-  # in-progress or expired logs have nothing to read yet
-  gh run view "$id" -R "$repo" --log 2>/dev/null \
-    | grep -F "[${pattern}]" | sed "s/.*\[${pattern}\] //" | sed "s/^/${ts%%T*} /" \
-    >> "$matches" || true
+  # in-progress or expired logs have nothing to read yet; an API failure
+  # (e.g. actions jobs 502s) is NOT "no data" and must be distinguishable,
+  # or an outage reads as telemetry gone missing
+  if ! gh run view "$id" -R "$repo" --log 2>"$tmp/err" > "$tmp/log"; then
+    if grep -qE "HTTP [0-9]{3}|Server Error" "$tmp/err"; then
+      errors=$((errors + 1)); continue
+    fi
+  fi
+  grep -F "[${pattern}]" "$tmp/log" | sed "s/.*\[${pattern}\] //" \
+    | sed "s/^/${ts%%T*} /" >> "$matches"
 done
 
-[ -s "$matches" ] || { echo "no [${pattern}] lines found in ${#runs[@]} runs"; exit 0; }
+[ "$errors" -gt 0 ] && echo "warning: $errors/${#runs[@]} runs had log-fetch failures (API degraded?)" >&2
+[ -s "$matches" ] || { echo "no [${pattern}] lines found in $((${#runs[@]} - errors)) readable runs"; exit 0; }
 
 cat "$matches"
 echo
