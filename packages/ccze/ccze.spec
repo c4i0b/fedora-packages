@@ -1,6 +1,6 @@
 Name:           ccze
 Version:        0.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A robust and modular log colorizer
 
 License:        GPL-2.0-or-later
@@ -58,6 +58,9 @@ rm %{buildroot}%{_includedir}/ccze.h
 
 %check
 %{buildroot}%{_bindir}/ccze --version >/dev/null
+# unmatched optional regex groups must not segfault (hollywood's widgets feed
+# ccze arbitrary log lines; regression guard for the pcre2 shim fix)
+printf ' leading whitespace\n' | %{buildroot}%{_bindir}/ccze -A
 
 %files
 %doc AUTHORS ChangeLog ChangeLog-0.1 NEWS README THANKS FAQ
@@ -70,5 +73,9 @@ rm %{buildroot}%{_includedir}/ccze.h
 %{_mandir}/man7/ccze-plugin.7*
 
 %changelog
+* Tue Nov 10 2026 Caio Bruno <cbrunofb@gmail.com> - 0.2.1-2
+- Fix segfault on log lines with leading whitespace (NULL substring in the
+  pcre2 shim); hollywood's ccze widgets crashed KDE-side
+
 * Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 0.2.1-1
 - Initial package (retired from Fedora rawhide; hollywood's widgets exit without it)
