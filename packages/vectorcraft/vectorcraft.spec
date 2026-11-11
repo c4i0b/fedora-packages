@@ -1,5 +1,5 @@
 Name:           vectorcraft
-Version:        0.23.0
+Version:        0.24.0
 Release:        1%{?dist}
 Summary:        Vector art editor for illustrations, SVG and PDF
 
@@ -74,6 +74,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.vector
 %{_datadir}/icons/hicolor/*/apps/ai.storyteller.vectorcraft.*
 
 %changelog
+* Wed Nov 11 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.24.0-1
+- Update to 0.24.0
+
 * Mon Nov 09 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.23.0-1
 - Update to 0.23.0
 
