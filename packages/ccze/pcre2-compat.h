@@ -71,6 +71,11 @@ static inline int pcre_exec(const pcre *code, const pcre_extra *extra,
   return rc;
 }
 
+/* ccze never checks the return value, and plugins like procmail have optional
+ * groups: an unmatched group must yield an empty string, not an error, or the
+ * callers pass a NULL char* to strcasecmp/ccze_addstr and segfault
+ * (e.g. any log line starting with whitespace).
+ */
 static inline int pcre_get_substring(const char *subject, const int *ovector,
                                      int stringcount, int stringnumber,
                                      const char **stringptr)
@@ -78,9 +83,16 @@ static inline int pcre_get_substring(const char *subject, const int *ovector,
   int len;
   char *buf;
 
-  if (stringnumber < 0 || stringnumber >= stringcount ||
-      ovector[2 * stringnumber] < 0)
+  if (stringnumber < 0 || stringnumber >= stringcount)
     return PCRE2_ERROR_NOSUBSTRING;
+  if (ovector[2 * stringnumber] < 0) {
+    buf = malloc(1);
+    if (buf == NULL)
+      return PCRE2_ERROR_NOMEMORY;
+    buf[0] = '\0';
+    *stringptr = buf;
+    return 0;
+  }
   len = ovector[2 * stringnumber + 1] - ovector[2 * stringnumber];
   buf = malloc(len + 1);
   if (buf == NULL)
