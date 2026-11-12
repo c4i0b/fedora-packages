@@ -17,8 +17,8 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3D944460fb%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 [![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D765b8c43%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 [![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3D1e53b87c%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3D158752d7%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3D3e002556%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3D74fdeb08%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3D23dd9ef7%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 <!-- chroot-badges end -->
 
 <!-- build-status begin -->
@@ -26,16 +26,16 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 
 | package | chroots | build |
 |---|---|---|
-| pdfcraft | fedora 43: 0.20.0 → ?<br>fedora 44: 0.20.0 → ?<br>fedora 45: 0.20.0 → ?<br>fedora rawhide: 0.20.0 → ?<br>epel 10: 0.20.0 → ? | [#11314799](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11314799/) |
+| rea-agents | fedora 43: 6.8.0 → 6.9.0<br>fedora 44: 6.8.0 → 6.9.0<br>fedora 45: 6.8.0 → 6.9.0 | [#11316751](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11316751/) |
 
-*Updated 2026-11-12 10:29 UTC*
+*Updated 2026-11-12 18:35 UTC*
 <!-- build-status end -->
 
 ## Per-package build
 
 <!-- package-badges begin -->
 [![aesthetic-wallpapers](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Faesthetic-wallpapers.json%3Fv%3D2025.06.17%2Er2)](https://github.com/D3Ext/aesthetic-wallpapers/)
-[![airgeddon](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fairgeddon.json%3Fv%3D12.02%2Er2)](https://github.com/v1s1t0r1sh3r3/airgeddon/)
+[![airgeddon](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fairgeddon.json%3Fv%3D12.10%2Er2)](https://github.com/v1s1t0r1sh3r3/airgeddon/)
 [![angryoxide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fangryoxide.json%3Fv%3D0.9.2%2Er2)](https://github.com/Ragnt/AngryOxide/)
 [![asleap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fasleap.json%3Fv%3D2.3%2Er2)](https://github.com/joswr1ght/asleap/)
 [![atac](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fatac.json%3Fv%3D0.24.0%2Er2)](https://github.com/julien-cpsn/ATAC/)
@@ -51,7 +51,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![colloid-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcolloid-icon-theme.json%3Fv%3D2026.08.10%2Er2)](https://github.com/vinceliuice/Colloid-icon-theme/)
 [![cozette-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcozette-fonts.json%3Fv%3D1.30.0%2Er2)](https://github.com/the-moonwitch/Cozette/)
 [![crunch](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcrunch.json%3Fv%3D3.6%2Er2)](https://github.com/crunchsec/crunch/)
-[![crush](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcrush.json%3Fv%3D0.100.0%2Er2)](https://github.com/charmbracelet/crush/)
+[![crush](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fcrush.json%3Fv%3D0.101.0%2Er2)](https://github.com/charmbracelet/crush/)
 [![ctop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fctop.json%3Fv%3D0.7.7%2Er2)](https://github.com/bcicen/ctop/)
 [![deckcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdeckcraft.json%3Fv%3D0.18.1%2Er2)](https://github.com/storytold/deckcraft/)
 [![designcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdesigncraft.json%3Fv%3D0.20.1%2Er2)](https://github.com/storytold/designcraft/)
@@ -113,14 +113,14 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![opencode](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode.json%3Fv%3D2.2.7%2Er2)](https://www.npmjs.com/package/@opencode/cli-linux-x64/)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D1.19.5%2Er2)](https://github.com/anomalyco/opencode/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3D0.13.4%2Er2)](https://github.com/mrjackwills/oxker/)
-[![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D0.20.0%2Er2)](https://github.com/storytold/pdfcraft/)
+[![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D0.21.1%2Er2)](https://github.com/storytold/pdfcraft/)
 [![pear-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpear-desktop.json%3Fv%3D3.12.0%2Er2)](https://github.com/pear-devs/pear-desktop/)
 [![photocraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fphotocraft.json%3Fv%3D0.23.1%2Er2)](https://github.com/storytold/photocraft/)
 [![press-start-2p-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpress-start-2p-fonts.json%3Fv%3D3.000%2Er2)](https://fonts.google.com/specimen/Press+Start+2P/)
 [![python3-libusb-package](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpython3-libusb-package.json%3Fv%3D1.0.30.1%2Er2)](https://github.com/pyocd/libusb-package/)
 [![qogir-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fqogir-icon-theme.json%3Fv%3D2025.02.15%2Er2)](https://github.com/vinceliuice/Qogir-icon-theme/)
 [![quiver-launcher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fquiver-launcher.json%3Fv%3D3.5.1%2Er2)](https://github.com/tgeorgiadis/quiver-launcher/)
-[![rea-agents](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Frea-agents.json%3Fv%3D6.8.0%2Er2)](https://www.npmjs.com/package/rea-agents/)
+[![rea-agents](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Frea-agents.json%3Fv%3D6.9.0%2Er2)](https://www.npmjs.com/package/rea-agents/)
 [![regclient](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fregclient.json%3Fv%3D0.11.7%2Er2)](https://github.com/regclient/regclient/)
 [![rio](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Frio.json%3Fv%3D0.5.29%2Er2)](https://github.com/raphamorim/rio/)
 [![scientifica-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fscientifica-fonts.json%3Fv%3D2.3%2Er2)](https://github.com/oppiliappan/scientifica/)
