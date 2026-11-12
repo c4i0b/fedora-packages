@@ -12,7 +12,7 @@ ExclusiveArch:  x86_64 aarch64
 Name:           pear-desktop
 Version:        3.12.0
 Release:        1%{?dist}
-Summary:        YouTube Music desktop app with plugins (Electron)
+Summary:        YouTube Music Desktop App including custom plugins (Electron)
 
 License:        MIT AND BSD-2-Clause AND BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND Zlib
 URL:            https://github.com/pear-devs/pear-desktop
@@ -30,9 +30,9 @@ Requires:       alsa-lib
 Requires:       libXScrnSaver
 
 %description
-YouTube Music Desktop App — a feature-rich Electron client for YouTube Music
-with plugins, from the pear-devs fork of th-ch/youtube-music. Bundles its own
-Electron runtime.
+Pear Desktop is a YouTube Music Desktop App including custom plugins,
+bringing a native look and feel to the YouTube Music streaming service.
+It bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
