@@ -1,5 +1,5 @@
 Name:           airgeddon
-Version:        12.02
+Version:        12.10
 Release:        1%{?dist}
 Summary:        Multi-platform bash wireless auditing script
 
@@ -91,5 +91,8 @@ bash -n airgeddon.sh
 %{_datadir}/airgeddon/plugins/
 
 %changelog
+* Thu Nov 12 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 12.10-1
+- Update to 12.10
+
 * Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 12.02-1
 - Initial package
