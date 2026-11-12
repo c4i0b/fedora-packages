@@ -387,6 +387,34 @@ def drop_unvendored_git_patches(ws):
     return dropped
 
 
+def pin_duplicate_git_crate(stderr_text, ws):
+    """cargo vendor refuses the same crate+version coming from two git
+    sources (an upstream lock can pin e.g. winprint at two revs), and a
+    patch cannot point back at the same repository. Fetch the first
+    source's rev into the tree and unify via a path [patch."<repo>"] entry
+    appended to the workspace manifest; path-patched crates stay in-tree
+    and are never vendored. The caller retries vendoring unlocked and
+    repacks the tree. True when the manifest was patched."""
+    m = re.search(
+        r"found duplicate version of package `([A-Za-z0-9_.-]+) v\S+` "
+        r"vendored from two sources:\s*\n\s*source 1: (\S+?rev=([0-9a-f]+))#",
+        stderr_text)
+    if not m:
+        return False
+    crate, src1, rev = m.group(1), m.group(2), m.group(3)
+    repo = re.sub(r"\?rev=[0-9a-f]+$", "", src1)
+    log(f"duplicate git sources for {crate}; pinning to {rev[:8]} via path patch")
+    pindir = Path(ws) / "dup-pinned" / crate
+    if not pindir.is_dir():
+        pindir.parent.mkdir(parents=True, exist_ok=True)
+        fetch_tarball(f"{repo}/archive/{rev}.tar.gz", strip=1, dest=pindir)
+    manifest = Path(ws) / "Cargo.toml"
+    with manifest.open("a") as f:
+        f.write(f'\n[patch."{repo}"]\n'
+                f'{crate} = {{ path = "dup-pinned/{crate}" }}\n')
+    return True
+
+
 def git_source_blocks(config_text):
     # [source."git+https://…"] replacement blocks cargo vendor printed (the
     # cargo_prep macro only rewrites crates-io); kept as-is inside the vendor
@@ -504,6 +532,10 @@ def vendor_cargo(spec, spec_text):
     # vendor into a fresh dir name: some trees already carry a "vendor" dir
     r = subprocess.run(["cargo", "vendor", "--locked", "vendor-deps"],
                        cwd=ws, capture_output=True, text=True)
+    if r.returncode != 0 and pin_duplicate_git_crate(r.stderr, ws):
+        changed = True
+        r = subprocess.run(["cargo", "vendor", "vendor-deps"],
+                           cwd=ws, capture_output=True, text=True)
     if r.returncode != 0:
         r = subprocess.run(["cargo", "vendor", "vendor-deps"],
                            cwd=ws, capture_output=True, text=True)
@@ -512,8 +544,6 @@ def vendor_cargo(spec, spec_text):
         die("cargo vendor failed")
     if drop_unvendored_git_patches(ws):
         changed = True
-    if changed:
-        repack_dir(d, src_file)
     Path("git-sources.conf").write_text(git_source_blocks(r.stdout))
     # trees that ship their own vendor/ keep it for the patches: our vendored
     # deps go to a SEPARATE dir — a merged dir breaks (registry replacement
@@ -521,6 +551,9 @@ def vendor_cargo(spec, spec_text):
     shutil.rmtree("vendor-deps", ignore_errors=True)  # stale from a previous run
     shutil.move(str(ws / "vendor-deps"), "vendor-deps")
     shutil.move("git-sources.conf", "vendor-deps/git-sources.conf")
+    if changed:
+        # after the move: repacking earlier embeds vendor-deps in Source0
+        repack_dir(d, src_file)
     subprocess.run(["tar", "--zstd", "-cf", "vendor.tar.zst", "vendor-deps"],
                    check=True)
     shutil.rmtree("vendor-deps")
