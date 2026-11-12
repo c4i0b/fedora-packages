@@ -321,7 +321,10 @@ _, tail = rest.split(end, 1)
 # when the status itself changed, so refreshes with no change do not commit
 current = rest.split(end, 1)[0]
 def essence(t):
-    t = re.sub(r"Updated [0-9-]+ [0-9:]+ UTC( automatically by GitHub Actions)?", "", t)
+    # drop the whole markdown timestamp line; a bare text sub would leave
+    # stray '*' making every refresh look like a state change
+    t = re.sub(r"^.*Updated [0-9-]+ [0-9:]+ UTC( automatically by GitHub Actions)?.*$",
+               "", t, flags=re.M)
     return "\n".join(l for l in t.split("\n") if l.strip()).strip()
 # unchanged status keeps its existing timestamp; the chroot/package blocks are
 # still rebuilt, so a plain file diff decides whether anything gets written
