@@ -17,7 +17,9 @@ ExclusiveArch:  x86_64 aarch64
 
 BuildRequires:  nodejs24
 BuildRequires:  nodejs24-npm
-Requires:       nodejs24
+# rea 6.9.0 refuses to start on Node < 24.22.1 (no floor on BuildRequires:
+# stable-Fedora nodejs24 may be older until 24.22.1 lands in updates)
+Requires:       nodejs24 >= 1:24.22.1
 
 # env-node shebangs across the npm payload; the wrapper is the entrypoint
 %define __brp_mangle_shebangs %{nil}
@@ -61,8 +63,15 @@ done
 
 %check
 # Scratch HOME: first run writes user-level state
-HOME=%{_builddir} %{_bindir}/node-24 scripts/rea.mjs --version
-HOME=%{_builddir} %{_bindir}/node-24 scripts/rea.mjs --help >/dev/null
+# rea hard-exits on Node.js < 24.22.1 at startup, so smoke-run only where
+# buildroot nodejs24 meets the floor; stable Fedora nodejs24 lags updates-testing
+runtime=$(rpm -q --qf '%%{version}' nodejs24)
+if [ "$(printf '%%s\n24.22.1\n' "$runtime" | sort -V | tail -1)" = "$runtime" ]; then
+    HOME=%{_builddir} %{_bindir}/node-24 scripts/rea.mjs --version
+    HOME=%{_builddir} %{_bindir}/node-24 scripts/rea.mjs --help >/dev/null
+else
+    echo "distro nodejs24 $runtime below rea's 24.22.1 floor; skipping smoke run"
+fi
 
 %files
 %license LICENSE
