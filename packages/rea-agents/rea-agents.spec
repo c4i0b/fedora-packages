@@ -17,9 +17,11 @@ ExclusiveArch:  x86_64 aarch64
 
 BuildRequires:  nodejs24
 BuildRequires:  nodejs24-npm
-# rea 6.9.0 refuses to start on Node < 24.22.1 (no floor on BuildRequires:
-# stable-Fedora nodejs24 may be older until 24.22.1 lands in updates)
-Requires:       nodejs24 >= 1:24.22.1
+# rea refuses to start on Node below its engines floor; the check section
+# re-derives the floor from package.json, this macro is only the Requires
+# fallback
+%global node_floor 24.22.1
+Requires:       nodejs24 >= 1:%{node_floor}
 
 # env-node shebangs across the npm payload; the wrapper is the entrypoint
 %define __brp_mangle_shebangs %{nil}
@@ -63,14 +65,21 @@ done
 
 %check
 # Scratch HOME: first run writes user-level state
-# rea hard-exits on Node.js < 24.22.1 at startup, so smoke-run only where
-# buildroot nodejs24 meets the floor; stable Fedora nodejs24 lags updates-testing
+# rea hard-exits on Node below its engines floor, which can be newer than
+# stable-Fedora nodejs24 (updates lag updates-testing); smoke-run only where
+# the buildroot nodejs24 meets the floor. The floor comes from package.json
+# engines field for the nodejs24 major we wrap (survives version bumps
+# without spec edits), falling back to the node_floor macro when engines
+# has no match.
 runtime=$(rpm -q --qf '%%{version}' nodejs24)
-if [ "$(printf '%%s\n24.22.1\n' "$runtime" | sort -V | tail -1)" = "$runtime" ]; then
+floor=$(sed -n 's/.*"nod[e]": *"\([^"]*\)".*/\1/p' package.json \
+    | grep -oE '\b24\.[0-9]+\.[0-9]+' | sort -V | tail -1)
+floor=${floor:-%%{node_floor}}
+if [ "$(printf '%%s\n%s\n' "$floor" "$runtime" | sort -V | tail -1)" = "$runtime" ]; then
     HOME=%{_builddir} %{_bindir}/node-24 scripts/rea.mjs --version
     HOME=%{_builddir} %{_bindir}/node-24 scripts/rea.mjs --help >/dev/null
 else
-    echo "distro nodejs24 $runtime below rea's 24.22.1 floor; skipping smoke run"
+    echo "distro nodejs24 $runtime below rea's $floor floor; skipping smoke run"
 fi
 
 %files

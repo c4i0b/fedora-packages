@@ -10,6 +10,13 @@
   necessarily complete** (regular `dependencies` may be missing) and can
   carry prebuilt arch binaries/wasm that break a noarch payload —
   smoke-run the CLI from the buildroot in `%check` to catch both.
+- JS CLIs may refuse to start below an `engines.node` floor **newer than
+  stable Fedora's nodejs** (the floor may only live in updates-testing).
+  Gate the `%check` smoke run on the buildroot's node version and derive the
+  floor from `package.json` `engines.node` for the wrapped major (fallback
+  to a `%global`), so version bumps don't re-break the build; keep the
+  protective `Requires: nodejsXX >= 1:<floor>` (epoch 1) without a
+  BuildRequires floor (see rea-agents).
 - Tauri source builds (artcraft) need the frontend compiled in `%build`
   before cargo — `npx nx run <app>:build` writes the `frontendDist` the
   tauri-build script embeds — plus `pkgconfig(webkit2gtk-4.1)`, gtk3 and
