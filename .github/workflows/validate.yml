@@ -37,17 +37,14 @@ jobs:
     # rust vendoring + SRPM builds run long; the bound exists for hangs, not
     # for legitimate slow runs
     timeout-minutes: 90
-    # bump the tag at each Fedora release
-    container: registry.fedoraproject.org/fedora:43
+    # pre-baked CI image (Containerfile.ci + ci-image.yml, rebuilt weekly);
+    # the tag major is the oldest stable Fedora — bump it there on EOL
+    container: ghcr.io/c4i0b/fedora-packages-ci:43
     steps:
       - run: echo "job_start=$(date +%s)" >> "$GITHUB_ENV"
-      # dnf on every run is the price of the bare container image; timed so
-      # the [phase-summary] telemetry can flag if it ever becomes the bottleneck
-      - run: |
-          t0=$(date +%s)
-          dnf -y install git make rpmdevtools rpmlint just curl
-          echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
-          echo "t_dnf=$(date +%s)" >> "$GITHUB_ENV"
+      # toolchain is baked into the CI image; the stamp stays so the
+      # phase-summary shape (and its absence as a bottleneck) stays visible
+      - run: echo "dnf=0" >> "$GITHUB_ENV"; echo "t_dnf=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           # full history: the scope step diffs HEAD against the sha of the

@@ -22,14 +22,9 @@ jobs:
   autoupdate:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    container: registry.fedoraproject.org/fedora:43
+    container: ghcr.io/c4i0b/fedora-packages-ci:43
     steps:
-      # dnf on every run is the price of the bare container image; timed so
-      # the telemetry can flag if it ever becomes the bottleneck
-      - run: |
-          t0=$(date +%s)
-          dnf -y install git make rpmdevtools rpmlint just curl
-          echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
+      # toolchain is baked into the CI image
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
