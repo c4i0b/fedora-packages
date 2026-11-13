@@ -16,8 +16,13 @@ BuildRequires:  cargo-rpm-macros
 %global debug_package %{nil}
 
 # Uncomment if the dependency tree pulls aws-lc-sys (rustls/reqwest): its
-# bundled jitterentropy errors on RPM's -O2 (see AGENTS.md)
+# bundled jitterentropy errors on RPM's -O2 (see docs/packaging/rust.md)
 #%global build_cflags %(echo "%{build_cflags}" | sed 's/ *-O2//g')
+
+# Uncomment when the tree outgrows COPR's 5 h timeout (see
+# docs/packaging/rust.md)
+#%global rustflags_codegen_units 16
+#%global rustflags_debuginfo 0
 
 %description
 __SUMMARY__
@@ -28,6 +33,8 @@ __SUMMARY__
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
+# zbus-lockstep resolves ../xml against the vendored "xml" crate otherwise
+[ -d vendor-deps/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor-deps/atspi-common/xml"
 %cargo_build
 
 %install

@@ -32,6 +32,19 @@
   in %build and `install -Dm755 target/release/<crate>` in %install (the
   prep macro symlinks target/release to the rpm profile); `%cargo_install`
   from a member dir demands a local Cargo.lock and dies offline.
+- Heavy Rust trees that outgrow COPR's 5 h timeout: set
+  `%global rustflags_codegen_units 16` + `%global rustflags_debuginfo 0`
+  (see solidcraft/vectorcraft) instead of waiting out a second timeout.
+- Craft-style app ids churn across releases (ai.storyteller.* renames):
+  never hardcode the app id in %files or the .desktop — glob the desktop
+  file and icons instead (see solidcraft).
+- GUI Rust apps: winit/wgpu dlopen their X11/Wayland/Vulkan/Xi/Xrandr
+  client libs, which Rust binaries never auto-Require — list each one;
+  re-check the set on every wgpu major bump.
+- F43's rustc pairs an older backend with a newer stdarch: rten-gemm's
+  avx512 VNNI fast path dies with "intrinsic signature mismatch" —
+  pdfcraft carries a source carve keyed on a comment anchor; re-check
+  which releases need it on each branch.
 - `aws-lc-sys` (common via rustls/reqwest) refuses RPM's `-O2`: drop it with
   `%global build_cflags %(echo "%{build_cflags}" | sed 's/ *-O2//g')` —
   plain `export CFLAGS` gets overridden by the %cargo macros.
