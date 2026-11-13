@@ -14,7 +14,9 @@ names follow it (file name always equals `name:`):
 - (delivery) — none: COPR pulls via webhook on push.
 - `badges` — status-artifact refresh. `just badges` does the same locally
   (README blocks, timestamp and failure table).
-- (auto-merge — not used; no bot PRs).
+- `auto-merge` — Dependabot PRs for Actions updates (pinned SHAs included),
+  YAML-validated, merged after validate's checks (paths-skipped PRs have
+  none and merge immediately).
 
 Generic workflow conventions (pinned SHAs, bash-invoked scripts, timeouts,
 concurrency, push-retry, GITHUB_TOKEN semantics) live in the
