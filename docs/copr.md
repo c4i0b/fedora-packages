@@ -11,6 +11,8 @@ names follow it (file name always equals `name:`):
 
 - `autoupdate` — scheduled version bumps.
 - `validate` — the git-side gate (PR/push): invariants, SRPM pre-flight.
+- `ci-image` — builds and pushes the pre-baked CI container (ghcr) the
+  other jobs run in; weekly rebuild keeps base and packages fresh.
 - (delivery) — none: COPR pulls via webhook on push.
 - `badges` — status-artifact refresh. `just badges` does the same locally
   (README blocks, timestamp and failure table).

@@ -1,0 +1,17 @@
+# Slim CI image for the validate/autoupdate jobs — the six packages the
+# jobs dnf-install today, on the OLDEST stable Fedora (spec macros and
+# %if conditions are validated at the low end: builds on the oldest,
+# builds on the newer). NOT the local tooling container (rawhide + mock/
+# copr-cli): wrong base, wrong weight.
+#
+# Bump the major ONLY when the current oldest stable goes EOL (i.e. when
+# the next Fedora release ships): FROM tag here, the image tag pushed by
+# .github/workflows/ci-image.yml, and the container: refs in validate.yml
+# and autoupdate.yml move together in one commit.
+FROM registry.fedoraproject.org/fedora:43
+
+RUN dnf -y --nodocs --setopt=install_weak_deps=0 install \
+      git make rpmdevtools rpmlint just curl \
+    && dnf -y clean all
+
+WORKDIR /app
