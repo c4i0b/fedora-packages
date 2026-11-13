@@ -28,6 +28,19 @@
 
 ## Specs
 
+- **Fix for the long term.** A fix that only survives until the next
+  autoupdate is unfinished:
+  - repeated constants get one `%global` (zig pin, version floors) — never
+    the same literal twice;
+  - derive what upstream controls when possible (engines floors from
+    `package.json`, zig floors from `build.zig.zon`, globs over hardcoded
+    ids/sonames);
+  - seds and pattern-matched workarounds carry a `grep -q … || exit 1`
+    guard, so drift fails loud at the right line instead of no-oping into a
+    far-away error;
+  - class knowledge goes to `docs/packaging/` or a template — a spec-local
+    comment is a private lesson; and check sibling packages: one member's
+    fix usually applies to the whole family.
 - BuildRequire every package providing the macros you use (pyproject macros,
   rust-packaging, go-vendor-tools...): an undefined macro reaches the shell
   literally and dies as "fg: no job control". Include build backends too

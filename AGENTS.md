@@ -29,6 +29,10 @@ prefer extending a linked doc over growing this file.
   (`skills/diagnose-copr-failure/SKILL.md`). If the same class of failure
   bites twice, encode it as an invariant in `tools/test.sh`, a template, or
   a one-line comment — fix the class, not the instance.
+- Specs and templates are written for the next bump, not the current build:
+  one `%global` per repeated constant, derive what upstream can change,
+  make drift fail loud — see "Fix for the long term" in
+  [conventions](docs/conventions.md).
 - Before adding a package, check it is not in Fedora official or RPM Fusion
   **on the oldest stable release** (not only rawhide) — packages can be
   retired in rawhide while still shipped in stable, and vice versa.
