@@ -13,10 +13,11 @@ permissions:
 jobs:
   badges:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
-      # owners derive from the origin remote + COPR_OWNER (see tools/host.sh)
-      - run: tools/update-badges.sh
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      # `bash <script>` instead of direct exec: immune to a lost +x bit
+      - run: bash tools/update-badges.sh
       # [skip ci] keeps the push from re-triggering validate; badge commits
       # never touch packages/, so the COPR webhook stays quiet too
       - run: |

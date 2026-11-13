@@ -34,6 +34,9 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    # rust vendoring + SRPM builds run long; the bound exists for hangs, not
+    # for legitimate slow runs
+    timeout-minutes: 90
     # bump the tag at each Fedora release
     container: registry.fedoraproject.org/fedora:43
     steps:
@@ -45,7 +48,7 @@ jobs:
           dnf -y install git make rpmdevtools rpmlint just curl
           echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
           echo "t_dnf=$(date +%s)" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           # full history: the scope step diffs HEAD against the sha of the
           # last successful run, which force-pushes can orphan (then: full)

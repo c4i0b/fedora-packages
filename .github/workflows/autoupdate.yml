@@ -19,10 +19,11 @@ jobs:
   autoupdate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
-      - run: .github/scripts/autoupdate.sh
+      # `bash <script>` instead of direct exec: immune to a lost +x bit
+      - run: bash .github/scripts/autoupdate.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # retry once on a lost race (concurrent run pushed first)
