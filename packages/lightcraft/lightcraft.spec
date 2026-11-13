@@ -56,7 +56,11 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 # offline; the binary is already built by the build section
 install -Dm755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
 
-install -Dm644 %{SOURCE2} %{buildroot}%{_datadir}/applications/ai.storyteller.lightcraft.desktop
+# upstream churns its app id between releases (ai.storyteller.* renames,
+# cf. solidcraft): ship whatever desktop file packaging/linux carries
+desktop_file=$(basename packaging/linux/*.desktop)
+install -Dm644 "packaging/linux/$desktop_file" \
+    %{buildroot}%{_datadir}/applications/$desktop_file
 
 # ship whatever sizes upstream provides (they change between releases)
 for icon in assets/app-icon/hicolor/*/apps/*; do
@@ -64,14 +68,14 @@ for icon in assets/app-icon/hicolor/*/apps/*; do
 done
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.lightcraft.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 %files
 %license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/lightcraft
-%{_datadir}/applications/ai.storyteller.lightcraft.desktop
-%{_datadir}/icons/hicolor/*/apps/ai.storyteller.lightcraft.*
+%{_datadir}/applications/*.desktop
+%{_datadir}/icons/hicolor/*/apps/*
 
 %changelog
 * Thu Nov 12 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.21.1-1
