@@ -4,6 +4,21 @@ The GitHub repo is the source of truth: COPR clones it, produces SRPMs via
 `.copr/Makefile` and rebuilds packages through a webhook on every push. There
 is no CI-side building.
 
+## CI workflow roles
+
+The pipeline shape is bump → gate → (builder pulls) → report; workflow
+names follow it (file name always equals `name:`):
+
+- `autoupdate` — scheduled version bumps.
+- `validate` — the git-side gate (PR/push): invariants, SRPM pre-flight.
+- (delivery) — none: COPR pulls via webhook on push.
+- `badges` — status-artifact refresh.
+- (auto-merge — not used; no bot PRs).
+
+Generic workflow conventions (pinned SHAs, bash-invoked scripts, timeouts,
+concurrency, push-retry, GITHUB_TOKEN semantics) live in the
+gh-actions-conventions skill.
+
 ## make_srpm contract
 
 - COPR invokes `make -f .copr/Makefile srpm outdir=... spec=...` with cwd in
