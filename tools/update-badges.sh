@@ -61,9 +61,15 @@ raw = f"{git_raw_base}/{gowner}/{gproject}/main/badges"
 
 BADGE_REV = 2  # bump to force GitHub camo to re-fetch every badge URL
 
+retries = 0
+
 def get(url, tries=3):
     # the results CDN (CloudFront -> packages.redhat.com/S3 redirects) drops
-    # or mis-serves occasional requests; retry with growing backoff
+    # or mis-serves occasional requests; retry with growing backoff. Each
+    # retry is printed (host+path, no cache-buster query) so CDN flakiness
+    # is visible in the run log, not just a silent delay
+    global retries
+    short = re.sub(r"^[a-z]+://", "", url).split("?")[0]
     for attempt in range(tries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "update-badges"})
@@ -72,6 +78,8 @@ def get(url, tries=3):
         except Exception:
             if attempt == tries - 1:
                 raise
+            retries += 1
+            print(f"WARNING: retry {attempt + 1}/{tries} for {short}")
             time.sleep(2 * (attempt + 1))
 
 mon = json.loads(get(
@@ -336,7 +344,7 @@ else:
 if readme != open(rp).read():
     open(rp, "w").write(readme)
 print(f"badges refreshed: {len(chroots)} chroots, {len(packages)} packages, "
-      f"{len(failed)} failing")
+      f"{len(failed)} failing, retries={retries}")
 
 summary = os.environ.get("GITHUB_STEP_SUMMARY")
 if summary:

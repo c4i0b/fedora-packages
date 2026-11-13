@@ -10,7 +10,6 @@ cd "$root"
 # shellcheck source=lib.sh
 source "$root/tools/lib.sh"
 
-srcs_files="$(srcs_find | wc -l)"
 # epoch covers source AND vendor archives plus the .vendor-ok stamps: a new
 # vendor tar (fresh package, bump, toolchain change) must trigger a cache
 # save just like a new source tarball
@@ -21,8 +20,17 @@ srcs_epoch="$(
       -o -name 'zig-pkg.tar.*' -o -name '.vendor-ok' \) -printf '%P %s\n'
   } | sort | sha256sum | cut -c1-12
 )"
+# "epoch" mode: the cache-save key in validate.yml consumes srcs_epoch, so
+# the workflow calls this BEFORE the save; the full phase-summary then runs
+# in a final always() step AFTER it (so `save=` and `total` include the
+# ~77s upload, until now invisible because total was stamped pre-save)
+if [ "${1:-}" = "epoch" ]; then
+  [ -n "${GITHUB_ENV:-}" ] && echo "srcs_epoch=$srcs_epoch" >> "$GITHUB_ENV"
+  exit 0
+fi
+
+srcs_files="$(srcs_find | wc -l)"
 srcs_mb="$(du -sm packages/*/ 2>/dev/null | awk '{s+=$1} END{print s+0}')"
-[ -n "${GITHUB_ENV:-}" ] && echo "srcs_epoch=$srcs_epoch" >> "$GITHUB_ENV"
 
 fields=(
   "scope=${SCOPE:-?}"
@@ -34,13 +42,12 @@ fields=(
   "dnf_toolchain=${dnf_toolchain:-na}"
   "test=${test:-na}"
   "validate=${validate:-na}"
-  "validate_cpu=${validate_cpu:-na}"
-  "vcpu_util=${vcpu_util:-na}"
   "jobs=${jobs:-na}"
   "downloads=${downloads:-na}"
   "vendor_runs=${vendor_runs:-na}"
   "vendor_skips=${vendor_skips:-na}"
   "srcs_cache=${SRCS_CACHE:-na}"
+  "save=${save:-na}"
   "srcs_files=$srcs_files"
   "srcs_mb=$srcs_mb"
   "total=$(( $(date +%s) - ${JOB_START:-$(date +%s)} ))"

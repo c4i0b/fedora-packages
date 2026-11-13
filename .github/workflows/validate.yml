@@ -109,16 +109,15 @@ jobs:
         env:
           FEDORA_PACKAGES_DIRECT: "1"
           KEEP_SOURCES: "1"
+      # epoch-only pass: the cache-save key below consumes srcs_epoch, so it
+      # must be computed before the save while the phase-summary itself moved
+      # after it (see the phase-summary step); t_save0 marks the save start
       - run: |
           just prune-sources
-          bash tools/ci-summary.sh
+          bash tools/ci-summary.sh epoch
+          echo "t_save0=$(date +%s)" >> "$GITHUB_ENV"
         env:
           FEDORA_PACKAGES_DIRECT: "1"
-          SCOPE: ${{ steps.scope.outputs.scope }}
-          REASON: ${{ steps.scope.outputs.reason }}
-          PKGS: ${{ steps.scope.outputs.pkgs }}
-          SRCS_CACHE: ${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }}
-          JOB_START: ${{ env.job_start }}
       # save only when the post-prune content set differs from what was
       # restored (same set = the immutable entry already holds it); volatile
       # "releases/latest" payloads are pruned before this point and never saved
@@ -138,6 +137,20 @@ jobs:
             packages/**/*.zip
             packages/**/.vendor-ok
           key: sources-v4-${{ hashFiles('packages/*/*.spec', 'tools/vendor-sources.py') }}-${{ env.srcs_epoch }}
+      # final always() emission so `save=` (the ~77s cache upload, the
+      # biggest infra cost) and `total` include the save step; runs even on
+      # a red job so failures keep their telemetry
+      - name: phase-summary
+        if: always()
+        run: |
+          echo "save=$(( $(date +%s) - ${t_save0:-$(date +%s)} ))" >> "$GITHUB_ENV"
+          bash tools/ci-summary.sh
+        env:
+          SCOPE: ${{ steps.scope.outputs.scope }}
+          REASON: ${{ steps.scope.outputs.reason }}
+          PKGS: ${{ steps.scope.outputs.pkgs }}
+          SRCS_CACHE: ${{ steps.sources_cache.outputs.cache-matched-key != '' && 'hit' || 'miss' }}
+          JOB_START: ${{ env.job_start }}
       # deterministic quota: drop stale sources-v* entries so the LRU never
       # evicts the live one (two 6GB entries transiently exceed the 10GB cap)
       - run: bash tools/trim-caches.sh

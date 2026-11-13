@@ -12,7 +12,9 @@ jobs:
   automerge:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    # validate on PRs that do trigger checks takes ~4m; 3m raced it. 10m is
+    # still bounded and auto-merge is not latency-sensitive
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 

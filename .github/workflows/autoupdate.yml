@@ -46,9 +46,20 @@ jobs:
       - id: gate
         if: steps.bump.outputs.count > 0
         run: |
+          t0=$(date +%s)
           FEDORA_PACKAGES_DIRECT=1 just test
+          echo "gate_test=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
+          t0=$(date +%s)
           FEDORA_PACKAGES_DIRECT=1 KEEP_SOURCES=1 just validate ${{ steps.bump.outputs.pkgs }}
+          echo "gate_validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
         timeout-minutes: 45
+      # same notice vocabulary as [phase-summary]: gate timings land in the
+      # log even (especially) when the gate itself is what failed
+      - name: gate-summary
+        if: always() && steps.bump.outputs.count > 0
+        run: >
+          echo "::notice::[gate-summary] pkgs=${{ steps.bump.outputs.pkgs }}
+          test=${gate_test:-na} validate=${gate_validate:-na}"
       # ff-only so main receives the exact SHA the gate validated; if main
       # moved during the gate, fail — the next 4h cycle retries (never
       # rebase-and-merge an ungated SHA). Also runs for a keepalive-only
