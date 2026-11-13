@@ -26,6 +26,9 @@
   implies zig's system package mode: install paths change (e.g. systemd
   units to `%{_prefix}/lib/systemd/user`) and upstream build defaults may
   flip (docs, vendored libs) — audit `%files` and build flags accordingly.
+  A `#` comment inside the backslash-continued `zig build` command truncates
+  it at that line — keep prose outside the command. New zig packages start
+  from templates/zig.spec.tpl (zig pin, vendored store, guarded seds).
 - GitHub tag archives omit git submodule contents. vendor-sources.py
   resolves each `.gitmodules` entry via the superproject's GitHub API (tag
   ref → pinned sha), overlays the submodule into the extracted tree and
@@ -51,5 +54,7 @@
   fail on stray paths.
 - Non-GCC toolchains (zig, elvish, …) emit no GNU build-id note, and empty
   debugsource lists break rpm 6.1+ — carry `%global debug_package %{nil}`
-  in those (and all -bin) specs. Add `%global __strip /bin/true` **only**
-  for Bun/Electron payloads (stripping corrupts them).
+  in those (and all -bin) specs. Add `%global __strip /bin/true` for zig
+  builds too (brp-strip chases zig's hardlinked cache .o files under
+  /usr/lib/<hash> that vanish mid-strip) and for Bun/Electron payloads
+  (stripping corrupts them).

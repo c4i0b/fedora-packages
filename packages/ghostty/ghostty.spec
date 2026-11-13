@@ -8,10 +8,12 @@ URL:            https://ghostty.org
 Source0:        https://github.com/ghostty-org/ghostty/archive/refs/tags/v%{version}.tar.gz
 # Upstream ships no GitHub Release for stable tags (only the "tip" prerelease),
 # so Source0 is the codeload archive; the autoupdate bot falls back to tags.
-# zig is not in Fedora; ghostty pins 0.17.x and builds it with the official
-# prebuilt toolchain (one Source per arch, SRPM builder arch is arbitrary).
-Source1:        https://ziglang.org/download/0.17.0/zig-x86_64-linux-0.17.0.tar.xz
-Source2:        https://ziglang.org/download/0.17.0/zig-aarch64-linux-0.17.0.tar.xz
+# zig is not in Fedora; ghostty builds with the official prebuilt toolchain
+# (one Source per arch, SRPM builder arch is arbitrary), pinned once here —
+# vendor-sources.py aborts when upstream's minimum_zig_version outgrows it
+%global zig_version 0.17.0
+Source1:        https://ziglang.org/download/%{zig_version}/zig-x86_64-linux-%{zig_version}.tar.xz
+Source2:        https://ziglang.org/download/%{zig_version}/zig-aarch64-linux-%{zig_version}.tar.xz
 # build.zig.zon dependency closure, pre-fetched at SRPM time into a
 # zig build --system package store (vendor-sources.sh): zig's own downloader
 # fails on the COPR builders
@@ -72,14 +74,24 @@ for libghostty-vt, Ghostty's standalone terminal emulation library.
 %if 0%{?rhel}
 # EPEL's harfbuzz (8.4) predates HB_BUFFER_CLUSTER_LEVEL_GRAPHEMES; it equals
 # CHARACTERS+1 in the newer harfbuzz the vendored binding links against
+grep -q 'c\.HB_BUFFER_CLUSTER_LEVEL_GRAPHEMES' pkg/harfbuzz/buffer.zig \
+  || { echo 'pattern drifted: harfbuzz GRAPHEMES cluster level' >&2; exit 1; }
 sed -i 's/c\.HB_BUFFER_CLUSTER_LEVEL_GRAPHEMES/c.HB_BUFFER_CLUSTER_LEVEL_CHARACTERS + 1/' pkg/harfbuzz/buffer.zig
 %endif
 %if 0%{?rhel} || 0%{?fedora} < 44
 # Upstream's version floors are its support policy, not compile requirements;
 # EL10 has adw 1.6/blueprint 0.19/gtk 4.16, f43 blueprint 0.18 — all compile
+grep -q '\.minor = 7,' src/apprt/gtk/build/gresource.zig \
+  || { echo 'pattern drifted: libadwaita floor (gresource)' >&2; exit 1; }
 sed -i 's/\.minor = 7,/.minor = 6,/' src/apprt/gtk/build/gresource.zig
+grep -q '\.minor = 20,' src/apprt/gtk/build/blueprint.zig \
+  || { echo 'pattern drifted: blueprint floor' >&2; exit 1; }
 sed -i 's/\.minor = 20,/.minor = 18,/' src/apprt/gtk/build/blueprint.zig
+grep -q '\.minor = 7,' src/apprt/gtk/adw_version.zig \
+  || { echo 'pattern drifted: libadwaita floor (adw_version)' >&2; exit 1; }
 sed -i 's/\.minor = 7,/.minor = 6,/' src/apprt/gtk/adw_version.zig
+grep -q '\.minor = 18,' src/apprt/gtk/gtk_version.zig \
+  || { echo 'pattern drifted: gtk4 floor' >&2; exit 1; }
 sed -i 's/\.minor = 18,/.minor = 16,/' src/apprt/gtk/gtk_version.zig
 %endif
 %ifarch x86_64
@@ -91,9 +103,9 @@ tar --zstd -xf %{SOURCE3}
 
 %install
 %ifarch x86_64
-export PATH="$PWD/zig-x86_64-linux-0.17.0:$PATH"
+export PATH="$PWD/zig-x86_64-linux-%{zig_version}:$PATH"
 %else
-export PATH="$PWD/zig-aarch64-linux-0.17.0:$PATH"
+export PATH="$PWD/zig-aarch64-linux-%{zig_version}:$PATH"
 %endif
 # Link the system fontconfig/freetype/harfbuzz rather than letting zig vendor
 # them: without -fsys= the executable would interpose its own copies over the
@@ -127,6 +139,8 @@ DESTDIR=%{buildroot} zig build \
     %endif
 
 # zig bakes DESTDIR into the pc files' prefix; check-buildroot aborts
+grep -q '^prefix=' %{buildroot}%{_datadir}/pkgconfig/libghostty-vt*.pc \
+  || { echo 'pattern drifted: pc prefix' >&2; exit 1; }
 sed -i 's@^prefix=.*@prefix=%{_prefix}@' \
     %{buildroot}%{_datadir}/pkgconfig/libghostty-vt*.pc
 # static artifacts shipped nowhere: drop them
@@ -188,9 +202,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_prefix}/lib \
 %{_datadir}/metainfo/com.mitchellh.ghostty.metainfo.xml
 # --system (system package mode) installs the unit to /usr/lib/systemd/user
 %{_prefix}/lib/systemd/user/app-com.mitchellh.ghostty.service
-# zig installs libraries into /usr/lib regardless of the arch-specific libdir
-%{_prefix}/lib/libghostty-vt.so.0
-%{_prefix}/lib/libghostty-vt.so.0.1.0
+# zig installs libraries into /usr/lib regardless of the arch-specific libdir;
+# glob tolerates soname bumps, the dev symlink (.so, no digit) is in -devel
+%{_prefix}/lib/libghostty-vt.so.0*
 # EPEL: zig builds its own layer-shell (no gtk4-layer-shell-devel there)
 %if 0%{?rhel}
 %{_prefix}/lib/libgtk4-layer-shell.so*
