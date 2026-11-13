@@ -17,4 +17,5 @@ maintained truth, `reference` stable background.
   [general](packaging/general.md) ·
   [python](packaging/python.md) ·
   [rust](packaging/rust.md) ·
-  [npm](packaging/npm.md)
+  [npm](packaging/npm.md) ·
+  [dotnet](packaging/dotnet.md)

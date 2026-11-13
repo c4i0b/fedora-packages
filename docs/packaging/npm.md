@@ -3,13 +3,18 @@
 - Yargs CLIs without a `completion` command still answer
   `--get-yargs-completions`: ship the canonical yargs bash shim (candidates
   come from the binary; never hand-write them) and smoke it in `%check`
-  (see devcontainers-cli). Only yargs — openclaw/rea-agents style custom
-  arg parsers have nothing to generate.
+  (see devcontainers-cli) — compare the smoke output only after
+  `tr '\n' ' '`, since `$(...)` keeps newlines while the expected string is
+  space-separated (devcontainers-cli bd7d07c). Only yargs — openclaw/
+  rea-agents style custom arg parsers have nothing to generate.
 - Apps may ship no GitHub Releases: the `upstream` file supports
   `npm:<package>` tracking. A bundled-`node_modules` tarball is **not
   necessarily complete** (regular `dependencies` may be missing) and can
   carry prebuilt arch binaries/wasm that break a noarch payload —
-  smoke-run the CLI from the buildroot in `%check` to catch both.
+  smoke-run the CLI from the buildroot in `%check` to catch both. For the
+  build-time dependency install, start from the openclaw/rea-agents flag
+  set (`--omit=dev --ignore-scripts`, plus `--legacy-peer-deps` where
+  peers conflict) and comment every deviation from it.
 - JS CLIs may refuse to start below an `engines.node` floor **newer than
   stable Fedora's nodejs** (the floor may only live in updates-testing).
   Gate the `%check` smoke run on the buildroot's node version and derive the
