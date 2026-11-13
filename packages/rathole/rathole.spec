@@ -10,6 +10,8 @@ Source1:        vendor.tar.zst
 
 # time 0.3.31 predates rustc's stricter type inference (E0282); bump within 0.3.x
 # cargo-update: -p time
+# openssl-sys < 0.9.114 rejects OpenSSL 4 (rawhide/f45); bump within 0.9.x/0.10.x
+# cargo-update: -p openssl-sys -p openssl
 
 BuildRequires:  cargo-rpm-macros
 BuildRequires:  openssl-devel
