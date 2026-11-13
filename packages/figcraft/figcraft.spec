@@ -7,7 +7,6 @@ License:        MIT OR Apache-2.0
 URL:            https://github.com/storytold/figcraft
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 Source1:        vendor.tar.zst
-Source2:        %{name}.desktop
 
 BuildRequires:  cargo-rpm-macros
 BuildRequires:  gcc
