@@ -310,10 +310,34 @@ def _fetch_zig_url(url, dest):
         tmp.unlink()
 
 
-def fetch_zig_closure(src_tree):
+def _zig_ver(s):
+    n = [int(p) for p in s.split("-")[0].split(".")]
+    return (n + [0, 0, 0])[:3]
+
+
+def check_zig_floor(src_tree, spec, spec_text):
+    """The root build.zig.zon's minimum_zig_version is a hard floor; a spec
+    pinning an older zig dies much later with cryptic compiler errors —
+    abort here, naming the pin to bump."""
+    zon = Path(src_tree) / "build.zig.zon"
+    if not zon.is_file():
+        return
+    m = re.search(r'\.minimum_zig_version\s*=\s*"([0-9][0-9.\-]*)',
+                  zon.read_text(errors="replace"))
+    pin = re.search(r"^%global\s+zig_version\s+(\S+)", spec_text, re.M) \
+        or re.search(r"ziglang\.org/download/([0-9][0-9.]*)", spec_text)
+    if not (m and pin):
+        return
+    if _zig_ver(m.group(1)) > _zig_ver(pin.group(1)):
+        die(f"{spec.name}: upstream requires zig >= {m.group(1)} but the spec "
+            f"pins {pin.group(1)} — bump the zig_version %global / Source URLs")
+
+
+def fetch_zig_closure(src_tree, spec, spec_text):
     """Prefetch the build.zig.zon dependency closure into a `zig build
     --system` package store (zig-pkg.tar.zst in the cwd): zig's own http
     client is unreliable on some builders."""
+    check_zig_floor(src_tree, spec, spec_text)
     missing = [b for b in ("git", "tar", "zstd") if shutil.which(b) is None]
     if missing:
         dnf_install(["git-core", "zstd", "tar"])
@@ -519,7 +543,7 @@ def vendor_cargo(spec, spec_text):
     # zig closure for cargo trees whose (sub)builds invoke zig (herdr's
     # ghostty-sys); the spec opts in via a zig-pkg.tar Source
     if ZIGSRC.search(spec_text):
-        fetch_zig_closure(d)
+        fetch_zig_closure(d, spec, spec_text)
     # the workspace may live in a subdirectory (openai/codex keeps it in
     # codex-rs/)
     ws = d
@@ -569,7 +593,7 @@ def vendor_zig(spec):
     d = extract_source0(src_file)
     check_prep_topdir(spec, d if d != Path(".") else None)
     fetch_submodules(d, url)
-    fetch_zig_closure(d)
+    fetch_zig_closure(d, spec, spec.read_text())
     if d != Path("."):
         shutil.rmtree(d, ignore_errors=True)
     return "zig-pkg.tar.zst"
