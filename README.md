@@ -166,7 +166,7 @@ upstream release
                      COPR webhook rebuilds the
                      touched packages server-side
                                  │
-                                 ▼  ~1h15 after the bump
+                                 ▼  ~1h20 after the bump
                      badges refresh (README + badges/*.json)
 ```
 

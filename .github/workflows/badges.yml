@@ -1,7 +1,7 @@
 name: badges
 
 on:
-  # ~1h15 after each autoupdate slot, when most COPR builds have finished;
+  # ~1h20 after each autoupdate slot (23 x 1-21/4), matching opensuse-packages;
   # in-flight ones show yellow with the last published version
   schedule:
     - cron: "41 2,6,10,14,18,22 * * *"
