@@ -160,8 +160,9 @@ upstream release
        │
        ▼  every 4h, per packages/<name>/upstream
 ┌───────────┐   bump Version/Release/changelog
-│ autoupdate│──────────────▶ commit to main
-└───────────┘                    │  touches packages/<name>/
+│ autoupdate│──────────────▶ main, after the in-job
+└───────────┘               gate (just test + validate)
+                                 │  touches packages/<name>/
                                  ▼
                      COPR webhook rebuilds the
                      touched packages server-side
