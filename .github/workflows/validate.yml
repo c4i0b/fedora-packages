@@ -73,7 +73,7 @@ jobs:
       # filtering re-packs them): its hash is part of the key so a recipe
       # change can never be served a tarball repacked by an older one (a
       # stale one poisoned soundcraft's vendor step with cargo exit 101).
-      - uses: actions/cache/restore@v5
+      - uses: actions/cache/restore@v6
         id: sources_cache
         with:
           path: |
@@ -122,7 +122,7 @@ jobs:
       # is pure overhead — the next full run folds it in (it re-downloads the
       # few new tarballs, so a slightly-high downloads counter there is
       # expected, not a prune/cache bug)
-      - uses: actions/cache/save@v5
+      - uses: actions/cache/save@v6
         if: steps.scope.outputs.scope == 'full' && steps.sources_cache.outputs.cache-matched-key != format('sources-v4-{0}-{1}', hashFiles('packages/*/*.spec', 'tools/vendor-sources.py'), env.srcs_epoch)
         with:
           # must stay IDENTICAL to the restore step's paths: the cache
