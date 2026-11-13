@@ -1,5 +1,9 @@
 # Packaging quirks — general
 
+- rpm does not expand macros in `Source:` files: ship wrapper scripts with
+  literal paths, or (preferred) generate them via heredoc in `%install`
+  where macros do expand (quiver-launcher 7d9b494 vs the
+  devcontainers-cli/openclaw pattern).
 - `CFLAGS=...` on the make command line overrides every `+=` append in the
   Makefiles (breaking upstream feature detection): `export CFLAGS=...`
   before `%make_build` instead.
