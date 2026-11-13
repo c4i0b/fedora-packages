@@ -5,6 +5,9 @@ Version:        5.8.2
 
 %bcond_with check
 
+# toolchain fetched via GOTOOLCHAIN=auto yields no debuginfo
+%global debug_package %{nil}
+
 Name:           dnscontrol
 Release:        1%{?dist}
 Summary:        Compiler and DSL for managing DNS zones across providers
