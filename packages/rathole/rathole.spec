@@ -8,6 +8,9 @@ URL:            https://github.com/rapiz1/rathole
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 Source1:        vendor.tar.zst
 
+# time 0.3.31 predates rustc's stricter type inference (E0282); bump within 0.3.x
+# cargo-update: -p time
+
 BuildRequires:  cargo-rpm-macros
 BuildRequires:  openssl-devel
 

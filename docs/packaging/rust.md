@@ -5,8 +5,11 @@
   prefer the crate's `vendored-openssl` feature (`perl` + `perl-FindBin`)
   over patching version checks.
 - Stale Cargo.lock pins breaking on new rustc (E0282 "type annotations
-  needed" & friends): `cargo update -p <crate>` in %prep (builds run with
-  network).
+  needed" & friends): add a `# cargo-update: -p <crate>` comment to the
+  spec — vendor-sources.py runs it before vendoring, so the fresh crate
+  and the updated lock both land in the SRPM (a plain `cargo update` in
+  %prep cannot work for vendored builds: the new version is not in
+  vendor.tar.zst). wezterm (unvendored) does the %prep equivalent.
 - Newer rustc denies old idioms outright (never-type-fallback via mlua's
   untyped `.eval()` etc): `export RUSTFLAGS="-A <lint-name>"` in %build
   rather than patching vintage code.

@@ -21,6 +21,9 @@ from pathlib import Path
 
 GO = re.compile(r"^%goprep|^go-vendor-tools", re.M)
 CARGO = re.compile(r"^%cargo_prep", re.M)
+# spec comment: `# cargo-update: -p <crate>` — stale lock pins bumped at
+# vendor time so the fresh crate lands in vendor.tar.zst (E0282 class)
+CARGO_UPDATE = re.compile(r"^#\s*cargo-update:\s*(.+?)\s*$", re.M)
 ZIGSRC = re.compile(r"^Source[0-9]*:.*zig-pkg\.tar", re.M)
 ZON_RE = re.compile(
     r'\.url\s*=\s*"((?:git\+)?https://[^"]+)",\s*\n\s*\.hash\s*=\s*"([^"]+)"')
@@ -565,6 +568,9 @@ def vendor_cargo(spec, spec_text):
                 ws = sub
                 break
     ws = ws.resolve()
+    for upd in CARGO_UPDATE.findall(spec_text):
+        subprocess.run(["cargo", "update"] + upd.split(), cwd=ws, check=True)
+        changed = True
     # vendor into a fresh dir name: some trees already carry a "vendor" dir
     r = subprocess.run(["cargo", "vendor", "--locked", "vendor-deps"],
                        cwd=ws, capture_output=True, text=True)
