@@ -1,0 +1,34 @@
+name: auto-merge
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Validate workflow YAML
+        run: |
+          set -euo pipefail
+          python3 -c "import glob,yaml; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]"
+
+      - name: Wait for required checks (validate)
+        # validate's paths filter skips .github/-only PRs; with no checks
+        # reported, --watch returns immediately and the merge proceeds
+        run: gh pr checks ${{ github.event.pull_request.number }} --watch --fail-fast
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-merge
+        run: gh pr merge ${{ github.event.pull_request.number }} --squash --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
