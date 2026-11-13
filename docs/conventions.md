@@ -61,7 +61,10 @@
 ## Repo hygiene
 
 - Never commit archives (`*.tgz`, `*.tar.gz` gitignored) — sources are
-  downloaded at build time.
+  downloaded at build time. `just prune-sources` drops untracked
+  unreferenced files from package dirs (bounds the CI sources cache);
+  `just prune-builds` deletes old COPR builds, keeping only the newest per
+  package (dry-run by default).
 - Never add Epoch (see [autoupdate.md](autoupdate.md) for overrides).
 - Squash/amend + force-push to `main` is acceptable; keep a small clean
   history.

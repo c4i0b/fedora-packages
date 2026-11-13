@@ -12,12 +12,14 @@ names follow it (file name always equals `name:`):
 - `autoupdate` — scheduled version bumps.
 - `validate` — the git-side gate (PR/push): invariants, SRPM pre-flight.
 - (delivery) — none: COPR pulls via webhook on push.
-- `badges` — status-artifact refresh.
+- `badges` — status-artifact refresh. `just badges` does the same locally
+  (README blocks, timestamp and failure table).
 - (auto-merge — not used; no bot PRs).
 
 Generic workflow conventions (pinned SHAs, bash-invoked scripts, timeouts,
 concurrency, push-retry, GITHUB_TOKEN semantics) live in the
-gh-actions-conventions skill.
+gh-actions-conventions skill. `just analyze-logs [workflow] [days] [pattern]`
+digests CI log telemetry (rate summaries) from recent runs.
 
 ## make_srpm contract
 
