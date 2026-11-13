@@ -13,6 +13,9 @@ names follow it (file name always equals `name:`):
 - `validate` — the git-side gate (PR/push): invariants, SRPM pre-flight.
 - `ci-image` — builds and pushes the pre-baked CI container (ghcr) the
   other jobs run in; weekly rebuild keeps base and packages fresh.
+  Bootstrap note: the first publish ends with one manual step — flip the
+  package to public in its settings (the CI token can push but cannot
+  change visibility, and job `container:` pulls carry no token).
 - (delivery) — none: COPR pulls via webhook on push.
 - `badges` — status-artifact refresh. `just badges` does the same locally
   (README blocks, timestamp and failure table).
