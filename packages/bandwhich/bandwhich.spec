@@ -29,8 +29,10 @@ remote address. Requires root at runtime.
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
-# build.rs writes manpage and shell completions here (OUT_DIR is a moving target)
+# build.rs writes manpage and shell completions here (OUT_DIR is a moving
+# target); it never mkdirs the dir itself
 export BANDWHICH_GEN_DIR="${PWD}/gen"
+mkdir -p "${BANDWHICH_GEN_DIR}"
 %cargo_build
 
 %install
