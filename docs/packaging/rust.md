@@ -35,6 +35,10 @@
 - Heavy Rust trees that outgrow COPR's 5 h timeout: set
   `%global rustflags_codegen_units 16` + `%global rustflags_debuginfo 0`
   (see solidcraft/vectorcraft) instead of waiting out a second timeout.
+  The cargo profile settings live in the config %cargo_prep writes:
+  env `CARGO_PROFILE_RPM_*` outranks it, plain RUSTFLAGS does not (mise
+  history, 6817333) — the %globals are the idiom because %cargo_prep
+  expands them straight into [profile.rpm].
 - Craft-style app ids churn across releases (ai.storyteller.* renames):
   never hardcode the app id in %files or the .desktop — glob the desktop
   file and icons instead (see solidcraft).
