@@ -8,6 +8,13 @@ git config --global --add safe.directory "$root"
 git -C "$root" config user.name "github-actions[bot]"
 git -C "$root" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+# gate-in-job (gh-actions-conventions rule 11): a GITHUB_TOKEN push to main
+# skips every GitHub-side workflow yet still fires the COPR webhook, so bumps
+# commit to a branch; the workflow gates it there and merges the exact gated
+# SHA into main (ff-only)
+branch="bump/$(date -u +%Y%m%d-%H%M)"
+git -C "$root" checkout -b "$branch"
+
 # fetches are network-bound: resolve all latest versions in parallel, then
 # apply bumps serially so git commits never race
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
@@ -143,6 +150,8 @@ find "$root/packages" -name upstream -maxdepth 2 \
 
 packages="$(mktemp)"
 bumped=0
+bumped_pkgs=""
+keepalive=0
 for f in "$resolved"/*; do
   [ -f "$f" ] || continue
   cat "$f"
@@ -185,6 +194,7 @@ while IFS=$'\t' read -r _ pkg latest; do
   git -C "$root" add "packages/$pkg"
   git -C "$root" commit -m "chore($pkg): update to $latest"
   bumped=$((bumped + 1))
+  bumped_pkgs="${bumped_pkgs:+$bumped_pkgs }$pkg"
   printf '| %s | %s | %s |\n' "$pkg" "$current" "$latest_rpm" >> "$bumps"
   git -C "$root" tag -f "$pkg/$latest"
 done < "$packages"
@@ -195,6 +205,7 @@ last_commit="$(git -C "$root" log -1 --format=%ct)"
 now="$(date +%s)"
 if [ $((now - last_commit)) -gt $((45 * 86400)) ]; then
   git -C "$root" commit --allow-empty -qm "chore: keepalive"
+  keepalive=1
 fi
 
 packages_total="$(find "$root/packages" -name upstream -maxdepth 2 | wc -l)"
@@ -209,6 +220,23 @@ wall=$(( $(date +%s) - job_start ))
 # resolves them), so it gets its own bucket instead of polluting "other"
 summary="packages=$packages_total bumped=$bumped requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
 echo "::notice::[rate-summary] $summary"
+
+if [ $((bumped + keepalive)) -gt 0 ]; then
+  # retry once on a lost race (concurrent run pushed first); if the rebase
+  # moves commits that is fine — the gate runs after, on the final HEAD
+  git -C "$root" push origin "$branch" \
+    || (sleep 15; git -C "$root" pull --rebase origin main && git -C "$root" push origin "$branch")
+fi
+
+if [ -n "${GITHUB_OUTPUT:-}" ]; then
+  {
+    echo "branch=$branch"
+    echo "sha=$(git -C "$root" rev-parse HEAD)"
+    echo "pkgs=$bumped_pkgs"
+    echo "count=$bumped"
+    echo "keepalive=$keepalive"
+  } >> "$GITHUB_OUTPUT"
+fi
 
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   {

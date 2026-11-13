@@ -40,7 +40,9 @@ digests CI log telemetry (rate summaries) from recent runs.
 - A push rebuilds a package **only if the commit touches files under its
   `packages/<name>/` directory**. Empty commits trigger nothing.
 - Pushes made with GITHUB_TOKEN trigger the COPR webhook but do NOT
-  re-trigger GitHub Actions workflows.
+  re-trigger GitHub Actions workflows — a direct bot push to main skips
+  every GitHub-side gate yet still delivers, so autoupdate gates in-job
+  and merges the exact gated SHA (gh-actions-conventions rule 11).
 - Webhook is push events only, `application/json`, obtained from COPR
   Settings → Integrations.
 

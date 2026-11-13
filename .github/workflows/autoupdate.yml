@@ -14,17 +14,44 @@ concurrency:
   group: autoupdate
   cancel-in-progress: true
 
-# no container: bump falls back to python when rpmdev-bumpspec is missing
+# fedora container (not ubuntu): bumps must pass the same gate as validate
+# (just test / just validate) in-job before reaching main — a GITHUB_TOKEN
+# push to main fires the COPR webhook while skipping every GitHub-side
+# workflow, so the gate has to run here (gh-actions-conventions rule 11)
 jobs:
   autoupdate:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container: registry.fedoraproject.org/fedora:43
     steps:
+      # dnf on every run is the price of the bare container image; timed so
+      # the telemetry can flag if it ever becomes the bottleneck
+      - run: |
+          t0=$(date +%s)
+          dnf -y install git make rpmdevtools rpmlint just curl
+          echo "dnf=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
-      # `bash <script>` instead of direct exec: immune to a lost +x bit
-      - run: bash .github/scripts/autoupdate.sh
+      # `bash <script>` instead of direct exec: immune to a lost +x bit.
+      # Commits to a bump/<ts> branch and pushes only that branch — main is
+      # never pushed here.
+      - id: bump
+        run: bash .github/scripts/autoupdate.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # retry once on a lost race (concurrent run pushed first)
-      - run: git push --follow-tags origin main || (sleep 15; git pull --rebase origin main && git push --follow-tags origin main)
+      # the gate: catches what a red PR would have (rea-agents %check,
+      # pdfcraft vendoring) before the COPR webhook spends builds on it;
+      # a red gate fails the run, the branch stays for inspection
+      - id: gate
+        if: steps.bump.outputs.count > 0
+        run: |
+          FEDORA_PACKAGES_DIRECT=1 just test
+          FEDORA_PACKAGES_DIRECT=1 KEEP_SOURCES=1 just validate ${{ steps.bump.outputs.pkgs }}
+        timeout-minutes: 45
+      # ff-only so main receives the exact SHA the gate validated; if main
+      # moved during the gate, fail — the next 4h cycle retries (never
+      # rebase-and-merge an ungated SHA). Also runs for a keepalive-only
+      # commit (gate skipped: it touches no packages).
+      - if: steps.gate.conclusion != 'failure' && (steps.bump.outputs.count > 0 || steps.bump.outputs.keepalive == '1')
+        run: bash .github/scripts/autoupdate-merge.sh "${{ steps.bump.outputs.branch }}" "${{ steps.bump.outputs.sha }}"
