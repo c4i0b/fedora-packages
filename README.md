@@ -153,6 +153,23 @@ sudo dnf install <package>
 
 ## How it works
 
+### Automatic updates
+
+```
+upstream release
+       │
+       ▼  every 4h, per packages/<name>/upstream
+┌───────────┐   bump Version/Release/changelog
+│ autoupdate│──────────────▶ commit to main
+└───────────┘                    │  touches packages/<name>/
+                                 ▼
+                     COPR webhook rebuilds the
+                     touched packages server-side
+                                 │
+                                 ▼  ~1h15 after the bump
+                     badges refresh (README + badges/*.json)
+```
+
 - Each package lives in `packages/<name>/` with its spec file.
 - COPR produces the SRPMs server-side (`.copr/Makefile` contract) and pushes
   to `main` rebuild the affected packages through a webhook.
