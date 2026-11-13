@@ -32,6 +32,8 @@ tar -xf %{S:1}
 
 %build
 %global gomodulesmode GO111MODULE=on
+# f43/f44 ship go 1.26 while go.mod requires 1.27; fetch the toolchain at build time (network is on)
+export GOTOOLCHAIN=auto
 %gobuild -o %{gobuilddir}/bin/dnscontrol -ldflags "-X 'github.com/DNSControl/dnscontrol/v5/pkg/version.version=%{version}'" %{goipath}
 
 %install
