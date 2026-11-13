@@ -316,20 +316,32 @@ def _zig_ver(s):
 
 
 def check_zig_floor(src_tree, spec, spec_text):
-    """The root build.zig.zon's minimum_zig_version is a hard floor; a spec
-    pinning an older zig dies much later with cryptic compiler errors —
-    abort here, naming the pin to bump."""
+    """The build.zig.zon minimum_zig_version is a hard floor; a spec pinning
+    an older zig dies much later with cryptic compiler errors — abort here,
+    naming the pin to bump. Cargo trees with an embedded zig build (herdr's
+    vendored ghostty) carry no root zon: fall back to every zon in the
+    source tree (the tree-mode scan zon_urls uses) and enforce the highest
+    floor found."""
     zon = Path(src_tree) / "build.zig.zon"
-    if not zon.is_file():
-        return
-    m = re.search(r'\.minimum_zig_version\s*=\s*"([0-9][0-9.\-]*)',
-                  zon.read_text(errors="replace"))
+    if zon.is_file():
+        zons = [zon]
+    else:
+        zons = [p for p in Path(src_tree).rglob("build.zig.zon")
+                if "zig-pkg" not in p.parts]
+    floor = None
+    for z in zons:
+        if not z.is_file():
+            continue
+        m = re.search(r'\.minimum_zig_version\s*=\s*"([0-9][0-9.\-]*)',
+                      z.read_text(errors="replace"))
+        if m and (floor is None or _zig_ver(m.group(1)) > _zig_ver(floor)):
+            floor = m.group(1)
     pin = re.search(r"^%global\s+zig_version\s+(\S+)", spec_text, re.M) \
         or re.search(r"ziglang\.org/download/([0-9][0-9.]*)", spec_text)
-    if not (m and pin):
+    if not (floor and pin):
         return
-    if _zig_ver(m.group(1)) > _zig_ver(pin.group(1)):
-        die(f"{spec.name}: upstream requires zig >= {m.group(1)} but the spec "
+    if _zig_ver(floor) > _zig_ver(pin.group(1)):
+        die(f"{spec.name}: upstream requires zig >= {floor} but the spec "
             f"pins {pin.group(1)} — bump the zig_version %global / Source URLs")
 
 

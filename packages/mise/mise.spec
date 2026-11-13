@@ -18,6 +18,12 @@ BuildRequires:  openssl-devel
 # debugsource trips brp-mangle-shebangs on vendored crate inner attrs
 %global debug_package %{nil}
 
+# nil debug_package + huge workspace: the rpm profile's debuginfo and single
+# codegen unit blow past the COPR timeout on 2-vCPU builders; the cargo_prep
+# macro bakes both into the [profile.rpm] config it writes
+%global rustflags_debuginfo 0
+%global rustflags_codegen_units 16
+
 %description
 Mise manages runtime and tool versions per project, directory or globally:
 node, python, go, terraform and hundreds of other tools, plus environment
@@ -30,12 +36,6 @@ and friends.
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
-# nil debug_package + huge workspace: the rpm profile's debuginfo and single
-# codegen unit blow past the COPR timeout on 2-vCPU builders; the settings
-# live in the cargo config the prep macro writes (not RUSTFLAGS), so override
-# via env, which outranks cargo config
-export CARGO_PROFILE_RPM_DEBUG=0
-export CARGO_PROFILE_RPM_CODEGEN_UNITS=16
 %cargo_build
 
 %install

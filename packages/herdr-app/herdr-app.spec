@@ -7,10 +7,12 @@ License:        Apache-2.0
 URL:            https://github.com/herdrdev/herdr-app
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 Source1:        vendor.tar.zst
-# zig is not in Fedora; the vendored ghostty-sys (terminal core) pins 0.16.
-# One Source per arch: the SRPM builder chroot has an arbitrary architecture.
-Source2:        https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz
-Source3:        https://ziglang.org/download/0.16.0/zig-aarch64-linux-0.16.0.tar.xz
+# zig is not in Fedora; the vendored ghostty-sys (terminal core) builds with
+# the official prebuilt toolchain (one Source per arch, SRPM builder arch is
+# arbitrary), pinned once here
+%global zig_version 0.16.0
+Source2:        https://ziglang.org/download/%{zig_version}/zig-x86_64-linux-%{zig_version}.tar.xz
+Source3:        https://ziglang.org/download/%{zig_version}/zig-aarch64-linux-%{zig_version}.tar.xz
 # ghostty's build.zig.zon closure, served to the embedded zig build via
 # --system: zig's own http client fails on COPR builders (vendor-sources.sh)
 Source4:        zig-pkg.tar.zst
@@ -47,10 +49,10 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 tar --zstd -xf %{SOURCE4}
 %ifarch x86_64
 tar -xJf %{SOURCE2}
-zigbin="$PWD/zig-x86_64-linux-0.16.0/zig"
+zigbin="$PWD/zig-x86_64-linux-%{zig_version}/zig"
 %else
 tar -xJf %{SOURCE3}
-zigbin="$PWD/zig-aarch64-linux-0.16.0/zig"
+zigbin="$PWD/zig-aarch64-linux-%{zig_version}/zig"
 %endif
 # ghostty-sys shells out to `zig build` itself; the shim serves its zon
 # closure from the prefetched --system store instead of zig's downloader
