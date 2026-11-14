@@ -12,5 +12,9 @@
   (the popular one is ToS-blocked and breaks workflows).
 - Renovate was evaluated and rejected — do not reintroduce without
   discussion.
+- One push per bump: the COPR webhook fires on pushes of any ref, so the
+  bump branch is never pushed pre-gate (the workflow publishes it only
+  when the gate fails, for inspection). Pushing it would build every
+  bumped package twice (branch push + merge push).
 - To skip or downgrade a release: never add Epoch; push a commit message
   `autoupdate: override <version>` on the package (the bot respects it).

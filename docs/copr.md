@@ -44,6 +44,10 @@ digests CI log telemetry (rate summaries) from recent runs.
 
 - A push rebuilds a package **only if the commit touches files under its
   `packages/<name>/` directory**. Empty commits trigger nothing.
+- The webhook reacts to push events on **any ref** — a push of a side
+  branch that touches packages builds them too. Deliverable pushes must
+  touch `packages/` exactly once (that is why autoupdate keeps its bump
+  branch local and pushes only the ff-merge to main).
 - Pushes made with GITHUB_TOKEN trigger the COPR webhook but do NOT
   re-trigger GitHub Actions workflows — a direct bot push to main skips
   every GitHub-side gate yet still delivers, so autoupdate gates in-job

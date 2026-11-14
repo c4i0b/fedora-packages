@@ -221,12 +221,10 @@ wall=$(( $(date +%s) - job_start ))
 summary="packages=$packages_total bumped=$bumped requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
 echo "::notice::[rate-summary] $summary"
 
-if [ $((bumped + keepalive)) -gt 0 ]; then
-  # retry once on a lost race (concurrent run pushed first); if the rebase
-  # moves commits that is fine — the gate runs after, on the final HEAD
-  git -C "$root" push origin "$branch" \
-    || (sleep 15; git -C "$root" pull --rebase origin main && git -C "$root" push origin "$branch")
-fi
+# The branch stays local: pushing it here would fire the COPR webhook on a
+# non-main ref (it reacts to push events on any branch) and build every
+# bumped package twice — once here, again on the merge push. The workflow
+# pushes the branch for inspection only when the gate fails.
 
 if [ -n "${GITHUB_OUTPUT:-}" ]; then
   {

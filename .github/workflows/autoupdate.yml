@@ -29,8 +29,9 @@ jobs:
         with:
           fetch-depth: 0
       # `bash <script>` instead of direct exec: immune to a lost +x bit.
-      # Commits to a bump/<ts> branch and pushes only that branch — main is
-      # never pushed here.
+      # Commits to a local bump/<ts> branch and pushes nothing — the gate
+      # runs in-job, then the workflow merges to main (one push = one COPR
+      # build per package; the branch is pushed only on gate failure).
       - id: bump
         run: bash .github/scripts/autoupdate.sh
         env:
@@ -48,6 +49,12 @@ jobs:
           FEDORA_PACKAGES_DIRECT=1 KEEP_SOURCES=1 just validate ${{ steps.bump.outputs.pkgs }}
           echo "gate_validate=$(( $(date +%s) - t0 ))" >> "$GITHUB_ENV"
         timeout-minutes: 45
+      # the bump branch is only pushed when the gate fails (inspection);
+      # pushing it on success would fire the COPR webhook on a non-main ref
+      # and duplicate every build (branch push + merge push)
+      - name: Publish failed gate branch
+        if: failure() && steps.bump.outputs.count > 0
+        run: git push origin "${{ steps.bump.outputs.branch }}"
       # same notice vocabulary as [phase-summary]: gate timings land in the
       # log even (especially) when the gate itself is what failed
       - name: gate-summary
