@@ -23,7 +23,7 @@ if [ "$(git -C "$root" rev-parse "$sha^{commit}")" = "$(git -C "$root" rev-parse
 fi
 
 if ! git -C "$root" merge-base --is-ancestor origin/main "$sha"; then
-  echo "::error::origin/main moved during the gate; ff-only to $sha is impossible. The next autoupdate cycle retries — refusing to rebase-and-merge an ungated SHA (branch $branch kept for inspection)."
+  echo "::error::origin/main moved during the gate; ff-only to $sha is impossible. The next autoupdate cycle re-bumps and retries — refusing to rebase-and-merge an ungated SHA (nothing was pushed; bumped list is in the run summary)."
   echo "::notice::[merge-summary] sha=${sha:0:7} result=refused-main-moved elapsed=$(( $(date +%s) - t0 ))s"
   exit 1
 fi
