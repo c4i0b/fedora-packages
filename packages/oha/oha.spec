@@ -1,5 +1,5 @@
 Name:           oha
-Version:        1.16.0
+Version:        1.17.0
 Release:        1%{?dist}
 Summary:        HTTP load generator, ahaha-style (ab/wrk/hey successor)
 
@@ -39,5 +39,8 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 %{_bindir}/oha
 
 %changelog
+* Sat Nov 14 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.17.0-1
+- Update to 1.17.0
+
 * Thu Oct 29 2026 Caio Bruno <cbrunofb@gmail.com> - 1.16.0-1
 - Initial package
