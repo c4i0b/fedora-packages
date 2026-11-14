@@ -29,15 +29,20 @@ and launches client-side attacks from a web UI.
 %prep
 %autosetup -n beef-%{version}
 
+%build
+# install into the builddir, not the buildroot: a network/resolution failure
+# must die in the build section, never leave a half-populated payload
+bundle config set --local path %{_builddir}/vendor
+# lockfile pins minitest to a ruby<4 only version: let bundler re-resolve
+BUNDLE_FROZEN= bundle install
+# gem metadata embeds absolute paths of wherever the gems were installed
+grep -rlI "%{_builddir}/vendor" . | xargs -r sed -i "s|%{_builddir}/vendor|%{_datadir}/beef/vendor|g"
+
 %install
 d=%{buildroot}%{_datadir}/beef
 install -d "$d"
 cp -a . "$d"
-pushd "$d"
-bundle config set --local path vendor
-# lockfile pins minitest to a ruby<4 only version: let bundler re-resolve
-BUNDLE_FROZEN= bundle install
-popd
+cp -a %{_builddir}/vendor "$d"/
 # gem metadata embeds absolute buildroot paths; the wrapper cds into the app
 grep -rlI "%{buildroot}" "$d" | xargs -r sed -i "s|%{buildroot}%{_datadir}/beef|%{_datadir}/beef|g"
 # native extensions carry the buildroot path in debug info

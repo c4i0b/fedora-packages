@@ -23,6 +23,10 @@ prefer extending a linked doc over growing this file.
 - COPR is the only build validator: `just test` locally, push, let the
   webhook build. Never run `just build-local` preemptively (mock escape
   hatch for inconclusive COPR failure logs only).
+- Build-time dependency fetching (npm/pip/bundle/cargo) is legal only
+  because the project is `--enable-net on` (see [conventions](docs/conventions.md));
+  never assume offline/Koji semantics. Keep fetched inputs reproducible:
+  pin versions, no floating "latest" URLs.
 - Never block waiting for COPR builds — keep working; check `just status`
   when finishing if builds are pending.
 - On a COPR failure, follow the `diagnose-copr-failure` skill

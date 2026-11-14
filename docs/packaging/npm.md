@@ -22,10 +22,12 @@
   to a `%global`), so version bumps don't re-break the build; keep the
   protective `Requires: nodejsXX >= 1:<floor>` (epoch 1) without a
   BuildRequires floor (see rea-agents).
-- Tauri source builds (artcraft) need the frontend compiled in `%build`
+- Tauri source builds need the frontend compiled in `%build`
   before cargo — `npx nx run <app>:build` writes the `frontendDist` the
   tauri-build script embeds — plus `pkgconfig(webkit2gtk-4.1)`, gtk3 and
   libsoup-3. BuildRequire `/usr/bin/npm`, not `npm`: EL10 only ships
   nodejs-npm. npm 11 blocks postinstall scripts, but esbuild/swc pull their
   platform binaries as optional deps, so the Vite build still works; export
   `NX_DAEMON=false` so Nx does not fork a daemon into the build chroot.
+  (Notes from artcraft, removed pending a dual-licensed release — kept for
+  the next Tauri app.)

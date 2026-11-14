@@ -20,9 +20,12 @@ Summary:        Open source AI coding agent for the terminal, IDE, and desktop
 License:        MIT
 URL:            https://opencode.ai
 Source0:        https://github.com/anomalyco/opencode/archive/refs/tags/v%{version}.tar.gz
-# Bun follows latest (project has build network); pin a version here if it ever breaks
-Source1:        https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip
-Source2:        https://github.com/oven-sh/bun/releases/latest/download/bun-linux-aarch64.zip
+# Bun builds the standalone binary; pinned so the same spec revision always
+# builds identically — refresh alongside version bumps (floating "latest" made
+# the SRPM non-reproducible)
+%global bun_version 1.4.4
+Source1:        https://github.com/oven-sh/bun/releases/download/bun-v%{bun_version}/bun-linux-x64.zip
+Source2:        https://github.com/oven-sh/bun/releases/download/bun-v%{bun_version}/bun-linux-aarch64.zip
 
 BuildRequires:  gcc-c++
 BuildRequires:  make
