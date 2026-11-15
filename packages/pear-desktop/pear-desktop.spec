@@ -10,7 +10,7 @@
 ExclusiveArch:  x86_64 aarch64
 
 Name:           pear-desktop
-Version:        3.12.0
+Version:        3.12.1
 Release:        1%{?dist}
 Summary:        YouTube Music Desktop App including custom plugins (Electron)
 
@@ -81,5 +81,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/*.png
 
 %changelog
+* Sun Nov 15 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 3.12.1-1
+- Update to 3.12.1
+
 * Fri Oct 16 2026 Caio Bruno <cbrunofb@gmail.com> - 3.12.0-1
 - Initial package
