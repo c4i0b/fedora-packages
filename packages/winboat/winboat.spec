@@ -18,7 +18,6 @@ License:        MIT AND BSD-2-Clause AND BSD-3-Clause AND LGPL-2.1-or-later AND 
 URL:            https://github.com/winboat-org/winboat
 Source0:        %{url}/releases/download/v%{version}/winboat-%{version}-x86_64.rpm
 
-BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
 
 Requires:       gtk3
@@ -39,7 +38,10 @@ both systems. Bundles its own Electron runtime and the WinBoat guest server.
 
 %prep
 %setup -T -q -c
-bsdtar -xf %{SOURCE0}
+# libarchive/bsdtar cannot parse RPMv4 payloads and old (EL10) cpio
+# misreads payload sizes; rpm2archive streams a tar on every rpm version
+rpm2archive %{SOURCE0} > payload.tgz
+tar -xzf payload.tgz
 
 %build
 

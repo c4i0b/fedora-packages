@@ -21,7 +21,6 @@ URL:            https://github.com/hydralauncher/hydra
 Source0:        %{url}/releases/download/v%{version}/hydralauncher-%{version}.x86_64.rpm
 Source1:        %{url}/raw/refs/tags/v%{version}/LICENSE
 
-BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
 BuildRequires:  binutils
 
@@ -40,7 +39,10 @@ Bundles its own Electron and Python runtimes.
 
 %prep
 %setup -T -q -c
-bsdtar -xf %{SOURCE0}
+# libarchive/bsdtar cannot parse RPMv4 payloads and old (EL10) cpio
+# misreads payload sizes; rpm2archive streams a tar on every rpm version
+rpm2archive %{SOURCE0} > payload.tgz
+tar -xzf payload.tgz
 
 %build
 # The app's own i18n is JS; Chromium locale paks only cover Electron-internal

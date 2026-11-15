@@ -20,7 +20,6 @@ Source0:        https://github.com/anomalyco/opencode/releases/download/v%{versi
 Source1:        https://github.com/anomalyco/opencode/releases/download/v%{version}/opencode-desktop-linux-aarch64.rpm
 Source2:        https://raw.githubusercontent.com/anomalyco/opencode/v%{version}/LICENSE
 
-BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
 
 Requires:       gtk3
@@ -36,11 +35,14 @@ agent. Bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
+# libarchive/bsdtar cannot parse RPMv4 payloads and old (EL10) cpio
+# misreads payload sizes; rpm2archive streams a tar on every rpm version
 %ifarch x86_64
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
 %else
-bsdtar -xf %{SOURCE1}
+rpm2archive %{SOURCE1} > payload.tgz
 %endif
+tar -xzf payload.tgz
 
 %build
 

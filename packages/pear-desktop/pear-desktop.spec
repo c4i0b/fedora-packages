@@ -20,7 +20,6 @@ Source0:        https://github.com/pear-devs/pear-desktop/releases/download/v%{v
 Source1:        https://github.com/pear-devs/pear-desktop/releases/download/v%{version}/youtube-music-%{version}.aarch64.rpm
 Source2:        https://raw.githubusercontent.com/pear-devs/pear-desktop/v%{version}/license
 
-BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
 
 Requires:       gtk3
@@ -36,11 +35,14 @@ It bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
+# libarchive/bsdtar cannot parse RPMv4 payloads and old (EL10) cpio
+# misreads payload sizes; rpm2archive streams a tar on every rpm version
 %ifarch x86_64
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
 %else
-bsdtar -xf %{SOURCE1}
+rpm2archive %{SOURCE1} > payload.tgz
 %endif
+tar -xzf payload.tgz
 
 %build
 

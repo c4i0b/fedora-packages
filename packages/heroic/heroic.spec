@@ -20,7 +20,6 @@ Source0:        %{url}/releases/download/v%{version}/Heroic-%{version}-linux-x86
 Source1:        %{url}/releases/download/v%{version}/Heroic-%{version}-linux-aarch64.rpm
 Source2:        %{url}/raw/refs/tags/v%{version}/COPYING
 
-BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
 
 Requires:       gtk3
@@ -36,11 +35,14 @@ Bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
+# libarchive/bsdtar cannot parse RPMv4 payloads and old (EL10) cpio
+# misreads payload sizes; rpm2archive streams a tar on every rpm version
 %ifarch x86_64
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
 %else
-bsdtar -xf %{SOURCE1}
+rpm2archive %{SOURCE1} > payload.tgz
 %endif
+tar -xzf payload.tgz
 
 %build
 

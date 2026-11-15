@@ -69,6 +69,14 @@ while IFS= read -r spec; do
   fail=1
 done < <(grep -lE '^%cargo_prep -v vendor([[:space:]]|$)' "$root"/packages/*/*.spec)
 
+# Bundled .rpm payloads must be unpacked with rpm2archive: libarchive
+# (bsdtar) cannot parse RPMv4 containers and old (EL10) cpio misreads
+# payload sizes (broke pear-desktop 3.12.1 and desktop-plus before it)
+while IFS= read -r spec; do
+  echo "FAIL: $spec extracts a bundled .rpm with bsdtar/cpio instead of rpm2archive" >&2
+  fail=1
+done < <(grep -lE '^Source[0-9]+:.*\.rpm' "$root"/packages/*/*.spec | xargs -r grep -lE '^[[:space:]]*(bsdtar -xf|rpm2cpio)' || true)
+
 # zig packages vendor their build.zig.zon closure as zig-pkg.tar.*; the build
 # must consume it hermetically (--system never fetches, unlike zig's flaky
 # http client on COPR builders)
