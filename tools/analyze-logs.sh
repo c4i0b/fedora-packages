@@ -38,10 +38,12 @@ for run in "${runs[@]}"; do
     fi
   fi
   grep -F "[${pattern}]" "$tmp/log" | sed "s/.*\[${pattern}\] //" \
-    | sed "s/^/${ts%%T*} /" >> "$matches"
+    | sed "s/^/${ts%%T*} /" >> "$matches" || true
 done
 
-[ "$errors" -gt 0 ] && echo "warning: $errors/${#runs[@]} runs had log-fetch failures (API degraded?)" >&2
+if [ "$errors" -gt 0 ]; then
+  echo "warning: $errors/${#runs[@]} runs had log-fetch failures (API degraded?)" >&2
+fi
 [ -s "$matches" ] || { echo "no [${pattern}] lines found in $((${#runs[@]} - errors)) readable runs"; exit 0; }
 
 cat "$matches"
