@@ -1,5 +1,5 @@
 %global goipath         github.com/librespeed/speedtest-cli
-Version:        1.0.14
+Version:        1.0.15
 
 %gometa -L -f
 
@@ -47,5 +47,8 @@ install -m 0755 -vp %{gobuilddir}/bin/*      %{buildroot}%{_bindir}/
 %{_bindir}/librespeed-cli
 
 %changelog
+* Tue Nov 17 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.0.15-1
+- Update to 1.0.15
+
 * Wed Oct 21 2026 Caio Bruno <cbrunofb@gmail.com> - 1.0.14-1
 - Initial package
