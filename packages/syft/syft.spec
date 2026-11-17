@@ -1,5 +1,5 @@
 %global goipath         github.com/anchore/syft
-Version:        1.57.1
+Version:        1.57.2
 
 %gometa -L -f
 
@@ -49,6 +49,9 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 %{_bindir}/syft
 
 %changelog
+* Tue Nov 17 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.57.2-1
+- Update to 1.57.2
+
 * Mon Nov 09 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.57.1-1
 - Update to 1.57.1
 
