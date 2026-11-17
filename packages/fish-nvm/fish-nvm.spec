@@ -1,5 +1,5 @@
 Name:           fish-nvm
-Version:        2.2.17
+Version:        2.2.18
 Release:        1%{?dist}
 Summary:        The Node.js version manager for fish
 BuildArch:      noarch
@@ -50,5 +50,8 @@ done
 %{_datadir}/fish/vendor_completions.d/*.fish
 
 %changelog
+* Tue Nov 17 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.2.18-1
+- Update to 2.2.18
+
 * Sat Oct 24 2026 Caio Bruno <cbrunofb@gmail.com> - 2.2.17-1
 - Initial package
