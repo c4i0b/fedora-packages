@@ -3,7 +3,7 @@
 # the fly), the install section just runs it with -d into the buildroot.
 # Upstream tags are dates: kept raw in the tag macro (Source0 references it);
 # Version is the sanitized form and bump.sh keeps both in sync.
-%define debug_package %{nil}
+%global debug_package %{nil}
 %global tag    2026-08-10
 
 Name:           colloid-icon-theme

@@ -4,7 +4,7 @@
 # Per family: set Source0 to the release tarball and Source1 to the ORIGINAL
 # font license under patched-fonts/<Family>/ in the nerd-fonts repo (the
 # release tarballs ship .ttf files only, no license).
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 Name:           __NAME__
 Version:        __VERSION__

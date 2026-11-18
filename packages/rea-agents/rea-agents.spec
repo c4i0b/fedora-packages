@@ -24,7 +24,7 @@ BuildRequires:  nodejs24-npm
 Requires:       nodejs24 >= 1:%{node_floor}
 
 # env-node shebangs across the npm payload; the wrapper is the entrypoint
-%define __brp_mangle_shebangs %{nil}
+%global __brp_mangle_shebangs %{nil}
 
 %description
 REA (Reverse Engineer Anything) is one CLI and MCP server that lets agents

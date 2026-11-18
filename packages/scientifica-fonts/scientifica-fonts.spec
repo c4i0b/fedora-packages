@@ -3,7 +3,7 @@
 # license file, so Source1 is the OFL text from the tagged repo. Only the
 # ttf set is installed: the bdf/otb copies serve legacy X11 bitmap apps
 # that fontconfig does not consume.
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 Name:           scientifica-fonts
 Version:        2.3

@@ -2,7 +2,7 @@
 # fontconfig does not consume — only the ttf set is installed. The zip
 # carries no license file, so Source1 is the OFL text from the tagged repo.
 # Selawik is the Segoe UI metric-compatible open typeface by Microsoft.
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 Name:           selawik-fonts
 Version:        1.01

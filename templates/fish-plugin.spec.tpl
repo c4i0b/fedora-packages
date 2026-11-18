@@ -51,6 +51,8 @@ done
 __EXTRAFILES__
 %{_datadir}/fish/vendor_conf.d/*.fish
 %{_datadir}/fish/vendor_functions.d/*.fish
+# no %{fish_completions_dir} here: not guaranteed on EPEL, expands to the
+# same vendor_completions.d path
 %{_datadir}/fish/vendor_completions.d/*.fish
 
 %changelog

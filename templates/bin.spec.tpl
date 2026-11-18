@@ -4,7 +4,7 @@
 # corrupts their embedded app data); Go/Rust prebuilts strip normally.
 # Vendor repacks that carry upstream dev-machine rpaths need an export of
 # the QA_RPATHS mask in install (check-rpaths would abort otherwise).
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 # Per-arch upstream assets: Source URLs must stay arch-agnostic (the COPR
 # SRPM builder runs on an arbitrary arch); select the payload in prep.

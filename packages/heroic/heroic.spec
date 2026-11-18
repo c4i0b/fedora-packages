@@ -1,6 +1,6 @@
 # Electron payload: stripping corrupts the embedded snapshot; rpm 6 also
-# fails on the empty debugsource list — see AGENTS.md
-%define debug_package %{nil}
+# fails on the empty debugsource list — see docs/packaging/general.md
+%global debug_package %{nil}
 %global __strip /bin/true
 
 # Bundled Electron must not leak into rpm provides/requires
@@ -79,7 +79,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_bindir}/heroic
 %{_libdir}/heroic/
 %{_datadir}/applications/heroic.desktop
-%{_datadir}/icons/hicolor/*/apps/heroic.png
+%{_datadir}/icons/hicolor/*/apps/*.png
 
 %changelog
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 2.22.4-1

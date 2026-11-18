@@ -14,7 +14,7 @@ Source1:        vendor.tar.zst
 Source2:        https://ziglang.org/download/%{zig_version}/zig-x86_64-linux-%{zig_version}.tar.xz
 Source3:        https://ziglang.org/download/%{zig_version}/zig-aarch64-linux-%{zig_version}.tar.xz
 # ghostty's build.zig.zon closure, served to the embedded zig build via
-# --system: zig's own http client fails on COPR builders (vendor-sources.sh)
+# --system: zig's own http client fails on COPR builders (vendor-sources.py)
 Source4:        zig-pkg.tar.zst
 
 BuildRequires:  cargo-rpm-macros

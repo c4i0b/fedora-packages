@@ -15,7 +15,7 @@ Source0:        https://github.com/ghostty-org/ghostty/archive/refs/tags/v%{vers
 Source1:        https://ziglang.org/download/%{zig_version}/zig-x86_64-linux-%{zig_version}.tar.xz
 Source2:        https://ziglang.org/download/%{zig_version}/zig-aarch64-linux-%{zig_version}.tar.xz
 # build.zig.zon dependency closure, pre-fetched at SRPM time into a
-# zig build --system package store (vendor-sources.sh): zig's own downloader
+# zig build --system package store (vendor-sources.py): zig's own downloader
 # fails on the COPR builders
 Source3:        zig-pkg.tar.zst
 ExclusiveArch:  x86_64 aarch64

@@ -14,7 +14,7 @@ BuildRequires:  cargo-rpm-macros
 %global cargo_install_lib false
 
 # Release profile strips the binary and vendor sources trip the shebang BRP
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 Requires:       topgrade
 

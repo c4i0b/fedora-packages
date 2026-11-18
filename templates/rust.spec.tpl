@@ -40,8 +40,13 @@ cat vendor-deps/git-sources.conf >> .cargo/config.toml
 %install
 %cargo_install
 
+%check
+# delete when the binary cannot run headless
+%{buildroot}%{_bindir}/__NAME__ --version
+
 %files
 %license LICENSE
+%doc README.md
 %{_bindir}/__NAME__
 
 %changelog

@@ -1,6 +1,6 @@
 # Electron payload: stripping corrupts the embedded snapshot; rpm 6 also
-# fails on the empty debugsource list — see AGENTS.md
-%define debug_package %{nil}
+# fails on the empty debugsource list — see docs/packaging/general.md
+%global debug_package %{nil}
 %global __strip /bin/true
 # bundled python stdlib ships "#!/usr/bin/env python" shebangs brp-mangle rejects
 %global __brp_mangle_shebangs %{nil}

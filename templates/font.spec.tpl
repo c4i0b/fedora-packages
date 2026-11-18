@@ -2,7 +2,7 @@
 # the upstream source is a .glyphs file, not buildable here): raw files
 # pinned to a commit — google/fonts has no tags/releases, so version bumps
 # are manual (no upstream file: the autoupdate bot skips it).
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 Name:           __NAME__
 Version:        __VERSION__

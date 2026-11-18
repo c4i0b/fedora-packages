@@ -19,7 +19,7 @@ BuildRequires:  desktop-file-utils
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
 
-# aws-lc-sys (via rustls) rejects RPM's -O2 (AGENTS.md)
+# aws-lc-sys (via rustls) rejects RPM's -O2 (docs/packaging/rust.md)
 %global build_cflags %(echo "%{build_cflags}" | sed 's/ *-O2//g')
 
 # Release profile strips the binary and vendor sources trip the shebang BRP

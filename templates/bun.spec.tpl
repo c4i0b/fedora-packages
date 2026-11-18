@@ -1,5 +1,5 @@
 # Bun-compiled standalone binary; stripping corrupts its embedded app data.
-%define debug_package %{nil}
+%global debug_package %{nil}
 %global __strip /bin/true
 
 %ifarch x86_64
@@ -20,9 +20,10 @@ Summary:        __SUMMARY__
 License:        __LICENSE__
 URL:            __URL__
 Source0:        __SOURCE0__
-Source1:        https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip
-Source2:        https://github.com/oven-sh/bun/releases/latest/download/bun-linux-aarch64.zip
-# Pin a bun version in the URLs above if latest ever breaks the build
+# pin a bun release instead of latest (no floating URLs)
+Source1:        https://github.com/oven-sh/bun/releases/download/bun-v%{bun_version}/bun-linux-x64.zip
+Source2:        https://github.com/oven-sh/bun/releases/download/bun-v%{bun_version}/bun-linux-aarch64.zip
+%global bun_version 1.4.4
 
 BuildRequires:  gcc-c++
 BuildRequires:  make

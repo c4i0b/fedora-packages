@@ -19,7 +19,7 @@ Requires:       nodejs24
 Recommends:     podman
 
 # env-node shebang inside the payload tree; the /usr/bin wrapper is the entrypoint
-%define __brp_mangle_shebangs %{nil}
+%global __brp_mangle_shebangs %{nil}
 
 %description
 The Dev Container CLI takes a devcontainer.json and creates and configures a

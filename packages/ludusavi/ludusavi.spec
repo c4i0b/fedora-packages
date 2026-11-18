@@ -18,7 +18,7 @@ BuildRequires:  pkgconfig(xkbcommon)
 %global cargo_install_lib false
 
 # Release profile strips the binary and vendor sources trip the shebang BRP
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 %description
 Ludusavi backs up and restores game saves across multiple roots, mapping them

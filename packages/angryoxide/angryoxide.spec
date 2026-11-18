@@ -17,7 +17,7 @@ BuildRequires:  cargo
 BuildRequires:  gcc
 
 # release profile strips the binary (Cargo.toml): empty debugsource otherwise
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 Requires:       gpsd
 Requires:       hashcat

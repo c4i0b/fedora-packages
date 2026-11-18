@@ -8,6 +8,7 @@ URL:            __URL__
 Source0:        __SOURCE0__
 
 BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 __SUMMARY__

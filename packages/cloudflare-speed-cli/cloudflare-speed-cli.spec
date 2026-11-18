@@ -17,7 +17,7 @@ BuildRequires:  cargo-rpm-macros
 # attributes (#![no_std]) as broken shebangs
 %global debug_package %{nil}
 
-# aws-lc-sys jitterentropy errors on RPM's -O2; see AGENTS.md
+# aws-lc-sys jitterentropy errors on RPM's -O2; see docs/packaging/rust.md
 %global build_cflags %(echo "%{build_cflags}" | sed 's/ *-O2//g')
 
 %description

@@ -44,7 +44,7 @@ line or by an AI agent.
 # git-sourced crates (craft-libs) need the source replacements cargo vendor
 # printed; the prep macro only rewrites crates-io
 cat vendor-deps/git-sources.conf >> .cargo/config.toml
-# unvendored [patch.crates-io] entries are dropped by vendor-sources.sh
+# unvendored [patch.crates-io] entries are dropped by vendor-sources.py
 
 %build
 # %%cargo_build cannot select a workspace member: its -n flag is

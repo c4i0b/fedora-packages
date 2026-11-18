@@ -1,5 +1,6 @@
-# Bun-compiled standalone binary; stripping corrupts its embedded app data.
-%define debug_package %{nil}
+# Upstream-published prebuilt binaries (bun-compiled standalone); stripping
+# corrupts the embedded app data.
+%global debug_package %{nil}
 %global __strip /bin/true
 
 ExclusiveArch:  x86_64 aarch64

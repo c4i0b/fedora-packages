@@ -3,7 +3,7 @@
 # the fly), the install section just runs it with -d into the buildroot.
 # Upstream tags are dates: kept raw in the tag macro (Source0 references it);
 # Version is the sanitized form and bump.sh keeps both in sync.
-%define debug_package %{nil}
+%global debug_package %{nil}
 %global tag    __TAG__
 
 Name:           __NAME__
@@ -34,6 +34,8 @@ mkdir -p %{buildroot}%{_datadir}/icons
 %files
 %license __LICENSEFILE__
 %{_datadir}/icons/__THEMEPREFIX__*
+# add a second .THEMEPREFIX*-style glob when upstream installs hidden base
+# dirs (symlink targets); shipping only the visible glob yields dead links
 
 %changelog
 * __DATE__ __PACKAGER__ - __VERSION__-1

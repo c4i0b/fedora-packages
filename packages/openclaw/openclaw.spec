@@ -17,7 +17,7 @@ BuildRequires:  nodejs24-npm
 
 # The npm tarball is not self-contained; remaining deps install at build time.
 # env-node shebangs would be mangled to nonexistent /usr/bin/node — skip that BRP.
-%define __brp_mangle_shebangs %{nil}
+%global __brp_mangle_shebangs %{nil}
 
 %description
 OpenClaw is a personal AI assistant you run on your own devices: one agent,

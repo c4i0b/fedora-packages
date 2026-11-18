@@ -3,7 +3,7 @@
 # raster copies serve legacy bitmap consumers fontconfig does not touch.
 # No upstream file: release tags are shaped "v.1.30.0" and the bot's v-strip
 # would mangle that into an invalid version, so bumps are manual.
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 Name:           cozette-fonts
 Version:        1.30.0
