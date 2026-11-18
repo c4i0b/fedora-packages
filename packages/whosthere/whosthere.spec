@@ -32,6 +32,7 @@ as a daemon with an HTTP API, and export scan results as JSON.
 %goprep -p1
 tar -xf %{S:1}
 # upstream tracks its dev toolchain; deps only need go 1.26
+grep -q '^go 1\.27\.' go.mod || exit 1
 sed -i 's/^go 1\.27\.[0-9]*/go 1.26/' go.mod
 
 %build

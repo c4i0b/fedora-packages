@@ -38,7 +38,7 @@ mkdir -p "$distinfo"
 cat > "$distinfo/METADATA" <<EOF
 Metadata-Version: 2.1
 Name: libusb-package
-Version:        1.0.30.1
+Version:        %{version}
 Summary: Package containing libusb so it can be installed via Python package managers
 License-Expression: Apache-2.0
 EOF

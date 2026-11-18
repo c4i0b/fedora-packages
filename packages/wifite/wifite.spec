@@ -54,6 +54,7 @@ attacks) with sensible defaults and a single interface.
 %prep
 %autosetup -p1 -n wifite2-%{version}
 # console_scripts names a nonexistent module; real entry is wifite.__main__
+grep -q 'wifite\.wifite:entry_point' setup.py || exit 1
 sed -i 's/wifite\.wifite:entry_point/wifite.__main__:entry_point/' setup.py
 
 %build

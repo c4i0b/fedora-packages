@@ -14,7 +14,7 @@ BuildRequires:  cargo-rpm-macros
 %global cargo_install_lib false
 
 # Uncomment if the dependency tree pulls aws-lc-sys (rustls/reqwest): its
-# bundled jitterentropy errors on RPM's -O2 (see AGENTS.md)
+# bundled jitterentropy errors on RPM's -O2 (see docs/packaging/rust.md)
 #%global build_cflags %(echo "%{build_cflags}" | sed 's/ *-O2//g')
 
 %description
@@ -23,6 +23,7 @@ File browser and launcher: navigates as an interactive tree, fuzzy-searches name
 %prep
 %autosetup -n %{name}-%{version} -p1 -a 1
 %cargo_prep -v vendor-deps
+cat vendor-deps/git-sources.conf >> .cargo/config.toml
 
 %build
 %cargo_build

@@ -30,6 +30,7 @@ Fzf powered fish history and tab completions
 %autosetup -n fifc-%{version}
 # broot's first-run "install the br function?" dialog must not fire from
 # inside the fzf ctrl-o: skip it with broot's own env knob
+grep -q 'broot --color=yes' functions/_fifc_open_dir.fish || exit 1
 sed -i 's/broot --color=yes/env BR_INSTALL=no broot --color=yes/' \
     functions/_fifc_open_dir.fish
 # late \t rebinders (autopair's --on-variable handler) clobber our TAB

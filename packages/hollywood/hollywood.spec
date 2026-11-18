@@ -41,9 +41,11 @@ like any good computer screen on Wall Street.
 %prep
 %autosetup -n hollywood-%{version} -p1
 # Fedora ships `bat`, not Debian's `batcat`
+grep -q batcat lib/hollywood/bat || exit 1
 sed -i 's/batcat/bat/g' lib/hollywood/bat
 # our mpv (ffmpeg-free build) replaces mplayer (RPM Fusion): null audio out
 # and libcaca keep the widget silent and headless
+grep -q 'command -v mplayer' lib/hollywood/mplayer || exit 1
 sed -i 's/^command -v mplayer/command -v mpv/; s/DISPLAY= mplayer -vo caca -nosound -loop 0 -ss/DISPLAY= mpv --vo=libcaca --really-quiet --ao=null --loop-file=inf --start/' lib/hollywood/mplayer
 # the bundled clip is h264, which ffmpeg-free cannot decode (buildroots have
 # no fedora-cisco-openh264 repo either): regenerate a soundwave-style clip
@@ -77,6 +79,7 @@ install -Dpm644 share/man/man1/hollywood.1 %{buildroot}%{_mandir}/man1/hollywood
 install -Dpm644 share/man/man1/wallstreet.1 %{buildroot}%{_mandir}/man1/wallstreet.1
 
 %files
+# no license text upstream (README-declared Apache-2.0; nudged upstream)
 %doc README.md
 %{_bindir}/hollywood
 %{_prefix}/lib/hollywood/
