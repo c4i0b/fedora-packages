@@ -1,3 +1,5 @@
+# Manual updates: upstream's tags are junk ("<2.7.0", "pre27"), a tracker
+# would downgrade (see docs/autoupdate.md).
 Name:           fish-z
 Version:        2026.04.16
 Release:        1%{?dist}

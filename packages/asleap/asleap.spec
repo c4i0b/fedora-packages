@@ -5,7 +5,9 @@ Summary:        Actively recover LEAP passwords
 
 License:        GPL-2.0-only
 URL:            https://github.com/joswr1ght/asleap
-Source0:        https://codeload.github.com/joswr1ght/asleap/tar.gz/refs/heads/master#/asleap-master.tar.gz
+# no tags/releases upstream: pinned commit, bump manually
+%global commit d3f4ff4941625169e0b2b2dfd434c8c90f5d56b5
+Source0:        https://codeload.github.com/joswr1ght/asleap/tar.gz/%{commit}#/asleap-%{commit}.tar.gz
 # rawhide glibc dropped setkey()/encrypt(): DES via OpenSSL instead, and
 # pcap-bpf.h no longer exists
 Patch0:         des-openssl.patch
@@ -21,7 +23,7 @@ Asleap captures LEAP challenge/response exchanges and recovers weak LEAP
 passwords offline, using a dictionary or a genkeys-generated hash file.
 
 %prep
-%autosetup -n asleap-master -p1
+%autosetup -n asleap-%{commit} -p1
 
 %build
 # command-line CFLAGS fully replace the Makefile ones; -lcrypt, not -lxcrypt

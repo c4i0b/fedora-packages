@@ -6,7 +6,7 @@ BuildArch:      noarch
 
 License:        MIT
 URL:            https://github.com/franciscolourenco/done
-Source0:        https://github.com/franciscolourenco/done/archive/refs/tags/1.21.1.tar.gz
+Source0:        https://github.com/franciscolourenco/done/archive/refs/tags/%{version}.tar.gz
 
 BuildRequires:  fish
 Requires:       fish

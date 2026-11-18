@@ -6,7 +6,7 @@ BuildArch:      noarch
 
 License:        MIT
 URL:            https://github.com/jorgebucaran/autopair.fish
-Source0:        https://github.com/jorgebucaran/autopair.fish/archive/refs/tags/1.0.4.tar.gz
+Source0:        https://github.com/jorgebucaran/autopair.fish/archive/refs/tags/%{version}.tar.gz
 
 BuildRequires:  fish
 Requires:       fish

@@ -1,6 +1,7 @@
 # Images install once into backgrounds/, every desktop entry points there.
-# Upstream usually has no tagged releases: pin a commit snapshot (switch
-# Source0 to tag form and keep Version in sync when upstream tags).
+# Upstream usually has no tagged releases: pin a commit snapshot (manual
+# bumps; switch Source0 to tag form and keep Version in sync when upstream
+# tags).
 %global commit e34f05935c5b768f4c016b0893924d18ec1dba61
 
 Name:           aesthetic-wallpapers

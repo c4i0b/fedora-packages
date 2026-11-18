@@ -1,3 +1,6 @@
+# Manual pin: upstream tags (20240203-110809-5046fc22) sanitize to a
+# version that never matches the 0.r… scheme below, so an upstream tracker
+# would re-bump forever — bump manually and keep the tag macro in sync
 %global tag 20240203-110809-5046fc22
 
 Name:           wezterm

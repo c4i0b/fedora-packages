@@ -5,7 +5,10 @@ Summary:        Wordlist generator where you can specify standard character sets
 
 License:        GPL-2.0-only
 URL:            https://github.com/crunchsec/crunch
-Source0:        https://codeload.github.com/crunchsec/crunch/tar.gz/refs/heads/master#/crunch-master.tar.gz
+# no tags/releases upstream (version comes from the binary): pinned commit,
+# bump manually
+%global commit 3bdc4a8941eb64e5c15086778df56af79d54e06b
+Source0:        https://codeload.github.com/crunchsec/crunch/tar.gz/%{commit}#/crunch-%{commit}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -16,7 +19,7 @@ character set. It generates all possible combinations of the given charset,
 with size and pattern constraints.
 
 %prep
-%autosetup -n crunch-master
+%autosetup -n crunch-%{commit}
 
 %build
 %make_build build

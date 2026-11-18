@@ -37,13 +37,13 @@ vkBasalt, intended as a convenient alternative to GOverlay.
 %meson_install
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/io.github.radiolamp.mangojuice.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/mangojuice
-%{_datadir}/applications/io.github.radiolamp.mangojuice.desktop
+%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/scalable/apps/*.svg
 %{_metainfodir}/io.github.radiolamp.mangojuice.metainfo.xml
 %{_datadir}/locale/*/LC_MESSAGES/*.mo

@@ -70,10 +70,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/com.jaoushingan.Waydr
 %{_metainfodir}/com.jaoushingan.WaydroidHelper.metainfo.xml
 %{_datadir}/glib-2.0/schemas/com.jaoushingan.WaydroidHelper.gschema.xml
 %{_datadir}/polkit-1/actions/com.jaoushingan.WaydroidHelper.policy
-%{_datadir}/locale/zh_CN/LC_MESSAGES/waydroid-helper.mo
-%{_datadir}/locale/de/LC_MESSAGES/waydroid-helper.mo
-%{_datadir}/locale/ru/LC_MESSAGES/waydroid-helper.mo
-%{_datadir}/locale/zh_TW/LC_MESSAGES/waydroid-helper.mo
+%{_datadir}/locale/*/LC_MESSAGES/*.mo
 %{_datadir}/dbus-1/system.d/id.waydro.Mount.conf
 %{_datadir}/dbus-1/system-services/id.waydro.Mount.service
 %{_unitdir}/waydroid-mount.service

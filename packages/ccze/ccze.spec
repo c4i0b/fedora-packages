@@ -1,3 +1,5 @@
+# Manual updates: upstream is dead (2003) and releases come from the Debian
+# pool, no forge tracker exists.
 Name:           ccze
 Version:        0.2.1
 Release:        2%{?dist}

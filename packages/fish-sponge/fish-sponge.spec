@@ -6,7 +6,7 @@ BuildArch:      noarch
 
 License:        MIT
 URL:            https://github.com/meaningful-ooo/sponge
-Source0:        https://github.com/meaningful-ooo/sponge/archive/refs/tags/1.1.0.tar.gz
+Source0:        https://github.com/meaningful-ooo/sponge/archive/refs/tags/%{version}.tar.gz
 
 BuildRequires:  fish
 Requires:       fish
