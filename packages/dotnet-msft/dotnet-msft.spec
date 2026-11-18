@@ -1,6 +1,7 @@
 # Repack of Microsoft's official .NET 10 SDK/runtime binaries, for chroots
 # where Fedora's dotnet10.0 is unavailable (EPEL): a true source build needs
 # a previous SDK to bootstrap and ~100 distro patches — not worth it here.
+# Manual updates: tag tracking would mis-bump the feature band (dotnet.md).
 # MS binaries link OpenSSL 3 (libssl.so.3) and only run on EPEL; Fedora
 # chroots ship the patched dotnet10.0 and should use that instead.
 %global debug_package %{nil}
@@ -71,7 +72,7 @@ ln -s %{_libdir}/dotnet-msft/dotnet %{buildroot}%{_bindir}/dotnet-msft
 %{_libdir}/dotnet-msft/shared/Microsoft.NETCore.App/
 
 %files -n dotnet-sdk-10.0-msft
-%{_libdir}/dotnet-msft/ThirdPartyNotices.txt
+%license %{_libdir}/dotnet-msft/ThirdPartyNotices.txt
 %{_libdir}/dotnet-msft/sdk/
 %{_libdir}/dotnet-msft/sdk-manifests/
 %{_libdir}/dotnet-msft/packs/

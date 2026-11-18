@@ -1,3 +1,5 @@
+# Manual updates: version tracks w1.fi hostapd releases plus the aircrack
+# WPE patch level; no single forge tracker can express both.
 Name:           hostapd-wpe
 Version:        2.12
 Release:        1%{?dist}
@@ -52,6 +54,7 @@ echo "$out" | grep -q "hostapd-WPE v%{version}"
 %{buildroot}%{_sbindir}/hostapd-wpe -k 2>&1 | grep -q WPE
 
 %files
+%license COPYING
 %doc hostapd/hostapd-wpe.conf hostapd/hostapd-wpe.eap_user hostapd/certs/README.wpe
 %{_sbindir}/hostapd-wpe
 %{_sysconfdir}/hostapd-wpe/certs

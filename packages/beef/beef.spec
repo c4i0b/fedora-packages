@@ -62,6 +62,7 @@ chmod 0755 %{buildroot}%{_bindir}/beef
 ruby -c beef
 
 %files
+# no license text upstream (README-declared GPL-2.0-only; nudged upstream)
 %{_bindir}/beef
 %config(noreplace) %{_datadir}/beef/config.yaml
 %{_datadir}/beef/
