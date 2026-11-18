@@ -11,8 +11,19 @@ behind each autoupdate slot.
   Releases latest (leading `v` stripped), `tags:owner/repo` → latest git tag
   via `ls-remote` (tags-only repos, any forge, zero API quota) or
   `npm:<package>` → npm dist-tag `latest`.
-- Registry/GitHub API responses are **compact JSON (single line)**: extract
-  fields with `grep -oE`, never with per-line `awk -F'"'`.
+- Resolution lives in `.github/scripts/resolve.py`; `autoupdate.sh` only
+  orchestrates (branch, commits, gate). Tag selection is strict-first:
+  plain `v<version>` tags win, component tags like `vscode-v1.0.0` or
+  ghostty's `vt-1.0.0` only feed a fallback pass (mixed-tag repos:
+  anomalyco/opencode, jdx/mise, Faugus/faugus-launcher). A downgrade guard
+  (`sort -V` against the spec Version) blocks publish-ordered
+  `releases/latest` surprises — never remove it without replacing it.
+  The pure selection logic is unit-tested in `tools/tests/` (real tag
+  lists as fixtures, no network); `tools/test.sh` runs the suite inside
+  the gate because the SRPM gate alone would happily build a
+  semantically wrong bump whose tarball exists.
+- JSON responses are parsed with `json.loads` in the resolver (the old
+  `grep -oE` trick died with the bash version; do not resurrect it).
 - Scheduled multiple times per day (see `autoupdate.yml` for the cron); an
   in-script empty-commit keepalive (only after 45 idle days) defeats
   GitHub's 60-day inactivity rule — do not use keepalive-workflow actions

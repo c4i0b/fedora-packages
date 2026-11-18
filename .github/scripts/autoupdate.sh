@@ -16,7 +16,9 @@ branch="bump/$(date -u +%Y%m%d-%H%M)"
 git -C "$root" checkout -b "$branch"
 
 # fetches are network-bound: resolve all latest versions in parallel, then
-# apply bumps serially so git commits never race
+# apply bumps serially so git commits never race. Resolution (tag choice,
+# JSON parsing) lives in resolve.py and is unit-tested by tools/test.sh;
+# this script only orchestrates.
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 resolved="$tmp/resolved"; mkdir "$resolved"
 stats="$tmp/stats"; : > "$stats"
@@ -29,131 +31,9 @@ SUCCESS_DELAY=0.3
 RETRY_BASE=3
 export SUCCESS_DELAY RETRY_BASE
 
-# GitHub throttles bursts with 403/429 even when authenticated; stats lines
-# are single appends, safe across the xargs workers
-get() {
-  local pkg="$1" url="$2" body headers code attempt wait src t0 t1 elapsed
-  shift 2
-  body="$tmp/.body.$$"; headers="$tmp/.hdr.$$"
-  for attempt in 1 2 3 4 5; do
-    t0="$(date +%s%N)"
-    code="$(curl -s -o "$body" -D "$headers" -w '%{http_code}' "$@" "$url")" || true
-    t1="$(date +%s%N)"
-    elapsed=$(( (t1 - t0) / 1000000 ))
-    rlrem="$(tr -d '\r' < "$headers" | awk 'tolower($1)=="x-ratelimit-remaining:"{print $2}' | head -1)"
-    printf 'REQ\t%s\t%s\t%s\t%s\n' "$pkg" "$code" "$attempt" "${rlrem:--}" >> "$stats"
-    if [ "$code" = 200 ]; then
-      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=200 wait=$SUCCESS_DELAY wait_src=success-delay elapsed=${elapsed}ms rlrem=${rlrem:--}"
-      sleep "$SUCCESS_DELAY"
-      cat "$body"
-      return 0
-    fi
-    if [ "$code" = 403 ] || [ "$code" = 429 ]; then
-      wait="$(tr -d '\r' < "$headers" | awk 'tolower($1)=="retry-after:"{print $2}' | head -1)"
-      if [ -n "$wait" ]; then
-        src=retry-after
-      else
-        src=computed
-        wait=$(( RETRY_BASE * (1 << (attempt - 1)) + RANDOM % 2 ))
-      fi
-      echo "RETRY" >> "$stats"
-      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=$wait wait_src=$src elapsed=${elapsed}ms rlrem=${rlrem:--}"
-      sleep "$wait"
-    else
-      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=0 wait_src=none elapsed=${elapsed}ms rlrem=${rlrem:--}"
-      return 1
-    fi
-  done
-  return 1
-}
-
-resolve() {
-  upstream_file="$1"
-  pkg="$(basename "$(dirname "$upstream_file")")"
-  source="$(cat "$upstream_file")"
-
-  auth=()
-  [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
-  # ordered by frequency: bare owner/repo (GitHub) dominates, then npm
-  if [[ "$source" == tags:* ]]; then
-    # tags-only repos: ls-remote is forge-agnostic and costs no API quota
-    # (nested forge prefixes reuse their own base: tags:gitlab:o/r, ...)
-    local repo_url="${source#tags:}"
-    case "$repo_url" in
-      gitlab:*) repo_url="https://gitlab.com/${repo_url#gitlab:}" ;;
-      codeberg:*) repo_url="https://codeberg.org/${repo_url#codeberg:}" ;;
-      forgejo:*) repo_url="${FORGEJO_HOME:-https://codeberg.org}/${repo_url#forgejo:}" ;;
-      *) repo_url="https://github.com/$repo_url" ;;
-    esac
-    # -v:refname sorts by version; skip annotated-tag deref (^{}) lines.
-    # Strict pass first (plain v?<version> tags only): component tags like
-    # anomalyco/opencode's "vscode-v1.0.0" sort above real releases, and the
-    # prefix-stripping pass would resolve them as downgrades; strip prefixes
-    # (openai/codex's "rust-v0.163.0" class) only when no plain version tag
-    # exists anywhere in the list. ghostty's "vt-1.0.1" fails both checks
-    # (no "-v<digit>" for the sed, not digit-leading after) so v1.4.0 wins.
-    tags_list="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
-      | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2}')"
-    latest="$(while IFS= read -r t; do
-        [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
-      done <<<"$tags_list")"
-    [ -z "$latest" ] && latest="$(while IFS= read -r t; do
-        t="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$t")"
-        [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
-      done <<<"$tags_list")"
-  elif [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
-    # repos without any GitHub Release (only prereleases) 404 here
-    body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
-    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-  elif [[ "$source" == npm:* ]]; then
-    npm_pkg="${source#npm:}"
-    npm_slug="$(echo "$npm_pkg" | sed 's|/|%2f|')"
-    body="$(get "$pkg" "https://registry.npmjs.org/${npm_slug}/latest")" || true
-    # with set -o pipefail an empty body must not abort before the fallback
-    latest="$(grep -oE '"version": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-  elif [[ "$source" == gitlab:* ]]; then
-    src="${source#gitlab:}"; proj="$(echo "$src" | sed 's|/|%2f|')"
-    [ -n "${GITLAB_TOKEN:-}" ] && auth=(-H "PRIVATE-TOKEN: $GITLAB_TOKEN")
-    body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/releases" "${auth[@]}")" || true
-    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-    if [ -z "$latest" ]; then
-      body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/repository/tags?per_page=1" "${auth[@]}")" || true
-      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-      latest="${latest#v}"
-    fi
-  elif [[ "$source" == codeberg:* || "$source" == forgejo:* ]]; then
-    src="${source#*:}"; baseh="https://codeberg.org/api/v1"
-    [[ "$source" == forgejo:* ]] && baseh="${FORGEJO_API:-$baseh}"
-    body="$(get "$pkg" "${baseh}/repos/${src}/releases?limit=1" "${auth[@]}")" || true
-    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-    if [ -z "$latest" ]; then
-      body="$(get "$pkg" "${baseh}/repos/${src}/tags?limit=1" "${auth[@]}")" || true
-      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-      latest="${latest#v}"
-    fi
-  fi
-  if [ -z "$latest" ] && [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
-    # Tag-only repos (no GitHub Releases): fall back to the latest tag
-    body="$(get "$pkg" "https://api.github.com/repos/${source}/tags?per_page=1" "${auth[@]}")" || true
-    latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-    [ -n "$latest" ] && echo "::notice::[tags-fallback] pkg=$pkg source=$source resolved=$latest (no GitHub Releases; releases/latest is re-checked every run)"
-  fi
-
-  if [ -z "$latest" ]; then
-    echo "::warning::$pkg: could not resolve latest release of $source"
-    return 0
-  fi
-  # prefixed tags like openai/codex's "rust-v0.163.0": keep the version part
-  latest="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$latest")"
-  printf 'latest\t%s\t%s\n' "$pkg" "$latest" > "$resolved/$pkg"
-}
-
-find "$root/packages" -name upstream -maxdepth 2 \
-  | xargs -P 8 -I{} bash -c "$(declare -f get resolve); resolve \"{}\""
+# a missing resolved/<pkg> is a per-package warning (::warning in the log),
+# not a job failure — the run still bumps everything else
+python3 "$root/.github/scripts/resolve.py" "$root" "$resolved" "$stats"
 
 packages="$(mktemp)"
 bumped=0

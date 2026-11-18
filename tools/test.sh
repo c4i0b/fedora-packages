@@ -128,6 +128,14 @@ while IFS= read -r spec; do
   fi
 done < <(git -C "$root" ls-files 'packages/*/*.spec')
 
+# autoupdate resolver selection logic is pure and offline: run its unit
+# suite in the gate so a resolver regression cannot reach main silently
+# (the SRPM gate would happily build a semantically wrong bump)
+if ! ( cd "$root" && python3 -m unittest discover -s tools/tests -p 'test_*.py' -q ); then
+  echo "FAIL: resolver unit suite" >&2
+  fail=1
+fi
+
 # host.sh must parse every remote syntax the repo may use (a past regression
 # silently dropped the owner and every host-dependent tool died on "/repo")
 # shellcheck source=host.sh
