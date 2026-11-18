@@ -87,6 +87,47 @@ while IFS= read -r spec; do
   }
 done < <(grep -lE '^Source[0-9]*:.*zig-pkg\.tar' "$root"/packages/*/*.spec)
 
+# Source hygiene: no floating branch heads (two builds of one Version:
+# differ), and Source0 must derive from a version macro or a commit pin —
+# literal versions rot on the next bump (fish-autopair class) while bump.sh
+# only rewrites Version:/%global tag
+while IFS= read -r spec; do
+  if grep -qE '^Source[0-9]+:.*refs/heads/' "$spec"; then
+    echo "FAIL: $spec SourceN points at a floating branch head" >&2
+    fail=1
+  fi
+  src0="$(sed -n 's/^Source0:[[:space:]]*//p' "$spec" | head -1)"
+  if ! grep -qE '%\{(version|tag|commit|gosource)\}' <<<"$src0" \
+     && ! grep -qE '[0-9a-f]{40}' <<<"$src0"; then
+    echo "FAIL: $spec Source0 does not reference %{version}/%{tag}/%{commit}" >&2
+    fail=1
+  fi
+done < <(git -C "$root" ls-files 'packages/*/*.spec')
+
+# License text must ship: %license, a macro that installs it
+# (%pyproject_save_files -l / %go_vendor_license_filelist) or a spec comment
+# waiving it (upstream ships no license file — beef/hollywood class)
+while IFS= read -r spec; do
+  if ! grep -q '^%license' "$spec" \
+     && ! grep -q '%pyproject_save_files.* -l' "$spec" \
+     && ! grep -q '%go_vendor_license_filelist\|%{go_vendor_license_filelist}' "$spec" \
+     && ! grep -qi '^# .*no license' "$spec"; then
+    echo "FAIL: $spec ships no license text (%license or waiver comment)" >&2
+    fail=1
+  fi
+done < <(git -C "$root" ls-files 'packages/*/*.spec')
+
+# A package without an upstream marker is a silent never-bump: require a
+# manual-pin note in the spec's leading comment block when the file is absent
+while IFS= read -r spec; do
+  dir="$(dirname "$spec")"
+  [ -f "$dir/upstream" ] && continue
+  if ! head -8 "$spec" | grep -qiE '^# .*(manual|no tags|no releases|pinned)'; then
+    echo "FAIL: $spec has no upstream marker and no manual-pin comment" >&2
+    fail=1
+  fi
+done < <(git -C "$root" ls-files 'packages/*/*.spec')
+
 # host.sh must parse every remote syntax the repo may use (a past regression
 # silently dropped the owner and every host-dependent tool died on "/repo")
 # shellcheck source=host.sh
