@@ -55,6 +55,10 @@ Lua.
 # rustc, the RUSTFLAGS lint allow below no longer covers it): bump both
 # within their compat ranges
 cargo update -p time -p mlua
+# never-type stabilization (F45+/rawhide rustc) infers `!` for the untyped
+# .eval() in config/src/lua.rs: annotate the unit return explicitly
+grep -q '^        \.eval()$' config/src/lua.rs || exit 1
+sed -i 's/^        \.eval()$/        .eval::<()>()/' config/src/lua.rs
 
 %build
 # EPEL's rustc denies never-type-fallback patterns (deny-by-default rust_2024
