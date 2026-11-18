@@ -1,5 +1,5 @@
 Name:           mise
-Version:        2026.11.9
+Version:        2026.11.10
 Release:        1%{?dist}
 Summary:        Polyglot runtime and tool version manager (modern asdf)
 
@@ -64,6 +64,9 @@ install -Dpm644 mise.fish %{buildroot}%{fish_completions_dir}/mise.fish
 %{fish_completions_dir}/mise.fish
 
 %changelog
+* Wed Nov 18 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2026.11.10-1
+- Update to 2026.11.10
+
 * Wed Nov 18 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2026.11.9-1
 - Update to 2026.11.9
 
