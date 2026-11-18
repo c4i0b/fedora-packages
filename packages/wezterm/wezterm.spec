@@ -50,8 +50,11 @@ Lua.
 
 %prep
 %autosetup -n %{name}-%{tag}
-# time 0.3.31 predates rustc's stricter type inference (E0282); bump within 0.3.x
-cargo update -p time
+# time 0.3.31 predates rustc's stricter type inference (E0282) and mlua
+# 0.9.5 predates never-type stabilization (hard E0277 on F45+/rawhide
+# rustc, the RUSTFLAGS lint allow below no longer covers it): bump both
+# within their compat ranges
+cargo update -p time -p mlua
 
 %build
 # EPEL's rustc denies never-type-fallback patterns (deny-by-default rust_2024
