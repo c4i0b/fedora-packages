@@ -1,5 +1,15 @@
 # Packaging quirks — npm
 
+- Electron/prebuilt-`-bin` packages deliberately skip Fedora's
+  `Provides: bundled(<lib>)` and bundled-license manifests (FPC exceptions
+  are an official-Fedora concept; COPR + `-bin` policy replaces them here).
+- A tracker may live in a different ecosystem than Source0: `opencode`
+  tracks `npm:@opencode/cli-linux-x64` while Source0 is the git tag tarball
+  — works because upstream's CI publishes both atomically; the npm publish
+  can lead the tag push by minutes (transient 404, next run heals).
+- `nodejsXX` major pins (openclaw, devcontainers-cli, rea-agents) need a
+  manual major flip at EOL — a `%global node_major` keeps it one line.
+
 - Yargs CLIs without a `completion` command still answer
   `--get-yargs-completions`: ship the canonical yargs bash shim (candidates
   come from the binary; never hand-write them) and smoke it in `%check`

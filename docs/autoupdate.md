@@ -25,3 +25,10 @@ behind each autoupdate slot.
   bumped package twice (branch push + merge push).
 - To skip or downgrade a release: never add Epoch; push a commit message
   `autoupdate: override <version>` on the package (the bot respects it).
+- No `upstream` file = manual pin. Legitimate when the forge has no
+  parseable tags/releases or tracking would mis-bump (version-scheme
+  mismatch, feature bands); say so in a leading spec comment. Current
+  manual-update packages: asleap, ccze, cozette-fonts, crunch,
+  press-start-2p-fonts, aesthetic-wallpapers, dotnet-msft, fish-hydro,
+  fish-z, hostapd-wpe, unimatrix, wezterm. Floating branch-head URLs are
+  never acceptable — pin a commit (`%global commit`).

@@ -16,7 +16,7 @@
 - zbus's `#[validate]` macro (zbus-lockstep) resolves its D-Bus XML dir as
   `../xml` relative to the crate being compiled: in a vendored build that
   lands on the vendored `xml` CRATE (its extensionless LICENSE panics the
-  macro). Export `LOCKSTEP_XML_PATH=<builddir>/vendor/atspi-common/xml`
+  macro). Export `LOCKSTEP_XML_PATH=<builddir>/vendor-deps/atspi-common/xml`
   in %build (see any craft spec).
 - `cargo vendor` trees with git deps (e.g. storytold craft-libs) need the
   `[source."git+https://…"]` blocks cargo vendor prints appended to the

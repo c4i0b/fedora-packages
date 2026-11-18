@@ -57,6 +57,10 @@
 - Ship upstream's `NOTICE` (or equivalent notices file) as `%license` when
   the source tree has one; smoke-run any headless CLI the package installs
   in `%check`.
+- Glob what upstream controls in `%files` (desktop files, icons, locale
+  `.mo`); stable GObject-style ids (metainfo, gschema, dbus, polkit names)
+  may stay pinned. When no license text exists upstream, keep a spec
+  comment saying so (test.sh waives on it).
 
 ## Repo hygiene
 
