@@ -162,19 +162,36 @@ sudo dnf install <package>
 ### Automatic updates
 
 ```
-upstream release
-       │
-       ▼  3×/day (01:23/09:23/17:23 UTC), per packages/<name>/upstream
-┌───────────┐   bump Version/Release/changelog
-│ autoupdate│──────────────▶ main, after the in-job
-└───────────┘               gate (just test + validate)
-                                 │  touches packages/<name>/
-                                 ▼
-                     COPR webhook rebuilds the
-                     touched packages server-side
-                                 │
-                                 ▼  ~1h20 after the bump
-                     badges refresh (README + badges/*.json)
+ (upstream release)
+  |
+  |  3x/day scan @ 01:23 / 09:23 / 17:23 UTC (data-driven slots,
+  |  see docs/autoupdate.md)
+  |
+  o  AUTOUPDATE BOT ........ bump Version/Release/changelog; sources
+  |                         vendored at SRPM-build time
+  |                         (tools/vendor-sources.py); gate red ->
+  |                         branch pushed for inspection only,
+  |                         next 4h cycle retries
+  |
+  o  IN-JOB GATE ........... just test + just validate
+  |
+  o  MAIN .................. ff-merge of the exact gated SHA;
+  |                         GITHUB_TOKEN pushes skip GH workflows
+  |                         but still fire the COPR webhook --
+  |                         hence the in-job gate (docs/copr.md)
+  |
+  o  COPR WEBHOOK .......... no delivery workflow: COPR pulls on
+  |                         push; rebuilds only packages/<name>/
+  |                         dirs the commit touches
+  |
+  o  COPR BUILDS ........... server-side: SRPM + chroots
+  |
+  o  BADGES ................ README + badges/*.json; reads
+  |                         api_3/monitor + repodata, 2h after
+  |                         each autoupdate slot
+  |                         blue ok - v->v building - red failed
+  |
+ (end of the pipeline)
 ```
 
 - Each package lives in `packages/<name>/` with its spec file.
