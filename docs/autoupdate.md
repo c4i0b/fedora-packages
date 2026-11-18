@@ -1,5 +1,12 @@
 # Automatic updates
 
+Schedule slots are sized from measured bump yield per slot (90 days of
+run history, catch-up runs excluded), not even spacing — method and
+rationale: agent-skills `gh-actions-conventions` rule 14
+(~/Projects/agent-skills/skills/foundations/gh-actions-conventions/SKILL.md).
+The same slots apply repo-family-wide (opensuse-packages); badges run 2 h
+behind each autoupdate slot.
+
 - `packages/<name>/upstream` selects the tracker: `owner/repo` → GitHub
   Releases latest (leading `v` stripped), `tags:owner/repo` → latest git tag
   via `ls-remote` (tags-only repos, any forge, zero API quota) or
