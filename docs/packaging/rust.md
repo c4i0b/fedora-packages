@@ -12,7 +12,10 @@
   vendor.tar.zst). wezterm (unvendored) does the %prep equivalent.
 - Newer rustc denies old idioms outright (never-type-fallback via mlua's
   untyped `.eval()` etc): `export RUSTFLAGS="-A <lint-name>"` in %build
-  rather than patching vintage code.
+  rather than patching vintage code. When the rustc finally *stabilizes*
+  the behavior the lint allow stops covering it (hard E0277): bump the
+  crate in the lockfile instead (wezterm's `cargo update -p mlua` in
+  %prep — the unvendored equivalent of the cargo-update comment).
 - zbus's `#[validate]` macro (zbus-lockstep) resolves its D-Bus XML dir as
   `../xml` relative to the crate being compiled: in a vendored build that
   lands on the vendored `xml` CRATE (its extensionless LICENSE panics the
