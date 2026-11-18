@@ -85,15 +85,22 @@ resolve() {
       forgejo:*) repo_url="${FORGEJO_HOME:-https://codeberg.org}/${repo_url#forgejo:}" ;;
       *) repo_url="https://github.com/$repo_url" ;;
     esac
-    # -v:refname sorts by version; skip annotated-tag deref (^{}) lines and
-    # non-version tags (component tags like ghostty's "vt-1.0.0" win the sort
-    # but are not releases): first tag whose normalization is digit-leading
-    latest="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
-      | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2}' \
-      | while IFS= read -r t; do
-          t="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$t")"
-          [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
-        done | head -1)"
+    # -v:refname sorts by version; skip annotated-tag deref (^{}) lines.
+    # Strict pass first (plain v?<version> tags only): component tags like
+    # anomalyco/opencode's "vscode-v1.0.0" sort above real releases, and the
+    # prefix-stripping pass would resolve them as downgrades; strip prefixes
+    # (openai/codex's "rust-v0.163.0" class) only when no plain version tag
+    # exists anywhere in the list. ghostty's "vt-1.0.1" fails both checks
+    # (no "-v<digit>" for the sed, not digit-leading after) so v1.4.0 wins.
+    tags_list="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
+      | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2}')"
+    latest="$(while IFS= read -r t; do
+        [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
+      done <<<"$tags_list")"
+    [ -z "$latest" ] && latest="$(while IFS= read -r t; do
+        t="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$t")"
+        [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
+      done <<<"$tags_list")"
   elif [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
     # repos without any GitHub Release (only prereleases) 404 here
     body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
@@ -179,6 +186,13 @@ while IFS=$'\t' read -r _ pkg latest; do
     continue
   fi
   current="$(awk '/^Version:/{print $2; exit}' "$spec")"
+  # releases/latest is publish-ordered and the tags?per_page=1 fallback can
+  # return an older or component tag: never bump down
+  if [ "$latest_rpm" != "$current" ] \
+     && [ "$(printf '%s\n%s\n' "$current" "$latest_rpm" | sort -V | head -1)" = "$latest_rpm" ]; then
+    echo "::warning::$pkg: resolved $latest_rpm <= current $current, skipping (downgrade)"
+    continue
+  fi
   if [ "$latest_rpm" = "$current" ]; then
     echo "$pkg: up to date ($current)"
     continue

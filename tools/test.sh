@@ -146,6 +146,29 @@ ssh://git@codeberg.org:2222/o/r.git|codeberg.org|o|r
 https://github.com/o/r|github.com|o|r
 EOF
 
+# autoupdate tag resolution must keep its shape: the resolver's prefix-strip
+# sed + digit-shape guard (autoupdate.sh tags: pass and line-144 normalize)
+# reject ghostty's vt-*, jethrokuan/z's '<2.7.0' and desktop-plus's
+# 'worktree-release', strip openai/codex's rust-v prefix, and pass plain and
+# date-shaped tags through — table mirrors the live tag lists of those repos
+while IFS='|' read -r tag expected; do
+  t="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$tag")"
+  if [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]]; then got="${t#v}"; else got=""; fi
+  if [ "$got" != "$expected" ]; then
+    echo "FAIL: tag '$tag' resolved as '$got' (expected '$expected')" >&2
+    fail=1
+  fi
+done <<'EOF'
+v1.4.0|1.4.0
+1.19.6|1.19.6
+vt-1.0.1|
+vscode-v1.0.0|1.0.0
+rust-v0.163.0|0.163.0
+<2.7.0|
+2026.09.10|2026.09.10
+worktree-release|
+EOF
+
 # tracked dirs only: the CI sources-cache restore can leave phantom dirs
 # from renamed packages (archives, no spec) next to the checkout
 while IFS= read -r dir; do
