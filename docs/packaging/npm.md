@@ -41,3 +41,9 @@
   `NX_DAEMON=false` so Nx does not fork a daemon into the build chroot.
   (Notes from artcraft, removed pending a dual-licensed release — kept for
   the next Tauri app.)
+- Plain-`cargo` Tauri builds (limusic) must enable the `custom-protocol`
+  feature: tauri's build script sets `dev = !custom-protocol`, and a dev
+  build loads the vite `devUrl` (`localhost:<port>`) instead of the bundled
+  frontend — blank window, "Could not connect to localhost". `cargo tauri
+  build` passes the feature implicitly; a spec must add
+  `--features tauri/custom-protocol` itself.

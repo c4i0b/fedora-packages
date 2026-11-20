@@ -12,7 +12,7 @@ ExclusiveArch:  x86_64 aarch64
 
 Name:           spotube
 Version:        6.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Spotify-compatible client that streams from YouTube Music
 
 License:        AGPL-3.0-only
@@ -39,8 +39,14 @@ Requires:       libXrender
 Requires:       libXtst
 Requires:       mesa-libGL
 Requires:       vlc-libs
-Requires:       vlc-plugin-ffmpeg
+# vlc-plugins-base owns the native libopus (itag 251) + libfaad (itag 140)
+# codec plugins and the ALSA output — the only ones vlcj (decode + audio)
+# actually uses; the Qt UI / X vouts of the standalone player stay out
+Requires:       vlc-plugins-base
 Requires:       vlc-plugin-pulseaudio
+# ffmpeg decode is only a fallback for exotic formats (base's native
+# opus/faad cover YouTube Music); optional, not worth a hard pull
+Recommends:     vlc-plugin-ffmpeg
 # Fedora only: webkit2gtk4.1 is not in EPEL (COPR chroots restricted to Fedora)
 Requires:       webkit2gtk4.1
 # tray icon (mirrors the upstream .deb Recommends: libappindicator3-1)
@@ -105,6 +111,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/*.png
 
 %changelog
+* Fri Nov 20 2026 Caio Bruno <cbrunofb@gmail.com> - 6.0.0-3
+- Require vlc-plugins-base (native opus/faad codecs + ALSA out) directly;
+  demote vlc-plugin-ffmpeg to Recommends (fallback only)
+
 * Fri Nov 20 2026 Caio Bruno <cbrunofb@gmail.com> - 6.0.0-2
 - Require harfbuzz (direct NEEDED of libskiko, not pulled by freetype)
 - Recommend libappindicator-gtk3 for the tray icon (mirrors upstream .deb)

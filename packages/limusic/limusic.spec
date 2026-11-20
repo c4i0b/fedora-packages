@@ -1,6 +1,6 @@
 Name:           limusic
 Version:        1.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Native desktop YouTube Music client (Rust + Tauri, no Electron)
 
 License:        GPL-3.0-or-later
@@ -61,8 +61,12 @@ export npm_config_cache="$PWD/.npm"
   npx --yes --package=pnpm@10 pnpm build
 )
 # %%cargo_build cannot select a workspace member: its -n flag is
-# --no-default-features and parametric macros reject other option letters
-%{__cargo} build %{?_smp_mflags} -Z avoid-dev-deps --profile rpm -p limusic-app
+# --no-default-features and parametric macros reject other option letters.
+# Plain-cargo Tauri builds must enable custom-protocol or the binary runs in
+# dev mode and loads the vite devUrl (localhost:5183) instead of the bundled
+# frontend — tauri's CLI passes this feature implicitly (see docs/packaging/npm.md)
+%{__cargo} build %{?_smp_mflags} -Z avoid-dev-deps --profile rpm -p limusic-app \
+  --features tauri/custom-protocol
 
 %install
 # cargo install from a workspace member dir demands a local lock file
@@ -98,6 +102,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 
 %changelog
+* Fri Nov 20 2026 Caio Bruno <cbrunofb@gmail.com> - 1.4.1-2
+- Enable tauri/custom-protocol: plain cargo builds default to dev mode and
+  load the vite devUrl instead of the bundled frontend
+
 * Fri Nov 20 2026 Caio Bruno <cbrunofb@gmail.com> - 1.4.1-1
 - Update to 1.4.1
 
