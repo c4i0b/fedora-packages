@@ -1,5 +1,5 @@
 %global goipath         github.com/DNSControl/dnscontrol/v5
-Version:        5.10.0
+Version:        5.10.1
 
 %gometa -L -f
 
@@ -54,6 +54,9 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 %{_bindir}/dnscontrol
 
 %changelog
+* Fri Nov 20 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 5.10.1-1
+- Update to 5.10.1
+
 * Wed Nov 18 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 5.10.0-1
 - Update to 5.10.0
 
