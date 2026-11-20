@@ -1,5 +1,5 @@
 Name:           limusic
-Version:        1.4.0
+Version:        1.4.1
 Release:        1%{?dist}
 Summary:        Native desktop YouTube Music client (Rust + Tauri, no Electron)
 
@@ -33,8 +33,11 @@ BuildRequires:  /usr/bin/npm
 %global build_rustflags %{build_rustflags} --cfg=rustix_use_libc
 
 Requires:       mpv-libs%{?_isa}
+# WebKitWebProcess SIGABRTs on the first media element (Google sign-in)
+# without gst autoaudiosink — upstream #430; Recommends is not pulled on
+# minimal/container installs
+Requires:       gstreamer1-plugins-good%{?_isa}
 # WebKitGTK plays music videos through gstreamer (Rust declares no auto-deps)
-Recommends:     gstreamer1-plugins-good%{?_isa}
 Recommends:     gstreamer1-plugins-bad-free%{?_isa}
 
 %description
@@ -95,5 +98,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 
 %changelog
+* Fri Nov 20 2026 Caio Bruno <cbrunofb@gmail.com> - 1.4.1-1
+- Update to 1.4.1
+
 * Thu Nov 19 2026 Caio Bruno <cbrunofb@gmail.com> - 1.4.0-1
 - Initial package

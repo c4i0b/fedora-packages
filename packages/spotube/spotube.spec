@@ -1,5 +1,5 @@
-# Flutter/Skiko payload: stripping corrupts the embedded runtime; rpm 6 also
-# fails on the empty debugsource list — see docs/packaging/general.md
+# Bundled JVM/Skiko payload: stripping corrupts the embedded runtime; rpm 6
+# also fails on the empty debugsource list — see docs/packaging/general.md
 %global debug_package %{nil}
 %global __strip /bin/true
 
@@ -7,16 +7,16 @@
 %global __provides_exclude_from ^%{_libdir}/spotube/.*$
 %global __requires_exclude_from ^%{_libdir}/spotube/.*$
 
-# Bundled Flutter/Skiko engine IS the product (-bin policy)
+# Bundled Compose Multiplatform/Skiko runtime IS the product (-bin policy)
 ExclusiveArch:  x86_64 aarch64
 
 Name:           spotube
 Version:        6.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Spotify-compatible client that streams from YouTube Music
 
 License:        AGPL-3.0-only
-URL:            https://github.com/team-spotube/spotube
+URL:            https://github.com/team-spotube/Spotube
 Source0:        %{url}/releases/download/v%{version}/Spotube-linux-x86_64.rpm
 Source1:        %{url}/releases/download/v%{version}/Spotube-linux-aarch64.rpm
 Source2:        %{url}/raw/refs/tags/v%{version}/LICENSE
@@ -29,6 +29,9 @@ Requires:       fontconfig
 Requires:       freetype
 Requires:       glib2
 Requires:       gtk3
+# libskiko-linux-x64.so has a direct NEEDED on libharfbuzz.so.0 that
+# freetype/fontconfig do not pull, and bundle requires are excluded
+Requires:       harfbuzz
 Requires:       libX11
 Requires:       libXext
 Requires:       libXi
@@ -40,11 +43,14 @@ Requires:       vlc-plugin-ffmpeg
 Requires:       vlc-plugin-pulseaudio
 # Fedora only: webkit2gtk4.1 is not in EPEL (COPR chroots restricted to Fedora)
 Requires:       webkit2gtk4.1
+# tray icon (mirrors the upstream .deb Recommends: libappindicator3-1)
+Recommends:     libappindicator-gtk3
 
 %description
 Spotube is a lightweight Spotify-compatible client that streams audio from
-YouTube Music, needing no Spotify Premium account. It bundles its own
-Flutter/Skiko runtime and plays through the system VLC libraries.
+YouTube Music, needing no Spotify Premium account. It is a Kotlin Compose
+Multiplatform app that bundles its own JVM/Skiko runtime and plays through
+the system VLC libraries.
 
 %prep
 %setup -T -q -c
@@ -99,5 +105,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/*.png
 
 %changelog
+* Fri Nov 20 2026 Caio Bruno <cbrunofb@gmail.com> - 6.0.0-2
+- Require harfbuzz (direct NEEDED of libskiko, not pulled by freetype)
+- Recommend libappindicator-gtk3 for the tray icon (mirrors upstream .deb)
+- Fix runtime description: Kotlin Compose Multiplatform, not Flutter
+
 * Thu Nov 19 2026 Caio Bruno <cbrunofb@gmail.com> - 6.0.0-1
 - Initial package
