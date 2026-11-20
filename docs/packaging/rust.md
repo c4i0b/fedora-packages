@@ -10,6 +10,13 @@
   and the updated lock both land in the SRPM (a plain `cargo update` in
   %prep cannot work for vendored builds: the new version is not in
   vendor.tar.zst). wezterm (unvendored) does the %prep equivalent.
+- When the broken pin has NO fixed version in its semver range
+  (rustix 0.37.x via souvlaki -> zbus 3 -> async-io 1 vs rustc's reserved
+  `rustc_*` attributes, limusic), `cargo-update` cannot help: force the
+  crate's alternate backend instead — `%global build_rustflags
+  %{build_rustflags} --cfg=rustix_use_libc` compiles the libc backend,
+  which never touches the offending linux_raw code (any rustix 0.38+/1.x
+  in the same tree ignores the cfg).
 - Newer rustc denies old idioms outright (never-type-fallback via mlua's
   untyped `.eval()` etc): `export RUSTFLAGS="-A <lint-name>"` in %build
   rather than patching vintage code. When the rustc finally *stabilizes*

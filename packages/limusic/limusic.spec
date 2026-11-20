@@ -27,6 +27,11 @@ BuildRequires:  /usr/bin/npm
 %global rustflags_debuginfo 0
 %global debug_package %{nil}
 
+# rustix 0.37 (souvlaki -> zbus 3 -> async-io 1) predates rustc's reserved
+# rustc_* attributes and has no fixed 0.37.x; force its libc backend — see
+# docs/packaging/rust.md
+%global build_rustflags %{build_rustflags} --cfg=rustix_use_libc
+
 Requires:       mpv-libs%{?_isa}
 # WebKitGTK plays music videos through gstreamer (Rust declares no auto-deps)
 Recommends:     gstreamer1-plugins-good%{?_isa}
