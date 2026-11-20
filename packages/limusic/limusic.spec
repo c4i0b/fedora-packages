@@ -78,7 +78,7 @@ Terminal=false
 Categories=Audio;AudioVideo;
 StartupWMClass=%{name}
 EOF
-for pair in 32x32:32x32 64x64:64x64 128x128:128x128 128x128@2x:256x256 icon.png:512x512; do
+for pair in 32x32.png:32x32 64x64.png:64x64 128x128.png:128x128 128x128@2x.png:256x256 icon.png:512x512; do
   src="${pair%%:*}"; size="${pair##*:}"
   install -Dpm644 "src-tauri/icons/$src" \
     "%{buildroot}%{_datadir}/icons/hicolor/$size/apps/%{name}.png"
