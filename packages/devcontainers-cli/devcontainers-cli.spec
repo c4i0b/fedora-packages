@@ -3,7 +3,7 @@
 # so the payload is plain JavaScript with no native addons and no build-time
 # npm install — noarch.
 Name:           devcontainers-cli
-Version:        0.90.0
+Version:        0.91.0
 Release:        1%{?dist}
 Summary:        Reference CLI for building and running Development Containers
 
@@ -76,5 +76,8 @@ HOME=%{_builddir} %{_bindir}/node-24 devcontainer.js --get-yargs-completions dev
 %{_prefix}/lib/node_modules/%{name}/
 
 %changelog
+* Sat Nov 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.91.0-1
+- Update to 0.91.0
+
 * Wed Oct 28 2026 Caio Bruno <cbrunofb@gmail.com> - 0.90.0-1
 - Initial package
