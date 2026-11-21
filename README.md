@@ -14,21 +14,15 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 
 <!-- chroot-badges begin -->
 [![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3D567e11d6%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/packages/)
-[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3Dee1bf22c%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D8f70863a%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3D05d663ef%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3D04af0230%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
-[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3Dfb7f54d9%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 43](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-43.json%3Fv%3Ddf6b8f72%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 44](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-44.json%3Fv%3D4751985a%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora 45](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-45.json%3Fv%3D4da58d33%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![fedora rawhide](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Ffedora-rawhide.json%3Fv%3D5157e182%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
+[![epel 10](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fepel-10.json%3Fv%3Dcf7c39de%2Er2)](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/monitor/)
 <!-- chroot-badges end -->
 
 <!-- build-status begin -->
-### :x: build failures
-
-| package | chroots | build |
-|---|---|---|
-| limusic | fedora 43: 1.4.0<br>fedora 44: 1.4.0<br>fedora 45: 1.4.0<br>fedora rawhide: 1.4.0<br>epel 10: 1.4.0 | [#11365946](https://copr.fedorainfracloud.org/coprs/caiobruno/fedora-packages/build/11365946/) |
-
-*Updated 2026-11-20 12:12 UTC*
+*Updated 2026-11-21 00:57 UTC*
 <!-- build-status end -->
 
 ## Per-package build
@@ -59,7 +53,7 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![desktop-plus](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdesktop-plus.json%3Fv%3D3.6.12.0%2Er2)](https://github.com/desktop-plus/desktop-plus/)
 [![devcontainers-cli](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdevcontainers-cli.json%3Fv%3D0.90.0%2Er2)](https://www.npmjs.com/package/@devcontainers/cli/)
 [![dive](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdive.json%3Fv%3D0.13.1%2Er2)](https://github.com/wagoodman/dive/)
-[![dnscontrol](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnscontrol.json%3Fv%3D5.10.0%2Er2)](https://github.com/DNSControl/dnscontrol/)
+[![dnscontrol](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnscontrol.json%3Fv%3D5.10.1%2Er2)](https://github.com/DNSControl/dnscontrol/)
 [![dnsdiag](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnsdiag.json%3Fv%3D2.10.1%2Er2)](https://github.com/farrokhi/dnsdiag/)
 [![dnspyre](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdnspyre.json%3Fv%3D3.12.0%2Er2)](https://github.com/Tantalor93/dnspyre/)
 [![dockle](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fdockle.json%3Fv%3D0.4.15%2Er2)](https://github.com/goodwithtech/dockle/)
@@ -104,12 +98,12 @@ Packages are built from source whenever practical: vendored at SRPM time for Go/
 [![lazygit](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flazygit.json%3Fv%3D0.66.3%2Er2)](https://github.com/jesseduffield/lazygit/)
 [![librespeed-cli](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flibrespeed-cli.json%3Fv%3D1.0.15%2Er2)](https://github.com/librespeed/speedtest-cli/)
 [![lightcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flightcraft.json%3Fv%3D0.21.1%2Er2)](https://github.com/storytold/lightcraft/)
-[![limusic](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flimusic.json%3Fv%3D1.4.0%2Er2)](https://github.com/SimoHypers/limusic/)
+[![limusic](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Flimusic.json%3Fv%3D1.4.1%2Er2)](https://github.com/SimoHypers/limusic/)
 [![ludusavi](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fludusavi.json%3Fv%3D0.31.0%2Er2)](https://github.com/mtkennerly/ludusavi/)
 [![mangojuice](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmangojuice.json%3Fv%3D1.0.0%2Er2)](https://github.com/radiolamp/mangojuice/)
 [![mdk4](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmdk4.json%3Fv%3D4.2%2Er2)](https://github.com/aircrack-ng/mdk4/)
 [![meslo-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmeslo-nerd-fonts.json%3Fv%3D3.5.1%2Er2)](https://github.com/ryanoasis/nerd-fonts/)
-[![mise](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmise.json%3Fv%3D2026.11.10%2Er2)](https://github.com/jdx/mise/)
+[![mise](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fmise.json%3Fv%3D2026.11.11%2Er2)](https://github.com/jdx/mise/)
 [![naabu](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fnaabu.json%3Fv%3D2.7.0%2Er2)](https://github.com/projectdiscovery/naabu/)
 [![netscanner](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fnetscanner.json%3Fv%3D0.6.43%2Er2)](https://github.com/Chleba/netscanner/)
 [![nexttrace](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Ffedora-packages%2Fmain%2Fbadges%2Fnexttrace.json%3Fv%3D1.7.6%2Er2)](https://github.com/nxtrace/NTrace-core/)
