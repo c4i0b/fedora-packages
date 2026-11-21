@@ -1,5 +1,5 @@
 Name:           fish-pure
-Version:        4.19.2
+Version:        4.19.3
 Release:        1%{?dist}
 Summary:        Minimalistic, fast fish prompt (pure)
 BuildArch:      noarch
@@ -50,5 +50,8 @@ done
 %{_datadir}/fish/vendor_functions.d/*.fish
 
 %changelog
+* Sat Nov 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 4.19.3-1
+- Update to 4.19.3
+
 * Sat Oct 17 2026 Caio Bruno <cbrunofb@gmail.com> - 4.19.2-1
 - Initial package
