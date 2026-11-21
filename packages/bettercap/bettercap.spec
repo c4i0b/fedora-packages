@@ -1,5 +1,5 @@
 %global goipath         github.com/bettercap/bettercap/v2
-Version:        2.41.7
+Version:        2.42.0
 
 %gometa -L -f
 
@@ -41,5 +41,8 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 %{_bindir}/bettercap
 
 %changelog
+* Sat Nov 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.42.0-1
+- Update to 2.42.0
+
 * Sun Oct 18 2026 Caio Bruno <cbrunofb@gmail.com> - 2.41.7-1
 - Initial package
