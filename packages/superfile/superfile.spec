@@ -1,5 +1,5 @@
 %global goipath         github.com/yorukot/superfile
-Version:        1.6.0
+Version:        1.6.1
 
 %gometa -L -f
 
@@ -54,5 +54,8 @@ install -Dpm644 %{SOURCE4} %{buildroot}%{_datadir}/%{name}/cd_on_quit.fish
 %{_datadir}/%{name}/
 
 %changelog
+* Sat Nov 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 1.6.1-1
+- Update to 1.6.1
+
 * Fri Oct 16 2026 Caio Bruno <cbrunofb@gmail.com> - 1.6.0-1
 - Initial package
