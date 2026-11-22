@@ -127,7 +127,11 @@ class Http:
     def get(self, pkg, url, headers=()):
         """200 body as text, else None. Retries 403/429 honoring
         Retry-After, exponential backoff otherwise (GitHub throttles
-        bursts even when authenticated)."""
+        bursts even when authenticated). Redirects are chased manually:
+        newer urllib refuses to follow a redirect when an Authorization
+        header is set, which turned every moved repo into a permanent
+        resolve failure (301 -> 'could not resolve')."""
+        hops = 0
         for attempt in range(1, 6):
             req = urllib.request.Request(url, headers=dict(headers))
             t0 = time.monotonic()
@@ -159,6 +163,12 @@ class Http:
                       f"status={code} wait={wait} wait_src={src} "
                       f"elapsed={elapsed}ms rlrem={rlrem}", file=sys.stderr)
                 time.sleep(float(wait))
+            elif code in (301, 302, 303, 307, 308) and hdrs.get("Location") \
+                    and hops < 3:
+                hops += 1
+                url = urllib.parse.urljoin(url, hdrs["Location"])
+                print(f"::notice::[rate] pkg={pkg} following redirect "
+                      f"hop={hops} -> {url}", file=sys.stderr)
             else:
                 print(f"::notice::[rate] pkg={pkg} attempt={attempt} "
                       f"status={code} wait=0 wait_src=none "
