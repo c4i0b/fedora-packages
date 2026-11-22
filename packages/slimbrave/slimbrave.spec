@@ -1,5 +1,5 @@
 Name:           slimbrave
-Version:        2.4.1
+Version:        2.4.2
 Release:        1%{?dist}
 Summary:        Debloat and harden Brave Browser using Chromium enterprise policies
 
@@ -33,6 +33,9 @@ python3 -m py_compile slimbrave-linux.py
 %{_bindir}/slimbrave
 
 %changelog
+* Sun Nov 22 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.4.2-1
+- Update to 2.4.2
+
 * Sat Nov 14 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 2.4.1-1
 - Update to 2.4.1
 
