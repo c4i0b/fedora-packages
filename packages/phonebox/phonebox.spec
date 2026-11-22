@@ -8,6 +8,9 @@ URL:            https://github.com/ersinkoc/phonebox
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 ExclusiveArch:  x86_64 aarch64
 
+# not %{_userunitdir}: that macro needs systemd-rpm-macros in the buildroot
+%global userunitdir %{_prefix}/lib/systemd/user
+
 # Fedora ships the SDK; EPEL does not — the dotnet-msft repack provides it
 # there (MS binaries link OpenSSL 3 and never run against rawhide)
 %if 0%{?fedora}
@@ -91,8 +94,8 @@ EOF
 # Upstream autostart runs a user systemd unit named phonebox.service; ship
 # the same unit (not enabled: the user opts in with
 # `systemctl --user enable --now phonebox`)
-install -Dpm644 /dev/null %{buildroot}%{_userunitdir}/phonebox.service
-cat > %{buildroot}%{_userunitdir}/phonebox.service <<'EOF'
+install -Dpm644 /dev/null %{buildroot}%{userunitdir}/phonebox.service
+cat > %{buildroot}%{userunitdir}/phonebox.service <<'EOF'
 [Unit]
 Description=PhoneBox desktop agent
 
@@ -109,7 +112,7 @@ EOF
 %doc README.md
 %{_bindir}/%{name}
 %{_libdir}/%{name}/
-%{_userunitdir}/phonebox.service
+%{userunitdir}/phonebox.service
 
 %changelog
 * Sun Nov 22 2026 Caio Bruno <cbrunofb@gmail.com> - 0.9.27-1
