@@ -1,5 +1,5 @@
 Name:           effectcraft
-Version:        0.24.1
+Version:        0.25.1
 Release:        1%{?dist}
 Summary:        Motion graphics and compositing tool
 
@@ -80,6 +80,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/*
 
 %changelog
+* Mon Nov 23 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.25.1-1
+- Update to 0.25.1
+
 * Thu Nov 12 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.24.1-1
 - Update to 0.24.1
 
