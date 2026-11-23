@@ -769,27 +769,31 @@ def fix_renamed_dup_deps(ws, repo, crate_tree):
                 git = v.get("git") and \
                     re.sub(r"\.git$", "", v["git"].rstrip("/")) == norm
                 if git or pkg in crate_tree:
-                    by_pkg.setdefault(pkg, []).append((tbl, name))
+                    by_pkg.setdefault(pkg, {}).setdefault(name, []).append(tbl)
         dirty = False
-        for pkg, refs in by_pkg.items():
-            if len(refs) < 2 or pkg not in crate_tree:
+        for pkg, names in by_pkg.items():
+            # same dep name in several tables is NOT a rename: every
+            # occurrence must share the canonical path or cargo rejects
+            # the manifest ("different source paths depending on target")
+            if len(names) < 2 or pkg not in crate_tree:
                 continue
-            refs.sort(key=lambda tn: tn[1] != pkg)  # un-renamed key keeps canon
             canon = _tree_member(ws, repo, crate_tree[pkg], pkg)
             if canon is None:
                 continue
             base = dup_pin_dir(ws, repo, crate_tree[pkg])
-            for tbl, name in refs[1:]:
+            preferred = pkg if pkg in names else sorted(names)[0]
+            for name in sorted(n for n in names if n != preferred):
                 copy = base.parent / (base.name + "-"
                                       + re.sub(r"[^A-Za-z0-9.-]", "-", name))
                 if not copy.is_dir():
                     shutil.copytree(canon, copy)
-                v = tbl[name]
-                nv = {k: x for k, x in v.items()
-                      if k not in ("git", "rev", "branch", "tag", "version",
-                                   "workspace")}
-                nv["path"] = os.path.relpath(copy.resolve(), cm.parent)
-                tbl[name] = nv
+                for tbl in names[name]:
+                    v = tbl[name]
+                    nv = {k: x for k, x in v.items()
+                          if k not in ("git", "rev", "branch", "tag", "version",
+                                       "workspace")}
+                    nv["path"] = os.path.relpath(copy.resolve(), cm.parent)
+                    tbl[name] = nv
                 dirty = True
                 log(f"{cm}: duplicated {pkg} dep '{name}' gets its own tree copy")
         if dirty:
