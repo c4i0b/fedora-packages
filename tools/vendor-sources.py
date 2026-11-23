@@ -656,7 +656,7 @@ def set_patch_entries(ws, repo, entries):
     text = manifest.read_text()
     header = f'[patch."{repo}"]'
     strip_re = re.compile(r"^# vendor-sources dup-pin\n"
-                          r"[A-Za-z0-9_.-]+ = \{ path = \"[^\"]+\" \}\n", re.M)
+                          r"[A-Za-z0-9_.-]+ = \{ path = \"[^\"]+\" \}(?:\n|\Z)", re.M)
     if header in text:
         before, rest = text.split(header, 1)
         cut = rest.find("\n[")
