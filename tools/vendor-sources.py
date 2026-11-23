@@ -15,6 +15,7 @@ import sys
 import tarfile
 import tempfile
 import time
+import tomllib
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -385,6 +386,188 @@ def fetch_zig_closure(src_tree, spec, spec_text):
     shutil.rmtree(store)
 
 
+# ---- workspace flattening -------------------------------------------------------
+
+_BARE = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def _toml_key(s):
+    return s if _BARE.match(s) else '"' + str(s).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _toml_val(v):
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, (int, float)):
+        return str(v)
+    if isinstance(v, str):
+        return '"' + v.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    if isinstance(v, list):
+        return "[" + ", ".join(_toml_val(x) for x in v) + "]"
+    raise TypeError(f"cannot serialize {type(v)}")
+
+
+def _toml_dumps(m):
+    """Minimal TOML writer (stdlib has no encoder): scalars/arrays inline,
+    dicts as [table] sections, lists of dicts as [[array-of-tables]]."""
+    out = []
+
+    def emit(table, prefix):
+        aots = {id(v) for k, v in table.items()
+                if isinstance(v, list) and v and all(isinstance(x, dict) for x in v)}
+        for k, v in table.items():
+            if isinstance(v, dict):
+                name = f"{prefix}.{_toml_key(k)}" if prefix else _toml_key(k)
+                if v:
+                    out.append(f"\n[{name}]")
+                    emit(v, name)
+            elif id(v) in aots:
+                name = f"{prefix}.{_toml_key(k)}" if prefix else _toml_key(k)
+                for item in v:
+                    out.append(f"\n[[{name}]]")
+                    emit(item, name)
+            else:
+                out.append(f"{_toml_key(k)} = {_toml_val(v)}")
+    emit(m, "")
+    return "\n".join(out) + "\n"
+
+
+def _dep_tables(m):
+    for k in ("dependencies", "dev-dependencies", "build-dependencies"):
+        if k in m:
+            yield m[k]
+    for tv in m.get("target", {}).values():
+        for k in ("dependencies", "dev-dependencies", "build-dependencies"):
+            if k in tv:
+                yield tv[k]
+
+
+def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
+    """Inline `workspace = true` inheritance in every member manifest of the
+    workspace at `root` (the fetched dup-pinned tree). Cargo resolves
+    inheritance of a [patch] path target — and of everything it reaches via
+    path deps — against the workspace doing the patching, so members of
+    another workspace can never be patch targets as-is (craft-libs' root is
+    a virtual manifest and every crate inherits heavily). With `repo`,
+    git deps pointing back at that repository become in-tree path deps —
+    they would otherwise reintroduce the duplicate git sources the pin is
+    trying to eliminate. With `crate_tree` (crate -> canonical rev) and
+    `ws`, same-repo references resolve to each crate's CANONICAL tree, so
+    every crate is reachable from exactly one path regardless of which
+    fetched tree mentions it. Only manifests that actually use inheritance
+    are rewritten."""
+    root = Path(root)
+    rm = tomllib.loads((root / "Cargo.toml").read_text())
+    wsp = rm.get("workspace", {})
+    wpkg, wdeps = wsp.get("package", {}), wsp.get("dependencies", {})
+    self_repo = re.sub(r"\.git$", "", repo.rstrip("/")) if repo else None
+    for cm in sorted(root.rglob("Cargo.toml")):
+        if cm.parent == root:
+            continue  # the root itself keeps defining the workspace
+        text = cm.read_text()
+        if not re.search(r"workspace\s*=\s*true", text):
+            continue  # no inheritance used: leave untouched
+        m = tomllib.loads(text)
+        if "package" not in m:
+            continue  # nested virtual manifest: nothing to inline
+        pkg = m["package"]
+        for k in list(pkg):
+            if pkg[k] == {"workspace": True}:
+                if k not in wpkg:
+                    die(f"{cm}: inherits package.{k}, root lacks it")
+                pkg[k] = wpkg[k]
+        if m.get("lints") == {"workspace": True}:
+            m["lints"] = {k.split(".", 1)[1]: v for k, v in wsp.items()
+                          if k.startswith("lints.")}
+        for tbl in _dep_tables(m):
+            for name in list(tbl):
+                v = tbl[name]
+                if not isinstance(v, dict) or v.get("workspace") is not True:
+                    continue
+                if name not in wdeps:
+                    die(f"{cm}: inherits dependency '{name}', root lacks it")
+                # { workspace = true, optional/features/... }: merge the
+                # extras onto the root's spec (cargo allows both)
+                base = wdeps[name]
+                if isinstance(base, str):
+                    base = {"version": base}
+                base = dict(base)
+                extra = {k: x for k, x in v.items() if k != "workspace"}
+                if "features" in extra and "features" in base:
+                    extra["features"] = base["features"] + extra["features"]
+                base.update(extra)
+                v = tbl[name] = base
+                # same-repo references become path deps: the crate's
+                # canonical tree when one is assigned (single path per
+                # crate — two live copies collide in the lockfile), else
+                # this tree
+                tgt = None
+                if crate_tree and ws is not None and name in crate_tree:
+                    tgt = _tree_member(ws, repo, crate_tree[name], name)
+                if tgt is None and self_repo and isinstance(v.get("git"), str) \
+                        and re.sub(r"\.git$", "", v["git"].rstrip("/")) == self_repo:
+                    tgt = crate_member_dir(root, name)
+                if tgt is not None:
+                    v = {k: x for k, x in v.items()
+                         if k not in ("git", "rev", "branch", "tag", "version")}
+                    v["path"] = os.path.relpath(tgt.resolve(), cm.parent)
+                    tbl[name] = v
+                elif "path" in v:  # root-relative -> member-relative
+                    v["path"] = os.path.relpath(
+                        (root / v["path"]).resolve(), cm.parent)
+        # second pass: a crate can be a plain registry/version dep in one
+        # table and inherit the (patched) path in another — cargo demands a
+        # single canonical source per crate per manifest, so route EVERY
+        # reference to a crate_tree crate at its canonical path
+        if crate_tree and ws is not None:
+            for tbl in _dep_tables(m):
+                for name in list(tbl):
+                    if name not in crate_tree:
+                        continue
+                    v = tbl[name]
+                    if isinstance(v, dict) and v.get("path"):
+                        continue  # already canonical from the pass above
+                    tgt = _tree_member(ws, repo, crate_tree[name], name)
+                    if tgt is None:
+                        continue
+                    extra = {k: x for k, x in v.items()
+                             if k not in ("version", "git", "rev", "branch",
+                                          "tag", "workspace")} \
+                        if isinstance(v, dict) else {}
+                    nv = {"path": os.path.relpath(tgt.resolve(), cm.parent)}
+                    nv.update(extra)
+                    tbl[name] = nv
+        # features referencing deps absent from the manifest (craft-libs
+        # points `snapshot` at a dev-dependency): tolerated inside the
+        # original workspace, eagerly rejected in a patch target — drop
+        # the dangling references
+        feats = m.get("features")
+        if isinstance(feats, dict):
+            # features may only reference normal/target dependencies —
+            # dev-dependencies count as dangling (craft-libs' `snapshot`)
+            depnames = set(m.get("dependencies", {}).keys())
+            for tv in m.get("target", {}).values():
+                depnames |= set(tv.get("dependencies", {}).keys())
+            for fname, items in list(feats.items()):
+                if not isinstance(items, list):
+                    continue
+                keep = []
+                for it in items:
+                    if not isinstance(it, str):
+                        keep.append(it)
+                        continue
+                    ref = it[4:] if it.startswith("dep:") else it.split("/", 1)[0]
+                    if ref in depnames or (not it.startswith("dep:")
+                                           and "/" not in it and ref in feats):
+                        keep.append(it)
+                    else:
+                        log(f"{cm}: dropping feature ref '{it}' "
+                            f"(dep not in manifest)")
+                feats[fname] = keep
+        cm.write_text(_toml_dumps(m))
+        log(f"flattened workspace inheritance in {cm}")
+
+
 # ---- cargo patch filtering -----------------------------------------------------
 
 def drop_unvendored_git_patches(ws):
@@ -426,31 +609,211 @@ def drop_unvendored_git_patches(ws):
     return dropped
 
 
-def pin_duplicate_git_crate(stderr_text, ws):
-    """cargo vendor refuses the same crate+version coming from two git
-    sources (an upstream lock can pin e.g. winprint at two revs), and a
-    patch cannot point back at the same repository. Fetch the first
-    source's rev into the tree and unify via a path [patch."<repo>"] entry
-    appended to the workspace manifest; path-patched crates stay in-tree
-    and are never vendored. The caller retries vendoring unlocked and
-    repacks the tree. True when the manifest was patched."""
-    m = re.search(
-        r"found duplicate version of package `([A-Za-z0-9_.-]+) v\S+` "
-        r"vendored from two sources:\s*\n\s*source 1: (\S+?rev=([0-9a-f]+))#",
-        stderr_text)
-    if not m:
-        return False
-    crate, src1, rev = m.group(1), m.group(2), m.group(3)
-    repo = re.sub(r"\?rev=[0-9a-f]+$", "", src1)
-    log(f"duplicate git sources for {crate}; pinning to {rev[:8]} via path patch")
-    pindir = Path(ws) / "dup-pinned" / crate
-    if not pindir.is_dir():
-        pindir.parent.mkdir(parents=True, exist_ok=True)
-        fetch_tarball(f"{repo}/archive/{rev}.tar.gz", strip=1, dest=pindir)
+def crate_member_dir(root, crate):
+    """Resolve the directory of the package manifest defining `crate`
+    inside a fetched git tree. Many repos (craft-libs) keep a virtual
+    workspace manifest at the root; a path [patch] entry must point at
+    the member, not the root. Falls back to `root` when it itself is the
+    package manifest or no member matches (the caller decides whether
+    that is fatal)."""
+    for cm in sorted(Path(root).rglob("Cargo.toml")):
+        if re.search(rf'^name\s*=\s*"{re.escape(crate)}"\s*$',
+                     cm.read_text(errors="replace"), re.M):
+            return cm.parent
+    return Path(root)
+
+
+DUP_SOURCES_RE = re.compile(
+    r"found duplicate version of package `([A-Za-z0-9_.-]+) v\S+` "
+    r"vendored from two sources:\s*\n\s*source 1: (\S+?rev=([0-9a-f]+))#[0-9a-f]+"
+    r"\s*\n\s*source 2: (\S+?rev=([0-9a-f]+))#[0-9a-f]+")
+
+
+def lock_git_crates(ws):
+    """From the lockfile: crate -> git repo, crate -> every rev it is
+    pinned at IN ORDER (an upstream lock routinely mixes a dozen revs of
+    one repo — each craft app pins whatever rev was current when it bumped
+    each crate)."""
+    lock = Path(ws) / "Cargo.lock"
+    cmap, crevs = {}, {}
+    if not lock.is_file():
+        return cmap, crevs
+    for blk in lock.read_text().split("[[package]]")[1:]:
+        name = re.search(r'^name = "(.+)"$', blk, re.M)
+        src = re.search(r'^source = "git\+(\S+?)\?rev=([0-9a-f]+)#', blk, re.M)
+        if name and src:
+            cmap.setdefault(name.group(1), src.group(1))
+            crevs.setdefault(name.group(1), []).append(src.group(2))
+    return cmap, crevs
+
+
+def set_patch_entries(ws, repo, entries):
+    """Write crate->path entries under [patch.\"repo\"], scoped to that
+    repo's section: other repos' tagged entries (earlier pins) survive,
+    upstream's own entries in the section are kept, and previously written
+    entries for THIS repo are tagged so a repin replaces them cleanly."""
     manifest = Path(ws) / "Cargo.toml"
-    with manifest.open("a") as f:
-        f.write(f'\n[patch."{repo}"]\n'
-                f'{crate} = {{ path = "dup-pinned/{crate}" }}\n')
+    text = manifest.read_text()
+    header = f'[patch."{repo}"]'
+    strip_re = re.compile(r"^# vendor-sources dup-pin\n"
+                          r"[A-Za-z0-9_.-]+ = \{ path = \"[^\"]+\" \}\n", re.M)
+    if header in text:
+        before, rest = text.split(header, 1)
+        cut = rest.find("\n[")
+        body, after = (rest, "") if cut < 0 else (rest[:cut], rest[cut + 1:])
+        body = strip_re.sub("", body)
+        existing = set(re.findall(r"^([A-Za-z0-9_.-]+)\s*=", body, re.M))
+    else:
+        before, after, existing = text, "", set()
+    block = "".join(f"# vendor-sources dup-pin\n"
+                    f"{c} = {{ path = \"{p}\" }}\n"
+                    for c, p in entries.items() if c not in existing)
+    if header in text or block:
+        manifest.write_text(before + header + "\n" + body + block + after)
+
+
+def reset_dup_pin_state(ws):
+    """A re-run may extract a Source0 that a previous run re-packed WITH
+    our dup-pin patches (tagged Cargo.toml entries, dup-pinned trees, a
+    lock resolved against them) — strip them so vendoring starts from the
+    pristine upstream state and re-resolves."""
+    shutil.rmtree(Path(ws) / "dup-pinned", ignore_errors=True)
+    manifest = Path(ws) / "Cargo.toml"
+    if not manifest.is_file():
+        return
+    text = manifest.read_text()
+    new = re.sub(r"^# vendor-sources dup-pin\n"
+                 r"[A-Za-z0-9_.-]+ = \{ path = \"[^\"]+\" \}\n",
+                 "", text, flags=re.M)
+    new = re.sub(r'(?m)^\[patch\."[^"]+"\]\n(?=\[|\Z)', "", new)
+    if new != text:
+        manifest.write_text(new)
+        log("stripped dup-pin patches re-extracted from a repacked Source0")
+
+
+def manifest_declared_rev(ws, repo, crate):
+    """The rev the workspace manifests themselves pin `crate` at from
+    `repo` — the version upstream actually builds against, so the first
+    candidate to try when unifying (lockfile rev counts drift once our
+    own patches rewrite the lock). None when not declared."""
+    for cm in Path(ws).rglob("Cargo.toml"):
+        if any(p in ("dup-pinned", "vendor-deps", "vendor")
+               for p in cm.relative_to(ws).parts[:-1]):
+            continue
+        try:
+            m = tomllib.loads(cm.read_text())
+        except tomllib.TOMLDecodeError:
+            continue
+        for tbl in _dep_tables(m):
+            v = tbl.get(crate)
+            if isinstance(v, dict) and v.get("git") \
+                    and re.sub(r"\.git$", "", v["git"].rstrip("/")) \
+                    == re.sub(r"\.git$", "", repo.rstrip("/")) \
+                    and v.get("rev"):
+                return v["rev"]
+    return None
+
+
+def dup_pin_dir(ws, repo, rev):
+    key = re.sub(r"[^A-Za-z0-9.-]", "-", repo.rstrip("/").rsplit("/", 1)[-1]) \
+        + "-" + rev[:8]
+    return Path(ws) / "dup-pinned" / key
+
+
+def _tree_member(ws, repo, rev, crate):
+    """The member dir defining `crate` in the fetched tree at `rev`, or
+    None when that rev does not carry it."""
+    d = dup_pin_dir(ws, repo, rev)
+    if not d.is_dir():
+        return None
+    pkg = crate_member_dir(d, crate)
+    if re.search(rf'^name\s*=\s*"{re.escape(crate)}"\s*$',
+                 (pkg / "Cargo.toml").read_text(errors="replace"), re.M):
+        return pkg
+    return None
+
+
+def pin_duplicate_git_crate(stderr_text, ws, tried):
+    """cargo vendor refuses the same crate+version coming from two git
+    revs, and a patch cannot point back at the same repository. Patch
+    every crate the lock draws from that repo to a fetched tree of the
+    rev THE LOCK PINNED IT AT — one canonical path per crate, identical to
+    upstream's own resolution, so feature requirements keep holding (a
+    single-rev unification cannot work: craft apps mix a dozen revs and no
+    one rev carries every crate or feature). Cross-tree deps are
+    redirected to each crate's canonical tree during flattening (see
+    flatten_workspace_members), which is what keeps the lockfile
+    collision-free. Only genuinely duplicated crates need a decision —
+    first lock entry wins, and a "does not have that feature" failure
+    flips that crate to its next rev via `tried`. Path-patched crates stay
+    in-tree and are never vendored. True when a pin was (re)written."""
+    cmap, crevs = lock_git_crates(ws)
+    m = DUP_SOURCES_RE.search(stderr_text)
+    sel = re.search(r"failed to select a version for `([A-Za-z0-9_.-]+)`",
+                    stderr_text)
+    feat = re.search(r"does not have (?:that feature|a feature)", stderr_text)
+    if m:
+        dup_crate = m.group(1)
+        repo = re.sub(r"\?rev=[0-9a-f]+$", "", m.group(2))
+    elif sel and feat and sel.group(1) in cmap:
+        dup_crate = sel.group(1)
+        repo = cmap[dup_crate]
+    else:
+        return False
+    if dup_crate not in [c for c, r in cmap.items() if r == repo]:
+        return False
+    # duplicated crate stuck on a failing rev: flip to the next candidate
+    if not m:
+        alts = list(dict.fromkeys(crevs.get(dup_crate, [])))
+        declared = manifest_declared_rev(ws, repo, dup_crate)
+        if declared and declared not in alts:
+            alts.append(declared)
+        done = tried.setdefault(dup_crate, [])
+        cands = [rv for rv in alts if rv not in done]
+        if not cands:
+            return False
+        tried.setdefault("overrides", {})[dup_crate] = cands[0]
+        done.append(cands[0])
+        log(f"{dup_crate} pinned at a feature-incompatible rev; "
+            f"flipping to {cands[0][:8]}")
+    overrides = tried.get("overrides", {})
+    crate_tree = {}
+    for crate, r in cmap.items():
+        if r != repo:
+            continue
+        crate_tree[crate] = overrides.get(crate, crevs[crate][0])
+    tag = hashlib.md5(repr(sorted(crate_tree.items())).encode()).hexdigest()[:8]
+    # fetch every needed tree first: flattening redirects cross trees.
+    # A tree flattened for a different crate mapping carries stale
+    # redirects (crate flipped to another rev) — refetch it pristine.
+    revs = sorted(set(crate_tree.values()))
+    for rev in revs:
+        pindir = dup_pin_dir(ws, repo, rev)
+        if pindir.is_dir():
+            marks = list(pindir.glob(".flattened-*"))
+            if marks and not (pindir / f".flattened-{tag}").is_file():
+                log(f"refetching {pindir.name}: flattened for another mapping")
+                shutil.rmtree(pindir)
+        if not pindir.is_dir():
+            pindir.parent.mkdir(parents=True, exist_ok=True)
+            fetch_tarball(f"{repo}/archive/{rev}.tar.gz", strip=1, dest=pindir)
+    entries = {}
+    for crate, rev in sorted(crate_tree.items()):
+        pkg = _tree_member(ws, repo, rev, crate)
+        if pkg is None:
+            log(f"dup-pinned {rev[:8]}: no member '{crate}', leaving it on git")
+            continue
+        entries[crate] = pkg.relative_to(ws).as_posix()
+    if not entries:
+        die(f"dup-pinned {repo}: no patchable members found")
+    for rev in revs:
+        pindir = dup_pin_dir(ws, repo, rev)
+        if not (pindir / f".flattened-{tag}").is_file():
+            flatten_workspace_members(pindir, repo, crate_tree, ws)
+            (pindir / f".flattened-{tag}").touch()
+    log(f"duplicate git sources from {repo}; patching its "
+        f"{len(entries)} lock crates to per-crate rev trees")
+    set_patch_entries(ws, repo, entries)
     return True
 
 
@@ -572,12 +935,29 @@ def vendor_cargo(spec, spec_text):
         subprocess.run(["cargo", "update"] + upd.split(), cwd=ws, check=True)
         changed = True
     # vendor into a fresh dir name: some trees already carry a "vendor" dir
+    reset_dup_pin_state(ws)
     r = subprocess.run(["cargo", "vendor", "--locked", "vendor-deps"],
                        cwd=ws, capture_output=True, text=True)
-    if r.returncode != 0 and pin_duplicate_git_crate(r.stderr, ws):
+    if r.returncode != 0:
+        # a repacked Source0 may carry a lock resolved against our path
+        # patches: --locked refuses it before any duplicate surfaces
+        r = subprocess.run(["cargo", "vendor", "vendor-deps"],
+                           cwd=ws, capture_output=True, text=True)
+    # each pin unifies one git repo at one rev; a wrong rev choice surfaces
+    # as a feature error and is retried with the next candidate
+    tried = {}
+    pins = 0
+    while r.returncode != 0 and pins < 8 \
+            and pin_duplicate_git_crate(r.stderr, ws, tried):
+        pins += 1
         changed = True
         r = subprocess.run(["cargo", "vendor", "vendor-deps"],
                            cwd=ws, capture_output=True, text=True)
+        if r.returncode != 0:
+            cause = [l for l in r.stderr.splitlines()
+                     if l.startswith(("error:", "  "))]
+            log(f"attempt {pins} still failing: "
+                + " | ".join(cause[:3][:3]))
     if r.returncode != 0:
         r = subprocess.run(["cargo", "vendor", "vendor-deps"],
                            cwd=ws, capture_output=True, text=True)

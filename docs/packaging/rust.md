@@ -28,6 +28,16 @@
   lands on the vendored `xml` CRATE (its extensionless LICENSE panics the
   macro). Export `LOCKSTEP_XML_PATH=<builddir>/vendor-deps/atspi-common/xml`
   in %build (see any craft spec).
+- `cargo vendor` refuses the same crate+version pinned at two git revs
+  (craft-libs revs drift between craft apps' locks): vendor-sources.py
+  fetches the first source's rev into `dup-pinned/<crate>` and unifies via
+  a path `[patch."<repo>"]` entry. Two traps make the naive patch fail:
+  the repo root is a virtual workspace manifest (not a patch target), and
+  cargo resolves a path target's `workspace = true` inheritance against
+  the patching workspace, not the target's own — so vendor-sources
+  *flattens* the fetched members into standalone manifests (inlining
+  workspace.package/dependencies/lints, rewriting root-relative path deps)
+  before pointing the patch at the member that defines the crate.
 - `cargo vendor` trees with git deps (e.g. storytold craft-libs) need the
   `[source."git+https://…"]` blocks cargo vendor prints appended to the
   config the cargo_prep macro writes; vendor-sources.py ships them inside

@@ -43,6 +43,12 @@ spec/SRPM name in the output matches the package you are diagnosing.
   Source0 fetched a forge **error page**, not a tarball. On GitHub the usual
   cause is a tag/branch name collision (lazygit keeps release branches) —
   pin Source0 to `archive/refs/tags/v<ver>/…`, which is unambiguous.
+- `cargo vendor` duplicate-pin failures (`found duplicate version of
+  package ... vendored from two sources`, `found a virtual manifest ...
+  instead of a package manifest`, `error inheriting ... from workspace
+  root manifest`) are vendor-sources.py's dup-pinned path patch — the
+  fix belongs in tools/vendor-sources.py (flatten + member resolution),
+  never in the package spec.
 - A noarch package failing every chroot with `Arch dependent binaries in
   noarch package` means ELFs/wasm/platform dirs in the payload — strip them in
   `%install` (see openclaw).
