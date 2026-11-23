@@ -454,8 +454,9 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
     trying to eliminate. With `crate_tree` (crate -> canonical rev) and
     `ws`, same-repo references resolve to each crate's CANONICAL tree, so
     every crate is reachable from exactly one path regardless of which
-    fetched tree mentions it. Only manifests that actually use inheritance
-    are rewritten."""
+    fetched tree mentions it. Manifests are rewritten only when something
+    actually changes (inheritance inlined, a reference rerouted, a
+    dangling feature ref dropped)."""
     root = Path(root)
     rm = tomllib.loads((root / "Cargo.toml").read_text())
     wsp = rm.get("workspace", {})
@@ -465,60 +466,63 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
         if cm.parent == root:
             continue  # the root itself keeps defining the workspace
         text = cm.read_text()
-        if not re.search(r"workspace\s*=\s*true", text):
-            continue  # no inheritance used: leave untouched
         m = tomllib.loads(text)
         if "package" not in m:
             continue  # nested virtual manifest: nothing to inline
-        pkg = m["package"]
-        for k in list(pkg):
-            if pkg[k] == {"workspace": True}:
-                if k not in wpkg:
-                    die(f"{cm}: inherits package.{k}, root lacks it")
-                pkg[k] = wpkg[k]
-        if m.get("lints") == {"workspace": True}:
-            m["lints"] = {k.split(".", 1)[1]: v for k, v in wsp.items()
-                          if k.startswith("lints.")}
-        for tbl in _dep_tables(m):
-            for name in list(tbl):
-                v = tbl[name]
-                if not isinstance(v, dict) or v.get("workspace") is not True:
-                    continue
-                if name not in wdeps:
-                    die(f"{cm}: inherits dependency '{name}', root lacks it")
-                # { workspace = true, optional/features/... }: merge the
-                # extras onto the root's spec (cargo allows both)
-                base = wdeps[name]
-                if isinstance(base, str):
-                    base = {"version": base}
-                base = dict(base)
-                extra = {k: x for k, x in v.items() if k != "workspace"}
-                if "features" in extra and "features" in base:
-                    extra["features"] = base["features"] + extra["features"]
-                base.update(extra)
-                v = tbl[name] = base
-                # same-repo references become path deps: the crate's
-                # canonical tree when one is assigned (single path per
-                # crate — two live copies collide in the lockfile), else
-                # this tree
-                tgt = None
-                if crate_tree and ws is not None and name in crate_tree:
-                    tgt = _tree_member(ws, repo, crate_tree[name], name)
-                if tgt is None and self_repo and isinstance(v.get("git"), str) \
-                        and re.sub(r"\.git$", "", v["git"].rstrip("/")) == self_repo:
-                    tgt = crate_member_dir(root, name)
-                if tgt is not None:
-                    v = {k: x for k, x in v.items()
-                         if k not in ("git", "rev", "branch", "tag", "version")}
-                    v["path"] = os.path.relpath(tgt.resolve(), cm.parent)
-                    tbl[name] = v
-                elif "path" in v:  # root-relative -> member-relative
-                    v["path"] = os.path.relpath(
-                        (root / v["path"]).resolve(), cm.parent)
+        dirty = False
+        if re.search(r"workspace\s*=\s*true", text):
+            dirty = True  # rewritten even if only formatting changes
+            pkg = m["package"]
+            for k in list(pkg):
+                if pkg[k] == {"workspace": True}:
+                    if k not in wpkg:
+                        die(f"{cm}: inherits package.{k}, root lacks it")
+                    pkg[k] = wpkg[k]
+            if m.get("lints") == {"workspace": True}:
+                m["lints"] = {k.split(".", 1)[1]: v for k, v in wsp.items()
+                              if k.startswith("lints.")}
+            for tbl in _dep_tables(m):
+                for name in list(tbl):
+                    v = tbl[name]
+                    if not isinstance(v, dict) or v.get("workspace") is not True:
+                        continue
+                    if name not in wdeps:
+                        die(f"{cm}: inherits dependency '{name}', root lacks it")
+                    # { workspace = true, optional/features/... }: merge the
+                    # extras onto the root's spec (cargo allows both)
+                    base = wdeps[name]
+                    if isinstance(base, str):
+                        base = {"version": base}
+                    base = dict(base)
+                    extra = {k: x for k, x in v.items() if k != "workspace"}
+                    if "features" in extra and "features" in base:
+                        extra["features"] = base["features"] + extra["features"]
+                    base.update(extra)
+                    v = tbl[name] = base
+                    # same-repo references become path deps: the crate's
+                    # canonical tree when one is assigned (single path per
+                    # crate — two live copies collide in the lockfile), else
+                    # this tree
+                    tgt = None
+                    if crate_tree and ws is not None and name in crate_tree:
+                        tgt = _tree_member(ws, repo, crate_tree[name], name)
+                    if tgt is None and self_repo and isinstance(v.get("git"), str) \
+                            and re.sub(r"\.git$", "", v["git"].rstrip("/")) == self_repo:
+                        tgt = crate_member_dir(root, name)
+                    if tgt is not None:
+                        v = {k: x for k, x in v.items()
+                             if k not in ("git", "rev", "branch", "tag", "version")}
+                        v["path"] = os.path.relpath(tgt.resolve(), cm.parent)
+                        tbl[name] = v
+                    elif "path" in v:  # root-relative -> member-relative
+                        v["path"] = os.path.relpath(
+                            (root / v["path"]).resolve(), cm.parent)
         # second pass: a crate can be a plain registry/version dep in one
         # table and inherit the (patched) path in another — cargo demands a
         # single canonical source per crate per manifest, so route EVERY
-        # reference to a crate_tree crate at its canonical path
+        # reference to a crate_tree crate at its canonical path. Applies to
+        # manifests WITHOUT inheritance too (the tree's vendored crates
+        # declare plain registry deps that would otherwise mix instances)
         if crate_tree and ws is not None:
             for tbl in _dep_tables(m):
                 for name in list(tbl):
@@ -537,6 +541,8 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
                     nv = {"path": os.path.relpath(tgt.resolve(), cm.parent)}
                     nv.update(extra)
                     tbl[name] = nv
+                    dirty = True
+                    log(f"{cm}: routing {name} at its canonical dup-pinned tree")
         # features referencing deps absent from the manifest (craft-libs
         # points `snapshot` at a dev-dependency): tolerated inside the
         # original workspace, eagerly rejected in a patch target — drop
@@ -563,9 +569,11 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
                     else:
                         log(f"{cm}: dropping feature ref '{it}' "
                             f"(dep not in manifest)")
+                        dirty = True
                 feats[fname] = keep
-        cm.write_text(_toml_dumps(m))
-        log(f"flattened workspace inheritance in {cm}")
+        if dirty:
+            cm.write_text(_toml_dumps(m))
+            log(f"flattened workspace inheritance in {cm}")
 
 
 # ---- cargo patch filtering -----------------------------------------------------
@@ -734,6 +742,60 @@ def _tree_member(ws, repo, rev, crate):
     return None
 
 
+def fix_renamed_dup_deps(ws, repo, crate_tree):
+    """A manifest can depend on one repo crate under two keys — upstream
+    pins an OLD rev under a renamed dep (effectcraft's craft-audio-markers
+    = { package = "craft-audio", git ... }) alongside the workspace one.
+    Once the repo is path-patched both edges collapse onto a single
+    package and cargo rejects the duplicate ("depends on crate multiple
+    times with different names"). Give every extra key its own physical
+    copy of the canonical member so the instances stay distinct."""
+    norm = re.sub(r"\.git$", "", repo.rstrip("/"))
+    for cm in Path(ws).rglob("Cargo.toml"):
+        if any(p in ("vendor-deps", "vendor") for p in cm.relative_to(ws).parts[:-1]):
+            continue
+        try:
+            m = tomllib.loads(cm.read_text())
+        except tomllib.TOMLDecodeError:
+            continue
+        if "package" not in m:
+            continue
+        by_pkg = {}
+        for tbl in _dep_tables(m):
+            for name, v in tbl.items():
+                if not isinstance(v, dict):
+                    continue
+                pkg = v.get("package", name)
+                git = v.get("git") and \
+                    re.sub(r"\.git$", "", v["git"].rstrip("/")) == norm
+                if git or pkg in crate_tree:
+                    by_pkg.setdefault(pkg, []).append((tbl, name))
+        dirty = False
+        for pkg, refs in by_pkg.items():
+            if len(refs) < 2 or pkg not in crate_tree:
+                continue
+            refs.sort(key=lambda tn: tn[1] != pkg)  # un-renamed key keeps canon
+            canon = _tree_member(ws, repo, crate_tree[pkg], pkg)
+            if canon is None:
+                continue
+            base = dup_pin_dir(ws, repo, crate_tree[pkg])
+            for tbl, name in refs[1:]:
+                copy = base.parent / (base.name + "-"
+                                      + re.sub(r"[^A-Za-z0-9.-]", "-", name))
+                if not copy.is_dir():
+                    shutil.copytree(canon, copy)
+                v = tbl[name]
+                nv = {k: x for k, x in v.items()
+                      if k not in ("git", "rev", "branch", "tag", "version",
+                                   "workspace")}
+                nv["path"] = os.path.relpath(copy.resolve(), cm.parent)
+                tbl[name] = nv
+                dirty = True
+                log(f"{cm}: duplicated {pkg} dep '{name}' gets its own tree copy")
+        if dirty:
+            cm.write_text(_toml_dumps(m))
+
+
 def pin_duplicate_git_crate(stderr_text, ws, tried):
     """cargo vendor refuses the same crate+version coming from two git
     revs, and a patch cannot point back at the same repository. Patch
@@ -815,6 +877,7 @@ def pin_duplicate_git_crate(stderr_text, ws, tried):
     log(f"duplicate git sources from {repo}; patching its "
         f"{len(entries)} lock crates to per-crate rev trees")
     set_patch_entries(ws, repo, entries)
+    fix_renamed_dup_deps(ws, repo, crate_tree)
     return True
 
 
