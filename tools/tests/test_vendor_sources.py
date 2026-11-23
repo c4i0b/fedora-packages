@@ -63,6 +63,48 @@ class CrateMemberDir(unittest.TestCase):
                          self.root)
 
 
+class SetPatchEntries(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.ws = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def manifest(self):
+        return (self.ws / "Cargo.toml").read_text()
+
+    def test_creates_section_and_preserves_other_repos(self):
+        (self.ws / "Cargo.toml").write_text(
+            '[patch."https://git/r1"]\n'
+            "# vendor-sources dup-pin\n"
+            'old = { path = "dup-pinned/r1-x/crates/old" }\n'
+            '[patch.crates-io]\nfoo = "1"\n')
+        vs.set_patch_entries(self.ws, "https://git/r1", {"new": "dup-pinned/r1-y/crates/new"})
+        vs.set_patch_entries(self.ws, "https://git/r2", {"bar": "dup-pinned/r2-z/crates/bar"})
+        m = self.manifest()
+        self.assertIn('new = { path = "dup-pinned/r1-y/crates/new" }', m)
+        self.assertNotIn("old =", m)  # same repo: replaced
+        self.assertIn('bar = { path = "dup-pinned/r2-z/crates/bar" }', m)
+        self.assertIn('[patch.crates-io]', m)
+
+    def test_no_section_yet(self):
+        (self.ws / "Cargo.toml").write_text("[package]\nname = \"x\"\n")
+        vs.set_patch_entries(self.ws, "https://git/r1", {"a": "dup-pinned/r1/crates/a"})
+        m = self.manifest()
+        self.assertIn('[patch."https://git/r1"]', m)
+        self.assertIn('a = { path = "dup-pinned/r1/crates/a" }', m)
+        self.assertTrue(m.index("[package]") < m.index("[patch"))
+
+    def test_upstream_entry_not_duplicated(self):
+        (self.ws / "Cargo.toml").write_text(
+            '[patch."https://git/r1"]\nup = { git = "https://git/r1" }\n')
+        vs.set_patch_entries(self.ws, "https://git/r1", {"up": "dup-pinned/r1/crates/up",
+                                                        "n2": "dup-pinned/r1/crates/n2"})
+        m = self.manifest()
+        self.assertEqual(m.count("up ="), 1)
+        self.assertIn('up = { git = "https://git/r1" }', m)
+        self.assertIn("n2 = ", m)
+
+
 class FlattenWorkspaceMembers(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

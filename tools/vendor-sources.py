@@ -665,6 +665,7 @@ def set_patch_entries(ws, repo, entries):
         existing = set(re.findall(r"^([A-Za-z0-9_.-]+)\s*=", body, re.M))
     else:
         before, after, existing = text, "", set()
+        body = ""
     block = "".join(f"# vendor-sources dup-pin\n"
                     f"{c} = {{ path = \"{p}\" }}\n"
                     for c, p in entries.items() if c not in existing)
