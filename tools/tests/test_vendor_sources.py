@@ -222,5 +222,24 @@ class ChoosePinRevs(unittest.TestCase):
         self.assertEqual(got["craft-stream"], "010702ee")
 
 
+class DeclaredGitRevs(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+        self.repo = "https://github.com/storytold/craft-libs"
+
+    def test_includes_renamed_dep_rev_excluded_from_lock_canonicals(self):
+        p = self.root / "crates" / "preflight" / "Cargo.toml"
+        p.parent.mkdir(parents=True)
+        p.write_text('[dependencies]\ncraft-cms-v2 = { package = "craft-cms", '
+                     'git = "%s", rev = "8503f24c" }\n' % self.repo)
+        (self.root / "Cargo.toml").write_text('[workspace.dependencies]\n'
+                                              'craft-cms = { git = "%s", '
+                                              'rev = "e2dc681a" }\n' % self.repo)
+        got = vs.declared_git_revs(self.root, self.repo)
+        self.assertEqual(got, {"8503f24c", "e2dc681a"})
+
+
 if __name__ == "__main__":
     unittest.main()

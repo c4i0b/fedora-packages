@@ -750,6 +750,33 @@ def choose_pin_revs(ws, repo, cmap, crevs, overrides=None):
     return out
 
 
+def declared_git_revs(ws, repo):
+    """Every rev manifests pin from `repo`, including renamed deps. A
+    renamed dep (pdfcraft's craft-cms-v2 = { package = "craft-cms", rev =
+    8503f24c }) needs its OWN tree: the canonical tree chosen for the
+    package may be a different rev without the API the code calls."""
+    revs = set()
+    norm = re.sub(r"\.git$", "", repo.rstrip("/"))
+    for cm in Path(ws).rglob("Cargo.toml"):
+        if any(p in ("dup-pinned", "vendor-deps", "vendor")
+               for p in cm.relative_to(ws).parts[:-1]):
+            continue
+        try:
+            m = tomllib.loads(cm.read_text())
+        except tomllib.TOMLDecodeError:
+            continue
+        tables = list(_dep_tables(m))
+        if m.get("workspace", {}).get("dependencies"):
+            tables.append(m["workspace"]["dependencies"])
+        for tbl in tables:
+            for v in tbl.values():
+                if isinstance(v, dict) and v.get("rev") \
+                        and isinstance(v.get("git"), str) \
+                        and re.sub(r"\.git$", "", v["git"].rstrip("/")) == norm:
+                    revs.add(v["rev"])
+    return revs
+
+
 def dup_pin_dir(ws, repo, rev):
     key = re.sub(r"[^A-Za-z0-9.-]", "-", repo.rstrip("/").rsplit("/", 1)[-1]) \
         + "-" + rev[:8]
@@ -803,17 +830,25 @@ def fix_renamed_dup_deps(ws, repo, crate_tree):
                     by_pkg.setdefault(pkg, {}).setdefault(name, []).append((tbl, v))
         dirty = False
         for pkg, names in by_pkg.items():
-            # same dep name in several tables is NOT a rename: every
-            # occurrence must share the canonical path or cargo rejects
-            # the manifest ("different source paths depending on target")
-            if len(names) < 2 or pkg not in crate_tree:
+            # a single renamed key (package != dep key) is a rename too:
+            # upstream's craft-cms-v2 alias carries a NEWER rev than the
+            # workspace's craft-cms, with APIs the alias's code calls
+            # (srgb_v2). Rewriting it to the canonical tree silently
+            # compiles against the wrong rev.
+            if pkg not in crate_tree or (len(names) == 1
+                                         and next(iter(names)) == pkg):
                 continue
             canon = _tree_member(ws, repo, crate_tree[pkg], pkg)
             if canon is None:
                 continue
             base = dup_pin_dir(ws, repo, crate_tree[pkg])
-            preferred = pkg if pkg in names else sorted(names)[0]
-            for name in sorted(n for n in names if n != preferred):
+            # same dep name in several tables is NOT a rename: every
+            # occurrence must share the canonical path or cargo rejects
+            # the manifest ("different source paths depending on target")
+            preferred = pkg if pkg in names else None
+            targets = ([n for n in names if n != preferred] if preferred
+                       else list(names))
+            for name in sorted(targets):
                 # the copy RENAMES the package to the dep key: upstream code
                 # already addresses it as <key>, and a distinct package name
                 # keeps the lockfile unambiguous (same name+version from two
@@ -920,7 +955,7 @@ def pin_duplicate_git_crate(stderr_text, ws, tried):
     # fetch every needed tree first: flattening redirects cross trees.
     # A tree flattened for a different crate mapping carries stale
     # redirects (crate flipped to another rev) — refetch it pristine.
-    revs = sorted(set(crate_tree.values()))
+    revs = sorted(set(crate_tree.values()) | declared_git_revs(ws, repo))
     for rev in revs:
         pindir = dup_pin_dir(ws, repo, rev)
         if pindir.is_dir():

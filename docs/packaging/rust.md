@@ -47,8 +47,11 @@
   self-contained; crates whose canonical tree is another rev get version
   build metadata (`0.1.0+<rev8>`): semver-equal, but a distinct lockfile
   entry. Renamed duplicate deps get a physical copy named after the dep
-  key; edits are journaled in `dup-pinned/.renamed-entries.json` and
-  reverted on re-runs that extract a repacked Source0. Rewriting TOML
+  key — copied from the rev the alias pins, NOT the canonical tree (a
+  `craft-cms-v2` alias at `8503f24c` has `srgb_v2`, the workspace's
+  `craft-cms` at `e2dc681a` does not). Edits are journaled in
+  `dup-pinned/.renamed-entries.json` and reverted on re-runs that
+  extract a repacked Source0. Rewriting TOML
   requires scalars-before-subtables (see `_toml_dumps`), or a dep such as
   `quick-xml` silently lands inside `[dependencies.serde]`.
 - `cargo vendor` trees with git deps (e.g. storytold craft-libs) need the
