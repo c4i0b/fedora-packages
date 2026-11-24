@@ -409,25 +409,29 @@ def _toml_val(v):
 
 def _toml_dumps(m):
     """Minimal TOML writer (stdlib has no encoder): scalars/arrays inline,
-    dicts as [table] sections, lists of dicts as [[array-of-tables]]."""
+    dicts as [table] sections, lists of dicts as [[array-of-tables]].
+    Scalars of a table MUST precede its sub-tables or they would attach
+    to the last open section — emit in passes, not in dict order."""
     out = []
 
     def emit(table, prefix):
         aots = {id(v) for k, v in table.items()
                 if isinstance(v, list) and v and all(isinstance(x, dict) for x in v)}
         for k, v in table.items():
-            if isinstance(v, dict):
+            if not isinstance(v, dict) and id(v) not in aots:
+                out.append(f"{_toml_key(k)} = {_toml_val(v)}")
+        for k, v in table.items():
+            if isinstance(v, dict) and id(v) not in aots:
                 name = f"{prefix}.{_toml_key(k)}" if prefix else _toml_key(k)
                 if v:
                     out.append(f"\n[{name}]")
                     emit(v, name)
-            elif id(v) in aots:
+        for k, v in table.items():
+            if id(v) in aots:
                 name = f"{prefix}.{_toml_key(k)}" if prefix else _toml_key(k)
                 for item in v:
                     out.append(f"\n[[{name}]]")
                     emit(item, name)
-            else:
-                out.append(f"{_toml_key(k)} = {_toml_val(v)}")
     emit(m, "")
     return "\n".join(out) + "\n"
 

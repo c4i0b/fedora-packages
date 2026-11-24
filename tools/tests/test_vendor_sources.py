@@ -156,6 +156,16 @@ class FlattenWorkspaceMembers(unittest.TestCase):
         vs.flatten_workspace_members(self.root)
         self.assertEqual(cm.read_text(), before)
 
+    def test_scalars_emitted_before_subtables(self):
+        # a scalar following a sub-table in dict order must still land in
+        # the parent section, not inside the last-open sub-table
+        m = {"dependencies": {"serde": {"version": "1"},
+                              "quick-xml": "0.41"}}
+        s = vs._toml_dumps(m)
+        mm = tomllib.loads(s)
+        self.assertEqual(mm["dependencies"]["quick-xml"], "0.41")
+        self.assertEqual(mm["dependencies"]["serde"], {"version": "1"})
+
     def test_roundtrip_supports_arrays_of_tables_and_nested_targets(self):
         # _toml_dumps must survive [[bin]] sections and target-scoped deps
         self.write("Cargo.toml",
