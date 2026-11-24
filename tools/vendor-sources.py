@@ -470,6 +470,16 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
         if "package" not in m:
             continue  # nested virtual manifest: nothing to inline
         dirty = False
+        # dev-deps of patch targets are never built, and the same dev-only
+        # crate reachable from two trees ("two packages named X in this
+        # workspace") aborts the resolve outright
+        if "dev-dependencies" in m or any(
+                "dev-dependencies" in tv for tv in m.get("target", {}).values()):
+            m.pop("dev-dependencies", None)
+            for tv in m.get("target", {}).values():
+                tv.pop("dev-dependencies", None)
+            dirty = True
+            log(f"{cm}: dropped dev-dependencies (patch target)")
         if re.search(r"workspace\s*=\s*true", text):
             dirty = True  # rewritten even if only formatting changes
             pkg = m["package"]
@@ -769,7 +779,7 @@ def fix_renamed_dup_deps(ws, repo, crate_tree):
                 git = v.get("git") and \
                     re.sub(r"\.git$", "", v["git"].rstrip("/")) == norm
                 if git or pkg in crate_tree:
-                    by_pkg.setdefault(pkg, {}).setdefault(name, []).append(tbl)
+                    by_pkg.setdefault(pkg, {}).setdefault(name, []).append((tbl, v))
         dirty = False
         for pkg, names in by_pkg.items():
             # same dep name in several tables is NOT a rename: every
@@ -783,19 +793,54 @@ def fix_renamed_dup_deps(ws, repo, crate_tree):
             base = dup_pin_dir(ws, repo, crate_tree[pkg])
             preferred = pkg if pkg in names else sorted(names)[0]
             for name in sorted(n for n in names if n != preferred):
+                # the copy RENAMES the package to the dep key: upstream code
+                # already addresses it as <key>, and a distinct package name
+                # keeps the lockfile unambiguous (same name+version from two
+                # paths is a hard collision)
                 copy = base.parent / (base.name + "-"
                                       + re.sub(r"[^A-Za-z0-9.-]", "-", name))
+                src = None
+                for _, v in names[name]:
+                    if v.get("rev"):
+                        src = _tree_member(ws, repo, v["rev"], pkg)
+                        if src is not None:
+                            break
+                if src is None:
+                    src = canon
                 if not copy.is_dir():
-                    shutil.copytree(canon, copy)
-                for tbl in names[name]:
-                    v = tbl[name]
+                    shutil.copytree(src, copy)
+                    cmk = copy / "Cargo.toml"
+                    mm = tomllib.loads(cmk.read_text())
+                    if "package" in mm:
+                        mm["package"]["name"] = name
+                        cmk.write_text(_toml_dumps(mm))
+                    # copied manifests carry paths relative to the SOURCE
+                    # location — re-anchor them at the copy or they dangle
+                    for ccm in copy.rglob("Cargo.toml"):
+                        try:
+                            cmm = tomllib.loads(ccm.read_text())
+                        except tomllib.TOMLDecodeError:
+                            continue
+                        moved = False
+                        orig_parent = (src / ccm.relative_to(copy)).parent
+                        for tbl in _dep_tables(cmm):
+                            for nn, vv in tbl.items():
+                                if isinstance(vv, dict) and "path" in vv:
+                                    tgt = (orig_parent / vv["path"]).resolve()
+                                    vv["path"] = os.path.relpath(
+                                        tgt, ccm.parent.resolve())
+                                    moved = True
+                        if moved:
+                            ccm.write_text(_toml_dumps(cmm))
+                for tbl, v in names[name]:
                     nv = {k: x for k, x in v.items()
                           if k not in ("git", "rev", "branch", "tag", "version",
-                                       "workspace")}
+                                       "workspace", "package")}
                     nv["path"] = os.path.relpath(copy.resolve(), cm.parent)
                     tbl[name] = nv
                 dirty = True
-                log(f"{cm}: duplicated {pkg} dep '{name}' gets its own tree copy")
+                log(f"{cm}: duplicated {pkg} dep '{name}' gets its own "
+                    f"renamed tree copy")
         if dirty:
             cm.write_text(_toml_dumps(m))
 
