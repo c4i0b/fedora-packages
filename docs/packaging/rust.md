@@ -30,14 +30,27 @@
   in %build (see any craft spec).
 - `cargo vendor` refuses the same crate+version pinned at two git revs
   (craft-libs revs drift between craft apps' locks): vendor-sources.py
-  fetches the first source's rev into `dup-pinned/<crate>` and unifies via
-  a path `[patch."<repo>"]` entry. Two traps make the naive patch fail:
-  the repo root is a virtual workspace manifest (not a patch target), and
-  cargo resolves a path target's `workspace = true` inheritance against
-  the patching workspace, not the target's own — so vendor-sources
-  *flattens* the fetched members into standalone manifests (inlining
-  workspace.package/dependencies/lints, rewriting root-relative path deps)
-  before pointing the patch at the member that defines the crate.
+  fetches a tree per lock rev into `dup-pinned/<repo>-<rev8>`, maps each
+  crate to the rev the workspace manifests declare (falling back to the
+  first lock rev for transitive crates), and adds a path
+  `[patch."<repo>"]` entry per crate. **Never pick the first lock rev
+  blindly**: a `[patch]` applies to every git edge for that crate, so an
+  arbitrary rev leaks into consumers compiled against another rev
+  (`craft_xml::El` vs `craft_xml::tree::El`, `wav::Reader` not implementing
+  `ByteSource`). Two more traps make the naive patch fail: the repo root is
+  a virtual workspace manifest (not a patch target), and cargo resolves a
+  path target's `workspace = true` inheritance against the patching
+  workspace, not the target's own — so vendor-sources *flattens* the
+  fetched members into standalone manifests (inlining
+  workspace.package/dependencies/lints, same-repo git refs become in-tree
+  path deps, dangling dev-dep feature refs dropped). Each tree stays
+  self-contained; crates whose canonical tree is another rev get version
+  build metadata (`0.1.0+<rev8>`): semver-equal, but a distinct lockfile
+  entry. Renamed duplicate deps get a physical copy named after the dep
+  key; edits are journaled in `dup-pinned/.renamed-entries.json` and
+  reverted on re-runs that extract a repacked Source0. Rewriting TOML
+  requires scalars-before-subtables (see `_toml_dumps`), or a dep such as
+  `quick-xml` silently lands inside `[dependencies.serde]`.
 - `cargo vendor` trees with git deps (e.g. storytold craft-libs) need the
   `[source."git+https://…"]` blocks cargo vendor prints appended to the
   config the cargo_prep macro writes; vendor-sources.py ships them inside

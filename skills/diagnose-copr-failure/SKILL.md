@@ -48,7 +48,13 @@ spec/SRPM name in the output matches the package you are diagnosing.
   instead of a package manifest`, `error inheriting ... from workspace
   root manifest`) are vendor-sources.py's dup-pinned path patch — the
   fix belongs in tools/vendor-sources.py (flatten + member resolution),
-  never in the package spec.
+  never in the package spec. Binary-stage trait/type mismatches naming
+  two rev trees of the same crate (`craft_xml::El` vs
+  `craft_xml::tree::El`, `wav::Reader: ByteSource`) mean the `[patch]`
+  picked an arbitrary first lock rev instead of the rev the manifests
+  declare (choose_pin_revs). Missing third-party deps in a patched
+  manifest (`cannot find module or crate quick_xml`) mean the TOML writer
+  nested a scalar dep under the previous sub-table (`_toml_dumps`).
 - A noarch package failing every chroot with `Arch dependent binaries in
   noarch package` means ELFs/wasm/platform dirs in the payload — strip them in
   `%install` (see openclaw).

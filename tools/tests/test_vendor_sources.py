@@ -184,5 +184,43 @@ class FlattenWorkspaceMembers(unittest.TestCase):
                          {"version": "1"})
 
 
+class ChoosePinRevs(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+        self.repo = "https://github.com/storytold/craft-libs"
+        self.cmap = {"craft-xml": self.repo, "craft-xfdf": self.repo,
+                     "craft-stream": self.repo, "other": "https://elsewhere"}
+
+    def write(self, rel, text):
+        p = self.root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text)
+
+    def test_declared_rev_wins_over_lock_order(self):
+        self.write("Cargo.toml", "[workspace.dependencies]\n"
+                   'craft-xml = { git = "%s", rev = "1546550b" }\n'
+                   % self.repo)
+        crevs = {"craft-xml": ["010702ee", "1546550b"],
+                 "craft-xfdf": ["1546550b"], "craft-stream": ["010702ee"]}
+        got = vs.choose_pin_revs(self.root, self.repo, self.cmap, crevs)
+        self.assertEqual(got["craft-xml"], "1546550b")
+        self.assertEqual(got["craft-xfdf"], "1546550b")
+        self.assertEqual(got["craft-stream"], "010702ee")
+        self.assertNotIn("other", got)
+
+    def test_override_wins_and_unknown_declared_rev_is_ignored(self):
+        self.write("Cargo.toml", "[workspace.dependencies]\n"
+                   'craft-xml = { git = "%s", rev = "deadbeef" }\n'
+                   % self.repo)
+        crevs = {"craft-xml": ["010702ee", "1546550b"],
+                 "craft-xfdf": ["1546550b"], "craft-stream": ["010702ee"]}
+        got = vs.choose_pin_revs(self.root, self.repo, self.cmap, crevs,
+                                 {"craft-xml": "99999999"})
+        self.assertEqual(got["craft-xml"], "99999999")
+        self.assertEqual(got["craft-stream"], "010702ee")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -712,7 +712,12 @@ def manifest_declared_rev(ws, repo, crate):
             m = tomllib.loads(cm.read_text())
         except tomllib.TOMLDecodeError:
             continue
-        for tbl in _dep_tables(m):
+        tables = list(_dep_tables(m))
+        # apps pin most deps in [workspace.dependencies]; members then
+        # inherit them with `workspace = true` (no rev of their own)
+        if m.get("workspace", {}).get("dependencies"):
+            tables.append(m["workspace"]["dependencies"])
+        for tbl in tables:
             v = tbl.get(crate)
             if isinstance(v, dict) and v.get("git") \
                     and re.sub(r"\.git$", "", v["git"].rstrip("/")) \
@@ -720,6 +725,29 @@ def manifest_declared_rev(ws, repo, crate):
                     and v.get("rev"):
                 return v["rev"]
     return None
+
+
+def choose_pin_revs(ws, repo, cmap, crevs, overrides=None):
+    """Pick the tree rev for every crate drawn from a duplicated repo.
+
+    The lockfile lists a crate's revs in source order, so `crevs[c][0]` is
+    arbitrary: pdfcraft picked craft-xml@010702ee although the app pins
+    1546550b, and effectcraft picked craft-media@30596f73 although both the
+    app and filmcraft pin 33be3562. A [patch] applies to EVERY git edge for
+    that crate, so the arbitrary rev propagates into consumers that were
+    built against another rev (type/trait mismatches at binary build time).
+    Prefer the rev the workspace manifests declare; fall back to the first
+    lock rev for transitive crates that no manifest pins directly.
+    """
+    out = {}
+    for crate, r in cmap.items():
+        if r != repo:
+            continue
+        declared = manifest_declared_rev(ws, repo, crate)
+        out[crate] = (overrides or {}).get(crate) \
+            or (declared if declared in crevs.get(crate, []) else None) \
+            or crevs[crate][0]
+    return out
 
 
 def dup_pin_dir(ws, repo, rev):
@@ -853,9 +881,10 @@ def pin_duplicate_git_crate(stderr_text, ws, tried):
     redirected to each crate's canonical tree during flattening (see
     flatten_workspace_members), which is what keeps the lockfile
     collision-free. Only genuinely duplicated crates need a decision —
-    first lock entry wins, and a "does not have that feature" failure
-    flips that crate to its next rev via `tried`. Path-patched crates stay
-    in-tree and are never vendored. True when a pin was (re)written."""
+    the rev declared by the manifests wins (see choose_pin_revs), and a
+    "does not have that feature" failure flips that crate to its next
+    rev via `tried`. Path-patched crates stay in-tree and are never
+    vendored. True when a pin was (re)written."""
     cmap, crevs = lock_git_crates(ws)
     m = DUP_SOURCES_RE.search(stderr_text)
     sel = re.search(r"failed to select a version for `([A-Za-z0-9_.-]+)`",
@@ -885,12 +914,8 @@ def pin_duplicate_git_crate(stderr_text, ws, tried):
         done.append(cands[0])
         log(f"{dup_crate} pinned at a feature-incompatible rev; "
             f"flipping to {cands[0][:8]}")
-    overrides = tried.get("overrides", {})
-    crate_tree = {}
-    for crate, r in cmap.items():
-        if r != repo:
-            continue
-        crate_tree[crate] = overrides.get(crate, crevs[crate][0])
+    crate_tree = choose_pin_revs(ws, repo, cmap, crevs,
+                                 tried.get("overrides", {}))
     tag = hashlib.md5(repr(sorted(crate_tree.items())).encode()).hexdigest()[:8]
     # fetch every needed tree first: flattening redirects cross trees.
     # A tree flattened for a different crate mapping carries stale
