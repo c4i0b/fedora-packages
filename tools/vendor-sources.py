@@ -442,7 +442,7 @@ def _dep_tables(m):
                 yield tv[k]
 
 
-def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
+def flatten_workspace_members(root, repo=None):
     """Inline `workspace = true` inheritance in every member manifest of the
     workspace at `root` (the fetched dup-pinned tree). Cargo resolves
     inheritance of a [patch] path target — and of everything it reaches via
@@ -451,11 +451,10 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
     a virtual manifest and every crate inherits heavily). With `repo`,
     git deps pointing back at that repository become in-tree path deps —
     they would otherwise reintroduce the duplicate git sources the pin is
-    trying to eliminate. With `crate_tree` (crate -> canonical rev) and
-    `ws`, same-repo references resolve to each crate's CANONICAL tree, so
-    every crate is reachable from exactly one path regardless of which
-    fetched tree mentions it. Manifests are rewritten only when something
-    actually changes (inheritance inlined, a reference rerouted, a
+    trying to eliminate. The tree stays self-contained: cross-tree
+    duplicates are disambiguated by version build metadata instead (see
+    pin_duplicate_git_crate). Manifests are rewritten only when something
+    actually changes (inheritance inlined, a dev-dependency dropped, a
     dangling feature ref dropped)."""
     root = Path(root)
     rm = tomllib.loads((root / "Cargo.toml").read_text())
@@ -509,17 +508,12 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
                         extra["features"] = base["features"] + extra["features"]
                     base.update(extra)
                     v = tbl[name] = base
-                    # same-repo references become path deps: the crate's
-                    # canonical tree when one is assigned (single path per
-                    # crate — two live copies collide in the lockfile), else
-                    # this tree
-                    tgt = None
-                    if crate_tree and ws is not None and name in crate_tree:
-                        tgt = _tree_member(ws, repo, crate_tree[name], name)
-                    if tgt is None and self_repo and isinstance(v.get("git"), str) \
+                    # same-repo git refs become in-tree path deps — the
+                    # tree is self-contained (a git edge would reintroduce
+                    # the duplicate sources the pin is eliminating)
+                    if self_repo and isinstance(v.get("git"), str) \
                             and re.sub(r"\.git$", "", v["git"].rstrip("/")) == self_repo:
                         tgt = crate_member_dir(root, name)
-                    if tgt is not None:
                         v = {k: x for k, x in v.items()
                              if k not in ("git", "rev", "branch", "tag", "version")}
                         v["path"] = os.path.relpath(tgt.resolve(), cm.parent)
@@ -527,32 +521,6 @@ def flatten_workspace_members(root, repo=None, crate_tree=None, ws=None):
                     elif "path" in v:  # root-relative -> member-relative
                         v["path"] = os.path.relpath(
                             (root / v["path"]).resolve(), cm.parent)
-        # second pass: a crate can be a plain registry/version dep in one
-        # table and inherit the (patched) path in another — cargo demands a
-        # single canonical source per crate per manifest, so route EVERY
-        # reference to a crate_tree crate at its canonical path. Applies to
-        # manifests WITHOUT inheritance too (the tree's vendored crates
-        # declare plain registry deps that would otherwise mix instances)
-        if crate_tree and ws is not None:
-            for tbl in _dep_tables(m):
-                for name in list(tbl):
-                    if name not in crate_tree:
-                        continue
-                    v = tbl[name]
-                    if isinstance(v, dict) and v.get("path"):
-                        continue  # already canonical from the pass above
-                    tgt = _tree_member(ws, repo, crate_tree[name], name)
-                    if tgt is None:
-                        continue
-                    extra = {k: x for k, x in v.items()
-                             if k not in ("version", "git", "rev", "branch",
-                                          "tag", "workspace")} \
-                        if isinstance(v, dict) else {}
-                    nv = {"path": os.path.relpath(tgt.resolve(), cm.parent)}
-                    nv.update(extra)
-                    tbl[name] = nv
-                    dirty = True
-                    log(f"{cm}: routing {name} at its canonical dup-pinned tree")
         # features referencing deps absent from the manifest (craft-libs
         # points `snapshot` at a dev-dependency): tolerated inside the
         # original workspace, eagerly rejected in a patch target — drop
@@ -693,9 +661,26 @@ def set_patch_entries(ws, repo, entries):
 
 def reset_dup_pin_state(ws):
     """A re-run may extract a Source0 that a previous run re-packed WITH
-    our dup-pin patches (tagged Cargo.toml entries, dup-pinned trees, a
-    lock resolved against them) — strip them so vendoring starts from the
-    pristine upstream state and re-resolves."""
+    our dup-pin patches (tagged Cargo.toml entries, renamed dep rewrites,
+    dup-pinned trees, a lock resolved against them) — strip them so
+    vendoring starts from the pristine upstream state and re-resolves."""
+    journal = Path(ws) / "dup-pinned" / ".renamed-entries.json"
+    if journal.is_file():
+        for rel, entries in json.loads(journal.read_text()).items():
+            cm = Path(ws) / rel
+            if not cm.is_file():
+                continue
+            try:
+                m = tomllib.loads(cm.read_text())
+            except tomllib.TOMLDecodeError:
+                continue
+            for key, orig in entries.items():
+                for tbl in _dep_tables(m):
+                    if key in tbl:
+                        tbl[key] = orig
+                        break
+            cm.write_text(_toml_dumps(m))
+            log(f"restored renamed dep edits in {rel}")
     shutil.rmtree(Path(ws) / "dup-pinned", ignore_errors=True)
     manifest = Path(ws) / "Cargo.toml"
     if not manifest.is_file():
@@ -759,8 +744,12 @@ def fix_renamed_dup_deps(ws, repo, crate_tree):
     Once the repo is path-patched both edges collapse onto a single
     package and cargo rejects the duplicate ("depends on crate multiple
     times with different names"). Give every extra key its own physical
-    copy of the canonical member so the instances stay distinct."""
+    copy of the canonical member so the instances stay distinct. Edits
+    are recorded in dup-pinned/.renamed-entries.json so a re-run can
+    restore the pristine manifests (the repacked Source0 carries them)."""
     norm = re.sub(r"\.git$", "", repo.rstrip("/"))
+    journal = Path(ws) / "dup-pinned" / ".renamed-entries.json"
+    undo = json.loads(journal.read_text()) if journal.is_file() else {}
     for cm in Path(ws).rglob("Cargo.toml"):
         if any(p in ("vendor-deps", "vendor") for p in cm.relative_to(ws).parts[:-1]):
             continue
@@ -838,11 +827,15 @@ def fix_renamed_dup_deps(ws, repo, crate_tree):
                                        "workspace", "package")}
                     nv["path"] = os.path.relpath(copy.resolve(), cm.parent)
                     tbl[name] = nv
+                    undo.setdefault(cm.relative_to(ws).as_posix(), {})[name] = v
                 dirty = True
                 log(f"{cm}: duplicated {pkg} dep '{name}' gets its own "
                     f"renamed tree copy")
         if dirty:
             cm.write_text(_toml_dumps(m))
+    if undo:
+        journal.parent.mkdir(parents=True, exist_ok=True)
+        journal.write_text(json.dumps(undo))
 
 
 def pin_duplicate_git_crate(stderr_text, ws, tried):
@@ -921,7 +914,24 @@ def pin_duplicate_git_crate(stderr_text, ws, tried):
     for rev in revs:
         pindir = dup_pin_dir(ws, repo, rev)
         if not (pindir / f".flattened-{tag}").is_file():
-            flatten_workspace_members(pindir, repo, crate_tree, ws)
+            flatten_workspace_members(pindir, repo)
+            # crates whose canonical tree is another rev keep their own
+            # instance here (self-contained tree): version build metadata
+            # makes the lockfile entry distinct — same name+version from
+            # two paths is an ambiguous-lock hard error, and metadata is
+            # semver-equal so every ^/=0.1.0 requirement still matches
+            for cm in sorted(pindir.rglob("Cargo.toml")):
+                try:
+                    mm = tomllib.loads(cm.read_text())
+                except tomllib.TOMLDecodeError:
+                    continue
+                name = mm.get("package", {}).get("name")
+                ver = mm.get("package", {}).get("version", "")
+                if not name or crate_tree.get(name, rev) == rev \
+                        or "+" in ver:
+                    continue
+                mm["package"]["version"] = f"{ver}+{rev[:8]}"
+                cm.write_text(_toml_dumps(mm))
             (pindir / f".flattened-{tag}").touch()
     log(f"duplicate git sources from {repo}; patching its "
         f"{len(entries)} lock crates to per-crate rev trees")
