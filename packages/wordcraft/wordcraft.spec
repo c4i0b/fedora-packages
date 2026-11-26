@@ -1,5 +1,5 @@
 Name:           wordcraft
-Version:        0.18.1
+Version:        0.19.1
 Release:        1%{?dist}
 Summary:        Word processor with docx support, track changes and mail merge
 
@@ -77,6 +77,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/icons/hicolor/*/apps/*
 
 %changelog
+* Thu Nov 26 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.19.1-1
+- Update to 0.19.1
+
 * Thu Nov 12 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.18.1-1
 - Update to 0.18.1
 
