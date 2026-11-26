@@ -40,11 +40,17 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           docker push "ghcr.io/${{ github.repository_owner }}/fedora-packages-ci:${{ steps.tag.outputs.tag }}"
           # new GHCR packages default to private; job `container:` pulls carry
-          # no token, so the image must be public
-          gh api --method PATCH "/user/packages/container/fedora-packages-ci" \
-            -f visibility=public || \
-            echo "::warning::could not set visibility; flip it manually in package settings"
-        env:
-          # gh never reads the runner token implicitly; without this the PATCH
-          # above always fails into the warning branch
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # no token, so the image must be public. GITHUB_TOKEN authenticates
+          # as the repo installation, which cannot PATCH /user/packages/...
+          # (404), so the flip cannot be automated — verify the real state
+          # instead and fail loud when it drifts
+          name="${{ github.repository_owner }}/fedora-packages-ci"
+          token="$(curl -s "https://ghcr.io/token?scope=repository:${name}:pull" | sed 's/.*"token":"\([^"]*\)".*/\1/')"
+          code="$(curl -s -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer $token" \
+            -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.docker.distribution.manifest.v2+json' \
+            "https://ghcr.io/v2/${name}/manifests/${{ steps.tag.outputs.tag }}")"
+          [ "$code" = 200 ] || {
+            echo "::error::image is not publicly pullable (anonymous manifest GET: HTTP $code). Flip ghcr.io/${name} to public in package settings — this workflow cannot (repo-scoped token)."
+            exit 1
+          }
