@@ -1,5 +1,5 @@
 Name:           wifit3
-Version:        0.7.2
+Version:        0.7.3
 Release:        1%{?dist}
 Summary:        Wireless auditor TUI talking to USB Wi-Fi adapters from userland
 
@@ -52,6 +52,9 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 %{_bindir}/wifit3
 
 %changelog
+* Thu Nov 26 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.7.3-1
+- Update to 0.7.3
+
 * Sat Nov 21 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.7.2-1
 - Update to 0.7.2
 
