@@ -73,7 +73,7 @@ jobs:
       # filtering re-packs them): its hash is part of the key so a recipe
       # change can never be served a tarball repacked by an older one (a
       # stale one poisoned soundcraft's vendor step with cargo exit 101).
-      - uses: actions/cache/restore@2c8a9bd7457de244a408f35966fab2fb45fda9c8
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         id: sources_cache
         with:
           path: |
