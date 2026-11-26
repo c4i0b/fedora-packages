@@ -44,3 +44,7 @@ jobs:
           gh api --method PATCH "/user/packages/container/fedora-packages-ci" \
             -f visibility=public || \
             echo "::warning::could not set visibility; flip it manually in package settings"
+        env:
+          # gh never reads the runner token implicitly; without this the PATCH
+          # above always fails into the warning branch
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
