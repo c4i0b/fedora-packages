@@ -63,11 +63,13 @@ BADGE_REV = 2  # bump to force GitHub camo to re-fetch every badge URL
 
 retries = 0
 
-def get(url, tries=3):
+def get(url, tries=5):
     # the results CDN (CloudFront -> packages.redhat.com/S3 redirects) drops
-    # or mis-serves occasional requests; retry with growing backoff. Each
-    # retry is printed (host+path, no cache-buster query) so CDN flakiness
-    # is visible in the run log, not just a silent delay
+    # or mis-serves occasional requests, and runner networking can blip
+    # "Network is unreachable" for tens of seconds (seen 2026-11-26 killing
+    # the monitor fetch); retry with growing backoff. Each retry is printed
+    # (host+path, no cache-buster query) so CDN flakiness is visible in the
+    # run log, not just a silent delay
     global retries
     short = re.sub(r"^[a-z]+://", "", url).split("?")[0]
     for attempt in range(tries):
@@ -80,7 +82,7 @@ def get(url, tries=3):
                 raise
             retries += 1
             print(f"WARNING: retry {attempt + 1}/{tries} for {short}")
-            time.sleep(2 * (attempt + 1))
+            time.sleep(min(30, 3 * 2 ** attempt))
 
 mon = json.loads(get(
     f"https://copr.fedorainfracloud.org/api_3/monitor?ownername={owner}&projectname={project}"
