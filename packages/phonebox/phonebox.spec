@@ -1,5 +1,5 @@
 Name:           phonebox
-Version:        0.9.31
+Version:        0.9.32
 Release:        1%{?dist}
 Summary:        Desktop agent that turns an old Android phone into a desk panel and touch control deck
 
@@ -115,6 +115,9 @@ EOF
 %{userunitdir}/phonebox.service
 
 %changelog
+* Sat Nov 28 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.9.32-1
+- Update to 0.9.32
+
 * Fri Nov 27 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.9.31-1
 - Update to 0.9.31
 
