@@ -1,5 +1,5 @@
 %global goipath         github.com/charmbracelet/crush
-Version:        0.103.0
+Version:        0.104.0
 
 %gometa -L -f
 
@@ -72,6 +72,9 @@ install -Dpm644 crush.1 %{buildroot}%{_mandir}/man1/crush.1
 %{_mandir}/man1/crush.1*
 
 %changelog
+* Sat Nov 28 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.104.0-1
+- Update to 0.104.0
+
 * Fri Nov 27 2026 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> - 0.103.0-1
 - Update to 0.103.0
 
